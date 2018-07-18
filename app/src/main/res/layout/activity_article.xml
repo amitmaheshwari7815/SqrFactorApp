@@ -56,6 +56,7 @@
                 android:background="@android:color/transparent"
                 android:hint="Title"
                 android:padding="5sp"
+                android:id="@+id/articleTitle"
                 android:inputType="text"/>
 
         </android.support.design.widget.TextInputLayout>
@@ -75,21 +76,69 @@
                 android:layout_gravity="center_horizontal"
                 android:background="@android:color/transparent"
                 android:hint="Short Description"
+                android:id="@+id/articleShortDescription"
                 android:padding="5sp"
                 android:inputType="text"/>
 
         </android.support.design.widget.TextInputLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:background="@drawable/gray_border"
+    android:orientation="vertical">
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
 
-        <EditText
+            <ImageButton
+                android:id="@+id/article_insert_image"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_add_a_photo"
+                />
+            <ImageButton
+                android:id="@+id/article_insert_video"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_video"/>
+            <ImageButton
+                android:id="@+id/article_insert_link"
+                android:layout_width="48dp"
+                android:layout_height="40dp"
+                android:background="@null"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_insert_link"
+                />
+
+        </LinearLayout>
+
+        <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="200sp"
-            android:background="@drawable/gray_border"
-            android:padding="15sp"
-            android:inputType="text"
-            android:layout_margin="10sp"
-            android:gravity="top"/>
+            android:layout_height="wrap_content">
+            <com.github.irshulx.Editor
+                android:layout_width="match_parent"
+                android:id="@+id/editor"
+                app:render_type="Editor"
+                app:placeholder="Type your text, add pictures and videos link here..."
+                android:paddingTop="10dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:layout_height="wrap_content"
+                android:paddingBottom="100dp"
+                />
+        </ScrollView>
 
-        <android.support.design.widget.TextInputLayout
+    </LinearLayout>
+
+
+
+    <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="60sp"
             android:layout_margin="10sp"
@@ -104,37 +153,53 @@
                 android:layout_gravity="center_horizontal"
                 android:background="@android:color/transparent"
                 android:hint="Tags | Separate tags with commas"
+                android:id="@+id/articleTags"
                 android:padding="5sp"
                 android:inputType="text"/>
 
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <ImageView
             android:layout_width="match_parent"
-            android:layout_height="60sp"
+            android:layout_height="150sp"
             android:layout_margin="10sp"
-            android:background="@drawable/gray_border"
-            android:padding="10sp"
-            app:hintTextAppearance="@color/colorPrimary"
-            android:layout_gravity="center">
+            android:id="@+id/cropFinalImage"/>
 
-            <EditText
-                android:layout_width="match_parent"
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="60sp"
+            android:background="@drawable/gray_border"
+            android:layout_margin="10sp"
+            android:padding="10sp"
+           >
+
+            <TextView
+                android:id="@+id/articleSelectBaneerImage"
+                android:layout_width="314dp"
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:background="@android:color/transparent"
+                android:gravity="center_vertical"
                 android:hint="Select Banner Image"
-                android:padding="5sp"
-                android:inputType="text"/>
+                android:inputType="text"
+                android:textSize="18dp" />
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity=""
+                android:src="@drawable/ic_attach_file_black_24dp"
+                android:id="@+id/selectBanerImageIcon"/>
 
-        </android.support.design.widget.TextInputLayout>
-
+        </LinearLayout>
         <Button
             android:layout_width="100sp"
             android:layout_height="60sp"
             android:background="@drawable/sqr_factor_btn_color"
             android:text="Save"
             android:textAllCaps="false"
+            android:id="@+id/saveArticle"
             android:textSize="20sp"
             android:textColor="#ffffff"
             android:textStyle="bold"

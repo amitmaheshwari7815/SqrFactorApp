@@ -5,10 +5,9 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/img"
+        android:id="@+id/chat_frnd_profile"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:src="@drawable/profilepic"
         android:padding="10dp"/>
 
     <LinearLayout
@@ -18,7 +17,7 @@
         android:layout_gravity="center_vertical">
 
         <TextView
-            android:id="@+id/tv1"
+            android:id="@+id/chat_frnd_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10sp"
@@ -29,7 +28,7 @@
             android:textSize="15sp"/>
 
         <TextView
-            android:id="@+id/tv2"
+            android:id="@+id/chat_last_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10sp"

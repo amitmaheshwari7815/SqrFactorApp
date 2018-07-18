@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
@@ -9,6 +10,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -33,7 +35,15 @@ public class HomeScreen extends ToolbarActivity {
         actionBar.setDisplayHomeAsUpEnabled(true);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new TrophyFragment()).commit();
+        SharedPreferences sharedPreferences = getSharedPreferences("PREF_NAME",MODE_PRIVATE);
+        String token = sharedPreferences.getString("TOKEN","sqr");
+        TokenClass.Token=token;
+        TokenClass tokenClass=new TokenClass(token);
+        Log.v("Token1",token);
+
+        //getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new TrophyFragment()).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NewsFeedFragment()).commit();
+
 
         tabLayout = (TabLayout)findViewById(R.id.tabs);
 
@@ -58,8 +68,6 @@ public class HomeScreen extends ToolbarActivity {
                 switch (tab.getPosition()){
 
                     case 0:
-
-                        break;
 
                     case 1:
                         tab.setIcon(R.drawable.envelope_filled);

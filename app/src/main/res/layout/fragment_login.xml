@@ -28,6 +28,7 @@
         android:layout_gravity="center">
 
         <EditText
+            android:id="@+id/loginEmail"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"
@@ -48,6 +49,7 @@
         android:layout_gravity="center">
 
         <EditText
+            android:id="@+id/loginPassword"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center_horizontal"

@@ -24,7 +24,6 @@
             android:gravity="center_vertical"
             android:textColor="#2b2a2a"
             android:layout_weight="1"
-            android:background="@drawable/gray_border"
             android:padding="5dp"/>
         <TextView
             android:layout_width="0sp"
@@ -37,7 +36,6 @@
             android:gravity="center"
             android:textColor="#2b2a2a"
             android:layout_weight="1"
-            android:background="@drawable/gray_border"
             android:padding="5dp"/>
         <!--<TextView-->
             <!--android:layout_width="wrap_content"-->
@@ -61,7 +59,6 @@
             android:id="@+id/firstWeekViews"
             android:textColor="#2b2a2a"
             android:layout_weight="1"
-            android:background="@drawable/gray_border"
             android:padding="5dp"/>
         <TextView
             android:layout_width="0sp"
@@ -74,7 +71,6 @@
             android:text="10$ Redeemes"
             android:textColor="#f70505"
             android:layout_weight="1"
-            android:background="@drawable/gray_border"
             android:padding="5dp"/>
 
     </LinearLayout>

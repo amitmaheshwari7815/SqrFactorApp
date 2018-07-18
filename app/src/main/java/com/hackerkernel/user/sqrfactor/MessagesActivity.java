@@ -1,26 +1,44 @@
 package com.hackerkernel.user.sqrfactor;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.GestureDetector;
-import android.view.MotionEvent;
+import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class MessagesActivity extends ToolbarActivity {
 
+    private ArrayList<ChatFriends> chatFriends = new ArrayList<>();
+    private ChatAdapter chatAdapter;
     RecyclerView recycler;
-    RecyclerView.Adapter adapter;
-    LinearLayoutManager linearLayoutManager;
+    LinearLayoutManager layoutManager;
+    public static String userProfile,userName;
+    public static int userId;
 
-    String names[] = {"Keanu Reeves", "Henry Cavill", "Henry Cavill"};
-    String desc[] = {"Have you watched The Matrix?", "I belong to DC!", "I am Henry's doppleganger!"};
-    Drawable dw1, dw2, dw3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +48,8 @@ public class MessagesActivity extends ToolbarActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //ActionBar actionBar = getSupportActionBar();
-        //actionBar.setDisplayHomeAsUpEnabled(true);
-
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -42,74 +59,107 @@ public class MessagesActivity extends ToolbarActivity {
             }
         });
 
-        dw1 = getApplicationContext().getResources().getDrawable(R.drawable.profilepic);
-        dw2 = getApplicationContext().getResources().getDrawable(R.drawable.henry);
-        dw3 = getApplicationContext().getResources().getDrawable(R.drawable.henry);
-
-        Drawable drawables[] = {dw1, dw2, dw3};
-
-        recycler = (RecyclerView)findViewById(R.id.recycler);
+        recycler = (RecyclerView)findViewById(R.id.msg_recycler);
         recycler.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recycler.setLayoutManager(layoutManager);
+        chatAdapter = new ChatAdapter(chatFriends,this);
+        recycler.setAdapter(chatAdapter);
 
-        linearLayoutManager = new LinearLayoutManager(this);
-        recycler.setLayoutManager(linearLayoutManager);
-
-        adapter = new MessageAdapter(names, desc, drawables);
-        recycler.setAdapter(adapter);
-
-        DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), linearLayoutManager.getOrientation());
+        DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation());
         recycler.addItemDecoration(decoration);
 
-        recycler.addOnItemTouchListener(new TouchListener(this, new ClickListener() {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/message/105",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONObject user=jsonObject.getJSONObject("user");
+                            userProfile=user.getString("profile");
+                            userName=user.getString("name");
+                            userId=user.getInt("id");
+
+                            JSONArray jsonArrayData = jsonObject.getJSONArray("friends");
+                            for (int i = 0; i < jsonArrayData.length(); i++) {
+                                Log.v("Response",response);
+                                ChatFriends chatFriends1 = new ChatFriends(jsonArrayData.getJSONObject(i));
+                                chatFriends.add(chatFriends1);
+                            }
+                            chatAdapter.notifyDataSetChanged();
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
             @Override
-            public void onClick(View view, int position) {
-                if (position==1){
-                    Intent i = new Intent(getApplicationContext(), ChatroomActivity.class);
-                    startActivity(i);
-                }
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+                return params;
             }
-        }));
+
+        };
+
+        requestQueue.add(myReq);
+
+
+
+//        PusherOptions options = new PusherOptions();
+//        options.setCluster("ap2");
+//        Pusher pusher = new Pusher("f3973acd596886c25549", options);
+//
+//        Channel channel = pusher.subscribe("my-channel");
+//
+//        channel.bind("my-event", new SubscriptionEventListener() {
+//                    @Override
+//                    public void onEvent(String channelName, String eventName, final String data) {
+//                        System.out.println(data);
+//                        Log.v("Data", data);
+//
+//
+//                        runOnUiThread(new Runnable() {
+//
+//                            @Override
+//                            public void run() {
+//                                try {
+//                                    final JSONObject jsonObject = new JSONObject(data);
+//                                    name.setText(jsonObject.getString("name"));
+//                                    message.setText(jsonObject.getString("message"));
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                }
+//
+//                            }
+//                        });
+//
+//
+//                    }
+//                });
+//
+//
+//        pusher.connect();
+//
+//    }
+    }
 
     }
 
-    public interface ClickListener{
-        public void onClick(View view, int position);
-    }
 
-    class TouchListener implements RecyclerView.OnItemTouchListener{
-        private ClickListener clickListener;
-        private GestureDetector gestureDetector;
-
-        public TouchListener(Context context, ClickListener clickListener) {
-
-            this.clickListener = clickListener;
-            gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
-                @Override
-                public boolean onSingleTapUp(MotionEvent e) {
-                    return true;
-                }
-            });
-        }
-
-        @Override
-        public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-            View child = rv.findChildViewUnder(e.getX(), e.getY());
-            if (child!=null && clickListener!=null && gestureDetector.onTouchEvent(e))
-                clickListener.onClick(child, rv.getChildAdapterPosition(child));
-
-            return false;
-        }
-
-        @Override
-        public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-
-        }
-
-        @Override
-        public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
-
-        }
-
-    }
-
-}
