@@ -1,7 +1,9 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -130,6 +132,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/chat/sendChat"
                 ,
                 new Response.Listener<String>() {
+                    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
@@ -157,6 +160,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                     }
                 }) {
 
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
