@@ -47,7 +47,7 @@ public class NotificationsActivity extends ToolbarActivity {
         recycler.setHasFixedSize(true);
         recycler.setLayoutManager(linearLayoutManager);
 
-        adapter = new com.hackerkernel.user.sqrfactor.MyAdapter(s);
+        adapter = new NotificationsAdapter(s);
         recycler.setAdapter(adapter);
 
         DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), linearLayoutManager.getOrientation());

@@ -267,7 +267,7 @@ public class StatusFragment extends Fragment {
         progressBar.setVisibility(View.VISIBLE);
 
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/news_feed",
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/parse/news-feed",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

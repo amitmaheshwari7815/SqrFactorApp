@@ -10,18 +10,18 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
+public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder>{
 
     String text;
 
-    public MyAdapter(String s) {
+    public NotificationsAdapter(String s) {
         text = s;
     }
 
     @NonNull
 
     @Override
-    public MyAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public NotificationsAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
         LinearLayout ll = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.notifications_layout, parent, false);
 
@@ -31,8 +31,8 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyAdapter.ViewHolder holder, int position) {
-        holder.tv.setText(Html.fromHtml(text));
+    public void onBindViewHolder(@NonNull NotificationsAdapter.ViewHolder holder, int position) {
+        holder.notification.setText(Html.fromHtml(text));
     }
 
     @Override
@@ -42,13 +42,13 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder>{
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView tv;
+        public TextView notification;
 
         public ViewHolder(View itemView) {
 
             super(itemView);
 
-            tv = (TextView)itemView.findViewById(R.id.tv);
+            notification = (TextView)itemView.findViewById(R.id.notification_line);
 
         }
     }
