@@ -1,5 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
+import com.google.gson.JsonObject;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,14 +13,14 @@ public class NewsFeedStatus implements Serializable {
     public String userImageUrl,authImageUrl,authName,time,postTitle,shortDescription,postImage,fullDescription;
     public String like,comments,share;
     public String commentProfileImageUrl,commentUserName,commentTime,commentDescription,commentLike;
-    public int postId,userId;
+    public int postId,userId,sharedId, commentId;
     public transient JSONObject jsonObject;
     public ArrayList<comments_limited> commentsLimitedArrayList=new ArrayList<>();
 
 
 
 
-    public NewsFeedStatus(int postId, int userId,String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String like, String comments, String share, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike) {
+    public NewsFeedStatus(int postId, int userId,int sharedId,int commentId,String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String like, String comments, String share, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike) {
         this.userImageUrl = userImageUrl;
         this.authImageUrl = authImageUrl;
         this.authName = authName;
@@ -36,6 +38,8 @@ public class NewsFeedStatus implements Serializable {
         this.commentLike = commentLike;
         this.postId = postId;
         this.userId = userId;
+        this.sharedId = sharedId;
+        this.commentId = commentId;
     }
 
 
@@ -57,8 +61,10 @@ public class NewsFeedStatus implements Serializable {
                 this.userImageUrl = jsonObject.getString("image");
                 this.postImage = jsonObject.getString("banner_image");
                 this.shortDescription = jsonObject.getString("short_description");
+                this.fullDescription = jsonObject.getString("description");
                 this.time =jsonObject.getString("updated_at");
                 this.comments =jsonObject.getString("comments_count");
+                this.sharedId = jsonObject.getInt("shared_id");
 
                 JSONObject user = jsonObject.getJSONObject("user");
                 this.authName=user.getString("first_name")+ user.getString("last_name");
@@ -73,7 +79,7 @@ public class NewsFeedStatus implements Serializable {
                {
                    try {
                        JSONObject jsonObject1=commentsLimited.getJSONObject(i);
-
+                        this.commentId = jsonObject1.getInt("id");
                        comments_limited limited=new comments_limited(jsonObject1.getJSONArray("likes").length(),jsonObject1.getJSONObject("user").getString("first_name")+" "+jsonObject1.getJSONObject("user").getString("last_name"),
                                jsonObject1.getJSONObject("user").getString("profile"),jsonObject1.getInt("id"),jsonObject1.getInt("user_id"),
                                jsonObject1.getInt("commentable_id"),jsonObject1.getString("commentable_type"),
@@ -179,6 +185,14 @@ public class NewsFeedStatus implements Serializable {
         return share;
     }
 
+    public int getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
+    }
+
     public void setShare(String share) {
         this.share = share;
     }
@@ -233,6 +247,22 @@ public class NewsFeedStatus implements Serializable {
 
     public void setPostId(int postId) {
         this.postId = postId;
+    }
+
+    public int getSharedId() {
+        return sharedId;
+    }
+
+    public void setSharedId(int sharedId) {
+        this.sharedId = sharedId;
+    }
+
+    public JSONObject getJsonObject() {
+        return jsonObject;
+    }
+
+    public void setJsonObject(JSONObject jsonObject) {
+        this.jsonObject = jsonObject;
     }
 
     public int getUserId() {

@@ -187,7 +187,7 @@ public class CommentsPage extends ToolbarActivity {
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String,String> params = new HashMap<>();
 
-                        params.put("commentable_id",newsFeedStatus.getCommentsLimitedArrayList().get(0).getComment_limited_commentable_id()+"");
+                        params.put("commentable_id",newsFeedStatus.getSharedId()+"");
 //
                         params.put("comment_text",commentWrite.getText().toString());
 

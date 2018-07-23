@@ -122,9 +122,9 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     public class MyViewHolder extends RecyclerView.ViewHolder {
          ImageView userImageUrl,authImageUrl,postImage,commentProfileImageUrl;
          TextView authName,time,postTitle,shortDescription,fullDescription,comments,share,
-                 commentUserName,commentTime,commentDescription,commentLike;
+                 commentUserName,commentTime,commentDescription,commentLike,writeComment;
          ImageButton like;
-         Button likelist;
+         Button likelist,commentPostbtn;
 
 
          TextView postId,userId;
@@ -140,7 +140,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             time=(TextView)itemView.findViewById(R.id.news_post_time);
             postTitle=(TextView)itemView.findViewById(R.id.news_post_title);
             shortDescription=(TextView)itemView.findViewById(R.id.news_short_Descrip);
-//            fullDescription=(TextView)itemView.findViewById(R.id.demo);
+            fullDescription=(TextView)itemView.findViewById(R.id.news_full_Descrip);
             like=(ImageButton) itemView.findViewById(R.id.news_post_like);
             comments=(TextView)itemView.findViewById(R.id.news_comment);
             share=(TextView)itemView.findViewById(R.id.news_share);
@@ -149,6 +149,56 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             commentDescription=(TextView)itemView.findViewById(R.id.news_comment_descrip);
             commentLike=(TextView)itemView.findViewById(R.id.news_commnent_like);
             likelist =(Button) itemView.findViewById(R.id.news_post_likeList);
+            writeComment =(TextView)itemView.findViewById(R.id.news_user_commnentEdit);
+            commentPostbtn =(Button)itemView.findViewById(R.id.news_comment_post);
+            commentPostbtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String s) {
+                                    Log.v("ResponseLike",s);
+                                    writeComment.setText("");
+
+//                        //Showing toast message of the response
+//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError volleyError) {
+
+                                    //Showing toast
+//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                                }
+                            }){
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put("Accept", "application/json");
+                            params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                            return params;
+                        }
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            Map<String,String> params = new HashMap<>();
+
+                            params.put("commentable_id",newsFeedStatuses.get(getAdapterPosition()).getSharedId()+"");
+//
+                            params.put("comment_text",writeComment.getText().toString());
+
+                            //returning parameters
+                            return params;
+                        }
+                    };
+
+                    //Adding request to the queue
+                    requestQueue.add(stringRequest);
+                }
+            });
             likelist.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -208,10 +258,9 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                             Map<String,String> params = new HashMap<>();
                             //Adding parameters
 //                 params.put("image_value",image);
-                            params.put("likeable_id",newsFeedStatuses.get(getAdapterPosition()).getPostId()+"");
-//                        params.put("likeable_type","user_post_share");
-                            params.put("user_id",newsFeedStatuses.get(getAdapterPosition()).getUserId()+"");
-
+                            params.put("likeable_id",newsFeedStatuses.get(getAdapterPosition()).getSharedId()+"");
+                            params.put("likeable_type","users_post_share");
+//                            params.put("user_id",newsFeedStatuses.get(getAdapterPosition()).getUserId()+"");
                             //returning parameters
                             return params;
                         }
@@ -255,7 +304,9 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                     commentLike.setTextColor(context.getColor(R.color.gray));
                     flag = 0;
                     }
+
                 context.startActivity(new Intent(context,CommentsPage.class));
+
             }
 
         });

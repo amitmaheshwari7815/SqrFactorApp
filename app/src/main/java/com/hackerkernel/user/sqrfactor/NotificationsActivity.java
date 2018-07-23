@@ -50,7 +50,7 @@ public class NotificationsActivity extends ToolbarActivity {
         adapter = new NotificationsAdapter(s);
         recycler.setAdapter(adapter);
 
-        DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), linearLayoutManager.getOrientation());
+        DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(),linearLayoutManager.getOrientation());
         recycler.addItemDecoration(decoration);
 
     }

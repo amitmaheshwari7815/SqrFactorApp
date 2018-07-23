@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.hackerkernel.user.sqrfactor">
-<uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.CAMERA"/>
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
 
     <application
         android:allowBackup="true"
@@ -25,8 +25,9 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".HomeScreen"
-            android:windowSoftInputMode="adjustPan"/>
+        <activity
+            android:name=".HomeScreen"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name=".Index">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -123,15 +124,18 @@
         <activity
             android:name=".FollowersActivity"
             android:label="Followers" />
-        <activity android:name=".BlueprintActivity"
-            android:label="Blueprints"/>
-        <activity android:name=".PortfolioActivity"
-            android:label="Portfolios"/>
-        <activity android:name=".FollowingActivity"
-            android:label="Following">
-        </activity>
-        <activity android:name=".MessagesActivity"/>
-        <activity android:name=".ChatWithAFriendActivity"/>
+        <activity
+            android:name=".BlueprintActivity"
+            android:label="Blueprints" />
+        <activity
+            android:name=".PortfolioActivity"
+            android:label="Portfolios" />
+        <activity
+            android:name=".FollowingActivity"
+            android:label="Following"></activity>
+        <activity android:name=".MessagesActivity" />
+        <activity android:name=".ChatWithAFriendActivity" />
+        <activity android:name=".UserProfileActivity"></activity>
     </application>
 
 </manifest>

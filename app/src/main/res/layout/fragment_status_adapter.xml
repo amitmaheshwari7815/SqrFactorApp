@@ -101,6 +101,12 @@
                     android:layout_height="wrap_content"
                     android:text="Check out this new design, by me."
                     android:textStyle="bold"/>
+                <TextView
+                    android:id="@+id/news_full_Descrip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Check out this new design, by me."
+                    android:textStyle="bold"/>
 
                 <ImageView
                     android:id="@+id/news_post_image"
