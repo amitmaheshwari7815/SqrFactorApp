@@ -6,13 +6,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UserProfileClass {
-    private String user_name,name,first_name,last_name,profile,email,mobile_number,user_type,postType,post_title,banner_image,short_description,description;
-    private String like,comment,share;
-    private int user_id,post_id,post_user_id;
-    private JSONObject jsonObject;
+import java.util.ArrayList;
 
-    public UserProfileClass(int user_id,String name, String user_name, String first_name, String last_name, String profile, String email, String mobile_number, String user_type) {
+public class UserProfileClass {
+    private String user_name,name,first_name,last_name,profile,email,mobile_number,user_type,post_time,postType,post_title,post_image,banner_image,short_description,description;
+    private String like,comment,share;
+    public String commentProfileImageUrl,commentUserName,commentTime,commentDescription,commentLike;
+    private int user_id,post_id,post_user_id,sharedId, commentId;
+    private JSONObject jsonObject;
+    private int followerscnt,followingcont,portfoliocnt;
+    public ArrayList<comments_limited> commentsLimitedArrayList=new ArrayList<>();
+
+    public UserProfileClass(int user_id,int post_id,int post_user_id,int sharedId, int commentId,String like,String comment,String share,String postType,String post_time,String post_title,String post_image,String banner_image,String short_description,String description,String commentDescription,String commentProfileImageUrl,String commentUserName, String commentLike,String commentTime,String name, String user_name, String first_name, String last_name, String profile, String email, String mobile_number, String user_type) {
         this.user_name = user_name;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -22,7 +27,33 @@ public class UserProfileClass {
         this.user_type = user_type;
         this.user_id = user_id;
         this.name = name;
+        this.postType = postType;
+        this.post_id = post_id;
+        this.post_title = post_title;
+        this.post_time = post_time;
+        this.post_image= post_image;
+        this.banner_image = banner_image;
+        this.short_description = short_description;
+        this.description = description;
+        this.like = like;
+        this.comment = comment;
+        this.share = share;
+        this.commentProfileImageUrl = commentProfileImageUrl;
+        this.commentUserName = commentUserName;
+        this.commentTime = commentTime;
+        this.commentDescription = commentDescription;
+        this.commentLike = commentLike;
     }
+
+
+    public ArrayList<comments_limited> getCommentsLimitedArrayList() {
+        return commentsLimitedArrayList;
+    }
+
+    public void setCommentsLimitedArrayList(ArrayList<comments_limited> commentsLimitedArrayList) {
+        this.commentsLimitedArrayList = commentsLimitedArrayList;
+    }
+
     public UserProfileClass(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
 
@@ -40,8 +71,39 @@ public class UserProfileClass {
             JSONObject jsonPost = jsonObject.getJSONObject("posts");
             JSONArray jsonArrayData = jsonPost.getJSONArray("data");
             for (int i = 0; i < jsonArrayData.length(); i++) {
-                JSONObject jsonObject1= jsonArrayData.getJSONObject(i);
+                JSONObject post= jsonArrayData.getJSONObject(i);
+                this.user_id = post.getInt("user_id");
+                this.post_title = post.getString("title");
+                this.banner_image = post.getString("banner_image");
+                this.short_description = post.getString("short_description");
+                this.description = post.getString("description");
+                this.post_image = post.getString("image");
+                this.post_time = post.getString("updated_at");
+                this.comment = post.getString("comments_count");
 
+                JSONArray likes = jsonObject.getJSONArray("likes");
+                this.like = likes.length()+"";
+
+                JSONArray commentsLimited=jsonObject.getJSONArray("comments_limited");
+
+                for(int j=0;j<commentsLimited.length();j++)
+                {
+                    try {
+                        JSONObject jsonObject1=commentsLimited.getJSONObject(j);
+                        this.commentId = jsonObject1.getInt("id");
+                        comments_limited limited=new comments_limited(jsonObject1.getJSONArray("likes").length(),jsonObject1.getJSONObject("user").getString("first_name")+" "+jsonObject1.getJSONObject("user").getString("last_name"),
+                                jsonObject1.getJSONObject("user").getString("profile"),jsonObject1.getInt("id"),jsonObject1.getInt("user_id"),
+                                jsonObject1.getInt("commentable_id"),jsonObject1.getString("commentable_type"),
+                                jsonObject1.getString("body"),jsonObject1.getString("created_at"),jsonObject1.getString("updated_at"));
+                        this.commentsLimitedArrayList.add(limited);
+
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+
+                }
 
             }
 
@@ -128,5 +190,157 @@ public class UserProfileClass {
     public void setJsonObject(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
 
+    }
+
+    public String getPost_time() {
+        return post_time;
+    }
+
+    public void setPost_time(String post_time) {
+        this.post_time = post_time;
+    }
+
+    public String getPostType() {
+        return postType;
+    }
+
+    public void setPostType(String postType) {
+        this.postType = postType;
+    }
+
+    public String getPost_title() {
+        return post_title;
+    }
+
+    public void setPost_title(String post_title) {
+        this.post_title = post_title;
+    }
+
+    public String getPost_image() {
+        return post_image;
+    }
+
+    public void setPost_image(String post_image) {
+        this.post_image = post_image;
+    }
+
+    public String getBanner_image() {
+        return banner_image;
+    }
+
+    public void setBanner_image(String banner_image) {
+        this.banner_image = banner_image;
+    }
+
+    public String getShort_description() {
+        return short_description;
+    }
+
+    public void setShort_description(String short_description) {
+        this.short_description = short_description;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getLike() {
+        return like;
+    }
+
+    public void setLike(String like) {
+        this.like = like;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public String getShare() {
+        return share;
+    }
+
+    public void setShare(String share) {
+        this.share = share;
+    }
+
+    public String getCommentProfileImageUrl() {
+        return commentProfileImageUrl;
+    }
+
+    public void setCommentProfileImageUrl(String commentProfileImageUrl) {
+        this.commentProfileImageUrl = commentProfileImageUrl;
+    }
+
+    public String getCommentUserName() {
+        return commentUserName;
+    }
+
+    public void setCommentUserName(String commentUserName) {
+        this.commentUserName = commentUserName;
+    }
+
+    public String getCommentTime() {
+        return commentTime;
+    }
+
+    public void setCommentTime(String commentTime) {
+        this.commentTime = commentTime;
+    }
+
+    public String getCommentDescription() {
+        return commentDescription;
+    }
+
+    public void setCommentDescription(String commentDescription) {
+        this.commentDescription = commentDescription;
+    }
+
+    public String getCommentLike() {
+        return commentLike;
+    }
+
+    public void setCommentLike(String commentLike) {
+        this.commentLike = commentLike;
+    }
+
+    public int getPost_id() {
+        return post_id;
+    }
+
+    public void setPost_id(int post_id) {
+        this.post_id = post_id;
+    }
+
+    public int getPost_user_id() {
+        return post_user_id;
+    }
+
+    public void setPost_user_id(int post_user_id) {
+        this.post_user_id = post_user_id;
+    }
+
+    public int getSharedId() {
+        return sharedId;
+    }
+
+    public void setSharedId(int sharedId) {
+        this.sharedId = sharedId;
+    }
+
+    public int getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
     }
 }

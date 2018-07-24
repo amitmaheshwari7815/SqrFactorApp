@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -35,6 +37,9 @@ public class UserProfileActivity extends AppCompatActivity {
     private ImageView morebtn, btn;
     private ArrayList<UserProfileClass> userProfileClassArrayList = new ArrayList<>();
     private TextView userBlueprint, userPortfolio, userFollowers, userFollowing;
+    LinearLayoutManager layoutManager;
+    UserProfileAdapter userProfileAdapter;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +49,13 @@ public class UserProfileActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        //ActionBar actionBar = getSupportActionBar();
-        //actionBar.setDisplayHomeAsUpEnabled(true);
+        recyclerView = findViewById(R.id.news_recycler);
+//        progressBar = rootView.findViewById(R.id.progress_bar_status);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        userProfileAdapter = new UserProfileAdapter(this,userProfileClassArrayList);
+        recyclerView.setAdapter(userProfileAdapter);
 
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
