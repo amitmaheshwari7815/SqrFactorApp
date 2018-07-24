@@ -2,6 +2,7 @@ package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -25,6 +26,10 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,11 +40,16 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyViewHolder> {
     private ArrayList<NewsFeedStatus> newsFeedStatuses;
     private Context context;
     int flag = 0;
     private PopupWindow popupWindow;
+    private FirebaseDatabase database;
+    private DatabaseReference ref;
+
 
     public NewsFeedAdapter(ArrayList<NewsFeedStatus> newsFeedStatuses, Context context) {
         this.newsFeedStatuses = newsFeedStatuses;
@@ -218,6 +228,15 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                        likelist.setTextColor(context.getColor(R.color.sqr));
                         int result = Integer.parseInt(newsFeedStatuses.get(getAdapterPosition()).getLike())+1;
                        likelist.setText(result+" Like");
+                        database= FirebaseDatabase.getInstance();
+                        ref = database.getReference();
+                        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+                        Gson gson = new Gson();
+                        String json = mPrefs.getString("MyObject", "");
+                        UserClass userClass = gson.fromJson(json, UserClass.class);
+                        NotificationClass notificationClass=new NotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Like");
+                        ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(notificationClass);
+
                         flag = 1;
                     }
                     else {

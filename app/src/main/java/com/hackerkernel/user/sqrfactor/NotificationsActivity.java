@@ -6,6 +6,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 public class NotificationsActivity extends ToolbarActivity {
 
@@ -13,6 +18,8 @@ public class NotificationsActivity extends ToolbarActivity {
     private RecyclerView recycler;
     private RecyclerView.Adapter adapter;
     private LinearLayoutManager linearLayoutManager;
+
+    private Button send;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +60,11 @@ public class NotificationsActivity extends ToolbarActivity {
         DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(),linearLayoutManager.getOrientation());
         recycler.addItemDecoration(decoration);
 
-    }
+
+
+
+
+        }
 
 }
+

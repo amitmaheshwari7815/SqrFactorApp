@@ -20,6 +20,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +42,30 @@ public class MessagesActivity extends ToolbarActivity {
     public static int userId;
 
 
+    public static String getUserProfile() {
+        return userProfile;
+    }
+
+    public static void setUserProfile(String userProfile) {
+        MessagesActivity.userProfile = userProfile;
+    }
+
+    public static String getUserName() {
+        return userName;
+    }
+
+    public static void setUserName(String userName) {
+        MessagesActivity.userName = userName;
+    }
+
+    public static int getUserId() {
+        return userId;
+    }
+
+    public static void setUserId(int userId) {
+        MessagesActivity.userId = userId;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +85,7 @@ public class MessagesActivity extends ToolbarActivity {
             }
         });
 
+
         recycler = (RecyclerView)findViewById(R.id.msg_recycler);
         recycler.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -67,12 +94,9 @@ public class MessagesActivity extends ToolbarActivity {
         chatAdapter = new ChatAdapter(chatFriends,this);
         recycler.setAdapter(chatAdapter);
 
-        DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), layoutManager.getOrientation());
-        recycler.addItemDecoration(decoration);
-
-
+        //String token_id=FirebaseInstanceId.getInstance().getToken();
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/message/105",
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/message/"+MessagesActivity.userId,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -81,6 +105,8 @@ public class MessagesActivity extends ToolbarActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONObject user=jsonObject.getJSONObject("user");
+
+                            //CurrentLoginedUser currentLoginedUser=new CurrentLoginedUser(userId,userName,userProfile);
                             userProfile=user.getString("profile");
                             userName=user.getString("name");
                             userId=user.getInt("id");
@@ -122,44 +148,10 @@ public class MessagesActivity extends ToolbarActivity {
 
 
 
-//        PusherOptions options = new PusherOptions();
-//        options.setCluster("ap2");
-//        Pusher pusher = new Pusher("f3973acd596886c25549", options);
-//
-//        Channel channel = pusher.subscribe("my-channel");
-//
-//        channel.bind("my-event", new SubscriptionEventListener() {
-//                    @Override
-//                    public void onEvent(String channelName, String eventName, final String data) {
-//                        System.out.println(data);
-//                        Log.v("Data", data);
-//
-//
-//                        runOnUiThread(new Runnable() {
-//
-//                            @Override
-//                            public void run() {
-//                                try {
-//                                    final JSONObject jsonObject = new JSONObject(data);
-//                                    name.setText(jsonObject.getString("name"));
-//                                    message.setText(jsonObject.getString("message"));
-//                                } catch (JSONException e) {
-//                                    e.printStackTrace();
-//                                }
-//
-//                            }
-//                        });
-//
-//
-//                    }
-//                });
-//
-//
-//        pusher.connect();
-//
-//    }
-    }
 
     }
+
+
+}
 
 

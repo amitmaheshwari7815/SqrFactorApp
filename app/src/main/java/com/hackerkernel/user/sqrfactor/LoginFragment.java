@@ -24,6 +24,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,10 +51,14 @@ public class LoginFragment extends Fragment {
         SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,getActivity().MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPref.edit();
 
+        final SharedPreferences  mPrefs = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+
         login = (Button)rootView.findViewById(R.id.login);
         forgot = (TextView)rootView.findViewById(R.id.forgot);
         loginEmail=(EditText) rootView.findViewById(R.id.loginEmail);
         loginPassword=(EditText) rootView.findViewById(R.id.loginPassword);
+
+
 
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +75,11 @@ public class LoginFragment extends Fragment {
                                     Log.v("Reponse", response);
                                     try {
                                         JSONObject jsonObject=new JSONObject(response);
+
+                                        UserClass userClass=new UserClass(jsonObject);
+                                        // notification listner for like and comment
+                                        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications"+userClass.getUserId());
+
                                         JSONObject TokenObject= jsonObject.getJSONObject("success");
                                         String Token = TokenObject.getString("token");
                                         Log.v("token", Token);
@@ -76,6 +87,11 @@ public class LoginFragment extends Fragment {
                                         //SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,MODE_PRIVATE);
                                         //SharedPreferences.Editor editor = sharedPref.edit();
                                         editor.putString("TOKEN",Token);
+                                        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                                        Gson gson = new Gson();
+                                        String json = gson.toJson(userClass);
+                                        prefsEditor.putString("MyObject", json);
+                                        prefsEditor.commit();
                                         editor.commit();
 
 //                                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("PREF_NAME",getActivity().MODE_PRIVATE);
