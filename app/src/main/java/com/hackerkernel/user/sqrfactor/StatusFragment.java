@@ -90,7 +90,7 @@ public class StatusFragment extends Fragment {
     private int PICK_IMAGE_REQUEST = 1;
     Bitmap bitmap;
     LinearLayoutManager layoutManager;
-    NewsFeedAdapter newsFeedAdapter;
+    private NewsFeedAdapter newsFeedAdapter;
     private ProgressDialog dialog = null;
     private JSONObject jsonObject;
 
@@ -107,8 +107,9 @@ public class StatusFragment extends Fragment {
         layoutManager = new LinearLayoutManager(this.getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
-        recyclerView.setAdapter(newsFeedAdapter);
+       // newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
+       // recyclerView.setAdapter(newsFeedAdapter);
+        Log.v("status","hello");
 
 
         camera = rootView.findViewById(R.id.news_camera);
@@ -146,7 +147,7 @@ public class StatusFragment extends Fragment {
                                 newsstatus.add(newsFeedStatus1);
                             }
 
-                            newsFeedAdapter.notifyDataSetChanged();
+                           // newsFeedAdapter.notifyDataSetChanged();
 
 
 //                            JSONObject TokenObject= (JSONObject) jsonObject.get("success");
@@ -282,7 +283,7 @@ public class StatusFragment extends Fragment {
                                 newsstatus.add(newsFeedStatus1);
                             }
 
-                            newsFeedAdapter.notifyDataSetChanged();
+                            //newsFeedAdapter.notifyDataSetChanged();
                             progressBar.setVisibility(View.GONE);
 
 

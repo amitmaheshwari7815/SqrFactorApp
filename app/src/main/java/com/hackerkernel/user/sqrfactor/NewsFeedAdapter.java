@@ -67,15 +67,45 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
-        holder.authName.setText(newsFeedStatus.getAuthName());
-        holder.time.setText(newsFeedStatus.getTime());
-        holder.postTitle.setText(newsFeedStatus.getPostTitle());
-        holder.shortDescription.setText(newsFeedStatus.getShortDescription());
-        Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
-                .into(holder.authImageUrl);
-        Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
-                .into(holder.postImage);
 
+        holder.time.setText(newsFeedStatus.getTime());
+        Log.v("status",newsFeedStatus.getType());
+//        if(newsFeedStatus.getType().equals("status"))
+//        {
+//            Log.v("status1",newsFeedStatus.getType());
+//            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+//            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+//            holder.shortDescription.setText(newsFeedStatus.getFullDescription());
+//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
+//                    .into(holder.postImage);
+//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+//                    .into(holder.authImageUrl);
+//        }
+//
+//       else if(newsFeedStatus.getType().equals("design"))
+//        {
+//            Log.v("status2",newsFeedStatus.getType());
+//            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+//            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+//            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+//            holder.shortDescription.setText(newsFeedStatus.getShortDescription());
+//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+//                    .into(holder.postImage);
+//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+//                    .into(holder.authImageUrl);
+//        }
+//
+//        else if(newsFeedStatus.getType().equals("article"))
+//        {
+//            Log.v("status2",newsFeedStatus.getType());
+//            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+//            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+//            holder.shortDescription.setText(newsFeedStatus.getShortDescription());
+//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+//                    .into(holder.postImage);
+//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+//                    .into(holder.authImageUrl);
+//        }
         String dtc = newsFeedStatus.getTime();
         Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);

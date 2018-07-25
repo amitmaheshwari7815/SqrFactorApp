@@ -14,6 +14,9 @@ public class UserClass implements Serializable{
     private String last_name;
     private String profile;
     private int userId;
+    private String email;
+    private String mobile;
+    private String userType;
 
     public int getUserId() {
         return userId;
@@ -60,9 +63,7 @@ public class UserClass implements Serializable{
         this.userType = userType;
     }
 
-    private String email;
-    private String mobile;
-    private String userType;
+
 
     public String getUser_name() {
         return user_name;
@@ -115,8 +116,8 @@ public class UserClass implements Serializable{
             this.last_name=user.getString("last_name");
             this.profile=user.getString("profile");
             this.email=user.getString("email");
-            this.mobile=user.getString("mobile");
-            this.profile=user.getString("profile");
+            this.mobile=user.getString("mobile_number");
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

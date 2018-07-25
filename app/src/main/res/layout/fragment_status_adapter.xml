@@ -87,20 +87,20 @@
                     android:id="@+id/news_post_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Check out this new design, by me."
+
                     android:textSize="18sp"
                     android:textStyle="bold"/>
                 <TextView
                     android:id="@+id/news_short_Descrip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Check out this new design, by me."
+
                     android:textStyle="bold"/>
                 <TextView
                     android:id="@+id/news_full_Descrip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Check out this new design, by me."
+
                     android:textStyle="bold"/>
 
                 <ImageView
@@ -123,7 +123,8 @@
                     android:layout_height="50sp"
                     android:layout_weight="1"
                     android:layout_marginStart="10dp"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="10dp">
 
                     <ImageButton
                         android:id="@+id/news_post_like"
