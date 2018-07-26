@@ -50,13 +50,6 @@ public class UserProfileClass {
     }
 
 
-    public ArrayList<comments_limited> getCommentsLimitedArrayList() {
-        return commentsLimitedArrayList;
-    }
-
-    public void setCommentsLimitedArrayList(ArrayList<comments_limited> commentsLimitedArrayList) {
-        this.commentsLimitedArrayList = commentsLimitedArrayList;
-    }
 
     public UserProfileClass(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
@@ -90,10 +83,10 @@ public class UserProfileClass {
                 this.post_time = post.getString("updated_at");
                 this.comment = post.getString("comments_count");
 
-                JSONArray likes = jsonObject.getJSONArray("likes");
+                JSONArray likes = post.getJSONArray("likes");
                 this.like = likes.length()+"";
 
-                JSONArray commentsLimited=jsonObject.getJSONArray("comments_limited");
+                JSONArray commentsLimited=post.getJSONArray("comments_limited");
 
                 for(int j=0;j<commentsLimited.length();j++)
                 {
@@ -120,6 +113,13 @@ public class UserProfileClass {
                 e.printStackTrace();
             }
         }
+    public ArrayList<comments_limited> getCommentsLimitedArrayList() {
+        return commentsLimitedArrayList;
+    }
+
+    public void setCommentsLimitedArrayList(ArrayList<comments_limited> commentsLimitedArrayList) {
+        this.commentsLimitedArrayList = commentsLimitedArrayList;
+    }
             public String getUser_name() {
         return user_name;
     }

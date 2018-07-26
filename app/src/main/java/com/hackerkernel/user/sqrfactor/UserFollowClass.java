@@ -3,7 +3,9 @@ package com.hackerkernel.user.sqrfactor;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class UserFollowClass {
+import java.io.Serializable;
+
+public class UserFollowClass implements Serializable {
     private boolean returnType;
     private String message,follwoingCnt,followerCnt;
     private int userid;
@@ -36,7 +38,7 @@ public class UserFollowClass {
           this.follwoingCnt = message.getString("following_count");
           this.followerCnt = message.getString("follower_count");
 
-          JSONObject fromuser = message.getJSONObject("user");
+          JSONObject fromuser = message.getJSONObject("from_user");
           this.userid = fromuser.getInt("id");
           this.user_name = fromuser.getString("user_name");
           this.first_name = fromuser.getString("first_name");

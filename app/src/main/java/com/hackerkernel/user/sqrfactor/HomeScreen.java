@@ -13,8 +13,24 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeScreen extends ToolbarActivity {
 
@@ -142,6 +158,43 @@ public class HomeScreen extends ToolbarActivity {
                     Intent intent = new Intent(HomeScreen.this,Settings.class);
                     //intent.putExtra("Activity", "3");
                     startActivity(intent);
+
+                }
+                if (id == R.id.navigation_logout){
+                    RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                    StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/logout",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.v("MorenewsFeedFromServer", response);
+                                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                                }
+
+                            },
+                            new Response.ErrorListener() {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            }) {
+
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put("Accept", "application/json");
+                            params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                            return params;
+                        }
+
+                    };
+
+                    requestQueue.add(myReq);
+                    Intent j = new Intent(HomeScreen.this,LoginScreen.class);
+                    startActivity(j);
+                    finish();
+
 
                 }
                 menuItem.setChecked(false);

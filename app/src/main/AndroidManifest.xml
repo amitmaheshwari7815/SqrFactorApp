@@ -29,11 +29,7 @@
             android:name=".HomeScreen"
             android:windowSoftInputMode="adjustPan" />
         <activity android:name=".Index">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".RedActivity"
@@ -137,7 +133,11 @@
         <activity android:name=".MessagesActivity" />
         <activity android:name=".ChatWithAFriendActivity" />
         <activity android:name=".UserProfileActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

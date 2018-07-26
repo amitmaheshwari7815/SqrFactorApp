@@ -1,21 +1,39 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-public class ProfileActivity extends ToolbarActivity {
+import java.util.ArrayList;
 
+public class ProfileActivity extends ToolbarActivity {
+    private ArrayList<ProfileClass> profileClassList = new ArrayList<>();
+    private ImageView displayImage;
+    private ImageView camera;// button
+    public ImageButton mRemoveButton;
+    private ProfileAdapter profileAdapter;
+    RecyclerView recyclerView;
     Toolbar toolbar;
     TabLayout tabLayout1;
-    ImageView morebtn, btn;
-
+    ImageView morebtn, btn,coverImage,profileImage,profileStatusImage;
+    private TextView profileName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
+    Button btnSubmit,editProfile;
+    EditText writePost;
+    Bitmap bitmap;
+    boolean flag = false;
+    LinearLayoutManager layoutManager;
     TextView blueprint, portfolio, followers, following;
 
     @Override
@@ -25,9 +43,27 @@ public class ProfileActivity extends ToolbarActivity {
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        recyclerView = findViewById(R.id.news_recycler);
+        layoutManager = new LinearLayoutManager(this);
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        profileAdapter = new ProfileAdapter(profileClassList,this);
+        recyclerView.setAdapter(profileAdapter);
 
         //ActionBar actionBar = getSupportActionBar();
         //actionBar.setDisplayHomeAsUpEnabled(true);
+        camera = (ImageView)findViewById(R.id.profile_profile_camera);
+        displayImage = (ImageView)findViewById(R.id.profile_upload_image);
+        btnSubmit = (Button)findViewById(R.id.profile_profile_postbtn);
+        writePost = (EditText)findViewById(R.id.profile_profile_write_post);
+        editProfile = (Button)findViewById(R.id.profile_editprofile);
+        coverImage = (ImageView) findViewById(R.id.profile_cover_image);
+        profileImage = (ImageView) findViewById(R.id.profile_profile_image);
+        profileStatusImage = (ImageView) findViewById(R.id.profile_status_image);
+        followCnt = (TextView) findViewById(R.id.profile_followerscnt);
+        followingCnt = (TextView) findViewById(R.id.profile_followingcnt);
+        portfolioCnt = (TextView) findViewById(R.id.profile_portfoliocnt);
+        bluePrintCnt = (TextView) findViewById(R.id.profile_blueprintcnt);
 
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
@@ -38,7 +74,7 @@ public class ProfileActivity extends ToolbarActivity {
             }
         });
 
-        btn = (ImageView)findViewById(R.id.btn);
+        btn = (ImageView)findViewById(R.id.profile_morebtn);
 
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -49,7 +85,7 @@ public class ProfileActivity extends ToolbarActivity {
             }
         });
 
-        morebtn = (ImageView)findViewById(R.id.morebtn);
+        morebtn = (ImageView)findViewById(R.id.profile_about_morebtn);
         morebtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,10 +112,10 @@ public class ProfileActivity extends ToolbarActivity {
             }
         });
 
-        blueprint = (TextView)findViewById(R.id.blueprint);
-        portfolio = (TextView)findViewById(R.id.portfolio);
-        followers = (TextView)findViewById(R.id.followers);
-        following = (TextView)findViewById(R.id.following);
+        blueprint = (TextView)findViewById(R.id.profile_blueprintClick);
+        portfolio = (TextView)findViewById(R.id.profile_portfolioClick);
+        followers = (TextView)findViewById(R.id.profile_followersClick);
+        following = (TextView)findViewById(R.id.profile_followingClick);
 
         blueprint.setOnClickListener(new View.OnClickListener() {
             @Override

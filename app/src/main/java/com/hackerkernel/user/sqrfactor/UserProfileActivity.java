@@ -35,6 +35,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UserProfileActivity extends AppCompatActivity {
@@ -43,7 +44,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private TextView userName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
     private Button followbtn,messagebtn;
     private ArrayList<UserProfileClass> userProfileClassArrayList = new ArrayList<>();
-    private ArrayList<UserFollowClass>userFollowClassArrayList = new ArrayList<>();
+    private ArrayList<UserFollowClass> userFollowClassList = new ArrayList<>();
     private TextView userBlueprint, userPortfolio, userFollowers, userFollowing;
     LinearLayoutManager layoutManager;
     UserProfileAdapter userProfileAdapter;
@@ -59,21 +60,21 @@ public class UserProfileActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-        messagebtn =(Button)findViewById(R.id.user_messagebtn);
-        coverImage =(ImageView)findViewById(R.id.user_coverImage);
-        userProfileImage =(ImageView)findViewById(R.id.user_image);
-        userName = (TextView)findViewById(R.id.user_name);
-        followCnt = (TextView)findViewById(R.id.user_followers);
-        followingCnt = (TextView)findViewById(R.id.user_following);
-        portfolioCnt = (TextView)findViewById(R.id.user_portfolio);
-        bluePrintCnt = (TextView)findViewById(R.id.user_blueprint);
+        messagebtn = (Button) findViewById(R.id.user_messagebtn);
+        coverImage = (ImageView) findViewById(R.id.user_coverImage);
+        userProfileImage = (ImageView) findViewById(R.id.user_image);
+        userName = (TextView) findViewById(R.id.user_name);
+        followCnt = (TextView) findViewById(R.id.user_followers);
+        followingCnt = (TextView) findViewById(R.id.user_following);
+        portfolioCnt = (TextView) findViewById(R.id.user_portfolio);
+        bluePrintCnt = (TextView) findViewById(R.id.user_blueprint);
 
         recyclerView = findViewById(R.id.user_profile_recycler);
 //        progressBar = rootView.findViewById(R.id.progress_bar_status);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-        userProfileAdapter = new UserProfileAdapter(this,userProfileClassArrayList);
+        userProfileAdapter = new UserProfileAdapter(this, userProfileClassArrayList);
         recyclerView.setAdapter(userProfileAdapter);
 
         toolbar.setNavigationIcon(R.drawable.back_arrow);
@@ -148,50 +149,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
-        followbtn =(Button)findViewById(R.id.user_followButton);
-
-        RequestQueue requestQueue0 = Volley.newRequestQueue(getApplicationContext());
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/follow_user",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-                        Log.v("ResponseLike",s);
-                        JSONObject jsonObject = null;
-                        try {
-                            jsonObject = new JSONObject(s);
-                            UserFollowClass userFollowClass = new UserFollowClass(jsonObject);
-                            userFollowClassArrayList.add(userFollowClass);
-                            followbtn.setText(userFollowClass.getMessage());
-                            
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-
-                        //Showing toast
-//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZmMTliZGU4NTZmODZiMTZiMDUxYjk2OGI3YTk5ZmRlYzM1MDk2YjBhNzJiN2YyMWQ1MGVkNmU2NDMwMzQ0ZTIxZGE5YWZiMDkxZGU5MzZjIn0.eyJhdWQiOiIzIiwianRpIjoiZmYxOWJkZTg1NmY4NmIxNmIwNTFiOTY4YjdhOTlmZGVjMzUwOTZiMGE3MmI3ZjIxZDUwZWQ2ZTY0MzAzNDRlMjFkYTlhZmIwOTFkZTkzNmMiLCJpYXQiOjE1MzI0Mjg5NjYsIm5iZiI6MTUzMjQyODk2NiwiZXhwIjoxNTYzOTY0OTY2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.TiGb0ea0wLkAVp9AstLs2EmH3RD8wORc-HjxeTXiQ_RRNAMUOcmUoV8E7g9SwdMjywztsZbYOekY_fQD0xnpY26gkaxSaaDVeZKYrnN-WM--zWWzHKpi9wUp9QUnVBh36Ah1Akqu-hwhCFKTplF7ZMS1NM9LKxOyNd2uwFsv-neScT2vQFvGYgxla2tmzqo9tzpXXPzFEn1uLQvg4lsr-EDZs_9CvB_Bef-WyLRZfKtJTEzbcd4FvviQdZCVYuzHkI-VixlMoBRAEWqMWBnUI0xBepOqC4gfv7s4Qs03M0vhu18rTXJ-nCfjhg3XA7wdYKBXe9sFNNTcTe7A0rnWIKRsIH6dQxipw0HqtXFOR-kgG6p0fFgY30oo_P8OSp8RwYNVYw118jsXKh24YR5twXyvXAeZoi-iNbU8qpJNVp1cWTRIUvbtosSt9ct8lj70zKpuyFRZgfT_FEfdW32UQ_6d9VC_7NjlyDFlmZazCfYOgEYsdOPmU1xTy4xGnEyNgj0jCbi_BNt7KnefER2i41leombzq14d8wqkdm_num53EPWTOxlaXRF85jOrjKv5a6WEFYOzTCHSXWeIIcYfYFnOdqsWXeSSlNZ4xD1DITObUbUl30lGkkNSY0v5yePFL9-hNVByGY7LrMH4TNFiWn5-g0MAIo5DOHK8gHAmWJg");
-
-                return params;
-            }
-
-        };
-
-        //Adding request to the queue
-        requestQueue0.add(stringRequest);
-
-
+        followbtn = (Button) findViewById(R.id.user_followButton);
         followbtn.setOnClickListener(new View.OnClickListener()
         {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -204,12 +162,9 @@ public class UserProfileActivity extends AppCompatActivity {
                             @Override
                             public void onResponse(String s) {
                                 Log.v("ResponseLike",s);
-                                JSONObject jsonObject = null;
                                 try {
-                                    jsonObject = new JSONObject(s);
+                                    JSONObject jsonObject = new JSONObject(s);
                                     UserFollowClass userFollowClass = new UserFollowClass(jsonObject);
-                                    userFollowClassArrayList.add(userFollowClass);
-                                    followbtn.setText(userFollowClass.getMessage());
                                     flag = userFollowClass.isReturnType();
                                     if (flag == false) {
                                         Log.v("follow",flag+"");
@@ -239,18 +194,15 @@ public class UserProfileActivity extends AppCompatActivity {
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         Map<String, String> params = new HashMap<String, String>();
                         params.put("Accept", "application/json");
-                        params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZmMTliZGU4NTZmODZiMTZiMDUxYjk2OGI3YTk5ZmRlYzM1MDk2YjBhNzJiN2YyMWQ1MGVkNmU2NDMwMzQ0ZTIxZGE5YWZiMDkxZGU5MzZjIn0.eyJhdWQiOiIzIiwianRpIjoiZmYxOWJkZTg1NmY4NmIxNmIwNTFiOTY4YjdhOTlmZGVjMzUwOTZiMGE3MmI3ZjIxZDUwZWQ2ZTY0MzAzNDRlMjFkYTlhZmIwOTFkZTkzNmMiLCJpYXQiOjE1MzI0Mjg5NjYsIm5iZiI6MTUzMjQyODk2NiwiZXhwIjoxNTYzOTY0OTY2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.TiGb0ea0wLkAVp9AstLs2EmH3RD8wORc-HjxeTXiQ_RRNAMUOcmUoV8E7g9SwdMjywztsZbYOekY_fQD0xnpY26gkaxSaaDVeZKYrnN-WM--zWWzHKpi9wUp9QUnVBh36Ah1Akqu-hwhCFKTplF7ZMS1NM9LKxOyNd2uwFsv-neScT2vQFvGYgxla2tmzqo9tzpXXPzFEn1uLQvg4lsr-EDZs_9CvB_Bef-WyLRZfKtJTEzbcd4FvviQdZCVYuzHkI-VixlMoBRAEWqMWBnUI0xBepOqC4gfv7s4Qs03M0vhu18rTXJ-nCfjhg3XA7wdYKBXe9sFNNTcTe7A0rnWIKRsIH6dQxipw0HqtXFOR-kgG6p0fFgY30oo_P8OSp8RwYNVYw118jsXKh24YR5twXyvXAeZoi-iNbU8qpJNVp1cWTRIUvbtosSt9ct8lj70zKpuyFRZgfT_FEfdW32UQ_6d9VC_7NjlyDFlmZazCfYOgEYsdOPmU1xTy4xGnEyNgj0jCbi_BNt7KnefER2i41leombzq14d8wqkdm_num53EPWTOxlaXRF85jOrjKv5a6WEFYOzTCHSXWeIIcYfYFnOdqsWXeSSlNZ4xD1DITObUbUl30lGkkNSY0v5yePFL9-hNVByGY7LrMH4TNFiWn5-g0MAIo5DOHK8gHAmWJg");
+                        params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjhmMDE5OTRkMmY4YzMxMzI3ZmNiMzE1OTU1ZDU4NTMyMjU2Y2VlYjZkOGIxZGYwMDVhYzcxZWNlMTAzYjYyODZkNzc3OTBkMGQ4M2IwNDMzIn0.eyJhdWQiOiIzIiwianRpIjoiOGYwMTk5NGQyZjhjMzEzMjdmY2IzMTU5NTVkNTg1MzIyNTZjZWViNmQ4YjFkZjAwNWFjNzFlY2UxMDNiNjI4NmQ3Nzc5MGQwZDgzYjA0MzMiLCJpYXQiOjE1MzI1MjUwNzYsIm5iZiI6MTUzMjUyNTA3NiwiZXhwIjoxNTY0MDYxMDc2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.gvi8MaHlApevKCCcjO0glCle3s5PlS5V7nBrFZaj-U2Hlt3dbvDq-2RgSM0Kwmoxx3QYgErz6BER289-VXdGYyGFwniZTsbpyT_uK62RoUB0Bx9XHkmeeqijWEGQObsbi8JbR__1o6ixBaDkW2nEvWvYvAFFqMpGJ2GHdIEZWRdTDDatP1fimmrQhLNf8Qvf8u7IIWXsbgb8LUtplGE_tEGcQIYJ8cvZpd7REQ2A8ijSq6dVW3HADxjfbWGEdV8JKfS5tdbdCfwXxBJ0MufYlNxnuxnPKrsDNCG6Ym-7-YhX-h6DnxVBpjsLPM37YPd2b4tuDrVQNB7GMi2x1TozODJh3cvJA-2ezufZFX8I2E6-ahRq0vMtkCmLv4tAWB_lmxQSS5NOEKhXJF4lH4_t6qdgPZn1kEY6u16hPo-398xa6MOtSGKl-sjiTS7qdug51MprIlHIwmr4vmqEU_8uYVBFkfpRBIbbgSkHEhpTB2K7Ny740lBziTrpM8QdTPpU7JGru1L5C58TJ2nXRkcUIwLspSPzV0UJgoyGRbEwAj4cQvtebXbpkUOUgkwZCUZdXj0PeTYLNLJsuB6P5iNjqybjjsleUunoUU7l9vhGQAoUdlvc76Ju0bZ01CCU5sLvqeEhqQ1fYF5XTj-A-JLA19NuEQgiV9FkXn54o8ts6fs");
 
                         return params;
                     }
                     @Override
                     protected Map<String, String> getParams() throws AuthFailureError {
                         Map<String,String> params = new HashMap<>();
-                        //Adding parameters
-//                 params.put("image_value",image);
+
                         params.put("to_user","106");
-//                            params.put("user_id",newsFeedStatuses.get(getAdapterPosition()).getUserId()+"");
-                        //returning parameters
                         return params;
                     }
                 };
@@ -261,6 +213,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
         });
+
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/detail/hackerkernel",
@@ -281,6 +234,7 @@ public class UserProfileActivity extends AppCompatActivity {
                                 Glide.with(getApplicationContext()).load("https://archsqr.in/"+userProfileClass.getProfile())
                                     .into(userProfileImage);
 
+                            userProfileAdapter.notifyDataSetChanged();
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -299,7 +253,7 @@ public class UserProfileActivity extends AppCompatActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZmMTliZGU4NTZmODZiMTZiMDUxYjk2OGI3YTk5ZmRlYzM1MDk2YjBhNzJiN2YyMWQ1MGVkNmU2NDMwMzQ0ZTIxZGE5YWZiMDkxZGU5MzZjIn0.eyJhdWQiOiIzIiwianRpIjoiZmYxOWJkZTg1NmY4NmIxNmIwNTFiOTY4YjdhOTlmZGVjMzUwOTZiMGE3MmI3ZjIxZDUwZWQ2ZTY0MzAzNDRlMjFkYTlhZmIwOTFkZTkzNmMiLCJpYXQiOjE1MzI0Mjg5NjYsIm5iZiI6MTUzMjQyODk2NiwiZXhwIjoxNTYzOTY0OTY2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.TiGb0ea0wLkAVp9AstLs2EmH3RD8wORc-HjxeTXiQ_RRNAMUOcmUoV8E7g9SwdMjywztsZbYOekY_fQD0xnpY26gkaxSaaDVeZKYrnN-WM--zWWzHKpi9wUp9QUnVBh36Ah1Akqu-hwhCFKTplF7ZMS1NM9LKxOyNd2uwFsv-neScT2vQFvGYgxla2tmzqo9tzpXXPzFEn1uLQvg4lsr-EDZs_9CvB_Bef-WyLRZfKtJTEzbcd4FvviQdZCVYuzHkI-VixlMoBRAEWqMWBnUI0xBepOqC4gfv7s4Qs03M0vhu18rTXJ-nCfjhg3XA7wdYKBXe9sFNNTcTe7A0rnWIKRsIH6dQxipw0HqtXFOR-kgG6p0fFgY30oo_P8OSp8RwYNVYw118jsXKh24YR5twXyvXAeZoi-iNbU8qpJNVp1cWTRIUvbtosSt9ct8lj70zKpuyFRZgfT_FEfdW32UQ_6d9VC_7NjlyDFlmZazCfYOgEYsdOPmU1xTy4xGnEyNgj0jCbi_BNt7KnefER2i41leombzq14d8wqkdm_num53EPWTOxlaXRF85jOrjKv5a6WEFYOzTCHSXWeIIcYfYFnOdqsWXeSSlNZ4xD1DITObUbUl30lGkkNSY0v5yePFL9-hNVByGY7LrMH4TNFiWn5-g0MAIo5DOHK8gHAmWJg");
+                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjhmMDE5OTRkMmY4YzMxMzI3ZmNiMzE1OTU1ZDU4NTMyMjU2Y2VlYjZkOGIxZGYwMDVhYzcxZWNlMTAzYjYyODZkNzc3OTBkMGQ4M2IwNDMzIn0.eyJhdWQiOiIzIiwianRpIjoiOGYwMTk5NGQyZjhjMzEzMjdmY2IzMTU5NTVkNTg1MzIyNTZjZWViNmQ4YjFkZjAwNWFjNzFlY2UxMDNiNjI4NmQ3Nzc5MGQwZDgzYjA0MzMiLCJpYXQiOjE1MzI1MjUwNzYsIm5iZiI6MTUzMjUyNTA3NiwiZXhwIjoxNTY0MDYxMDc2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.gvi8MaHlApevKCCcjO0glCle3s5PlS5V7nBrFZaj-U2Hlt3dbvDq-2RgSM0Kwmoxx3QYgErz6BER289-VXdGYyGFwniZTsbpyT_uK62RoUB0Bx9XHkmeeqijWEGQObsbi8JbR__1o6ixBaDkW2nEvWvYvAFFqMpGJ2GHdIEZWRdTDDatP1fimmrQhLNf8Qvf8u7IIWXsbgb8LUtplGE_tEGcQIYJ8cvZpd7REQ2A8ijSq6dVW3HADxjfbWGEdV8JKfS5tdbdCfwXxBJ0MufYlNxnuxnPKrsDNCG6Ym-7-YhX-h6DnxVBpjsLPM37YPd2b4tuDrVQNB7GMi2x1TozODJh3cvJA-2ezufZFX8I2E6-ahRq0vMtkCmLv4tAWB_lmxQSS5NOEKhXJF4lH4_t6qdgPZn1kEY6u16hPo-398xa6MOtSGKl-sjiTS7qdug51MprIlHIwmr4vmqEU_8uYVBFkfpRBIbbgSkHEhpTB2K7Ny740lBziTrpM8QdTPpU7JGru1L5C58TJ2nXRkcUIwLspSPzV0UJgoyGRbEwAj4cQvtebXbpkUOUgkwZCUZdXj0PeTYLNLJsuB6P5iNjqybjjsleUunoUU7l9vhGQAoUdlvc76Ju0bZ01CCU5sLvqeEhqQ1fYF5XTj-A-JLA19NuEQgiV9FkXn54o8ts6fs");
 
                 return params;
             }
@@ -307,6 +261,8 @@ public class UserProfileActivity extends AppCompatActivity {
         };
 
         requestQueue.add(myReq);
+
     }
+
 }
 
