@@ -32,13 +32,13 @@ public class VolleySingletonClass {
      *
      * @param context parent context
      */
-    private VolleySingletonClass(Context context) {
+    private VolleySingletonClass(final Context context) {
         mCtx = context;
         mRequestQueue = getRequestQueue();
 
         mImageLoader = new ImageLoader(mRequestQueue,
                 new ImageLoader.ImageCache() {
-                    private final LruCache<String, Bitmap> cache = new LruBitmapCache(mCtx);
+                    private final LruCache<String, Bitmap> cache = new LruBitmapCache(1000);
 
                     @Override
                     public Bitmap getBitmap(String url) {

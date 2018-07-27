@@ -14,10 +14,10 @@ public class UserProfileClass {
     public String commentProfileImageUrl,commentUserName,commentTime,commentDescription,commentLike;
     private int user_id,post_id,post_user_id,sharedId, commentId;
     private JSONObject jsonObject;
-    private int followerscnt,followingcont,portfoliocnt;
+    private String followerscnt,followingcnt,portfoliocnt,bluePrintcnt;
     public ArrayList<comments_limited> commentsLimitedArrayList=new ArrayList<>();
 
-    public UserProfileClass(int user_id,int post_id,int post_user_id,int sharedId, int commentId,String like,String comment,String share,String postType,String post_time,String post_title,String post_image,String banner_image,String short_description,String description,String commentDescription,String commentProfileImageUrl,String commentUserName, String commentLike,String commentTime,String name, String user_name, String first_name, String last_name, String profile, String email, String mobile_number, String user_type) {
+    public UserProfileClass(int user_id,int post_id,int post_user_id,int sharedId, int commentId ,String followerscnt,String followingcnt,String portfoliocnt,String bluePrintcnt,String like,String comment,String share,String postType,String post_time,String post_title,String post_image,String banner_image,String short_description,String description,String commentDescription,String commentProfileImageUrl,String commentUserName, String commentLike,String commentTime,String name, String user_name, String first_name, String last_name, String profile, String email, String mobile_number, String user_type) {
         this.user_name = user_name;
         this.first_name = first_name;
         this.last_name = last_name;
@@ -43,21 +43,23 @@ public class UserProfileClass {
         this.commentTime = commentTime;
         this.commentDescription = commentDescription;
         this.commentLike = commentLike;
+        this.followerscnt = followerscnt;
+        this.followingcnt = followingcnt;
+        this.bluePrintcnt = bluePrintcnt;
+        this.portfoliocnt = portfoliocnt;
     }
 
 
-    public ArrayList<comments_limited> getCommentsLimitedArrayList() {
-        return commentsLimitedArrayList;
-    }
-
-    public void setCommentsLimitedArrayList(ArrayList<comments_limited> commentsLimitedArrayList) {
-        this.commentsLimitedArrayList = commentsLimitedArrayList;
-    }
 
     public UserProfileClass(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
 
         try {
+            this.followingcnt = jsonObject.getString("followingCnt");
+            this.followerscnt = jsonObject.getString("followCnt");
+            this.portfoliocnt = jsonObject.getString("portfolioCnt");
+            this.bluePrintcnt = jsonObject.getString("blueprintCnt");
+
             JSONObject user = jsonObject.getJSONObject("user");
             this.user_id = user.getInt("id");
             this.user_name = user.getString("user_name");
@@ -81,10 +83,10 @@ public class UserProfileClass {
                 this.post_time = post.getString("updated_at");
                 this.comment = post.getString("comments_count");
 
-                JSONArray likes = jsonObject.getJSONArray("likes");
+                JSONArray likes = post.getJSONArray("likes");
                 this.like = likes.length()+"";
 
-                JSONArray commentsLimited=jsonObject.getJSONArray("comments_limited");
+                JSONArray commentsLimited=post.getJSONArray("comments_limited");
 
                 for(int j=0;j<commentsLimited.length();j++)
                 {
@@ -111,6 +113,13 @@ public class UserProfileClass {
                 e.printStackTrace();
             }
         }
+    public ArrayList<comments_limited> getCommentsLimitedArrayList() {
+        return commentsLimitedArrayList;
+    }
+
+    public void setCommentsLimitedArrayList(ArrayList<comments_limited> commentsLimitedArrayList) {
+        this.commentsLimitedArrayList = commentsLimitedArrayList;
+    }
             public String getUser_name() {
         return user_name;
     }
@@ -338,6 +347,38 @@ public class UserProfileClass {
 
     public int getCommentId() {
         return commentId;
+    }
+
+    public String getFollowerscnt() {
+        return followerscnt;
+    }
+
+    public void setFollowerscnt(String followerscnt) {
+        this.followerscnt = followerscnt;
+    }
+
+    public String getFollowingcnt() {
+        return followingcnt;
+    }
+
+    public void setFollowingcnt(String followingcnt) {
+        this.followingcnt = followingcnt;
+    }
+
+    public String getPortfoliocnt() {
+        return portfoliocnt;
+    }
+
+    public void setPortfoliocnt(String portfoliocnt) {
+        this.portfoliocnt = portfoliocnt;
+    }
+
+    public String getBluePrintcnt() {
+        return bluePrintcnt;
+    }
+
+    public void setBluePrintcnt(String bluePrintcnt) {
+        this.bluePrintcnt = bluePrintcnt;
     }
 
     public void setCommentId(int commentId) {

@@ -87,20 +87,29 @@
                     android:id="@+id/news_post_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
 
+=======
+>>>>>>> f7d32da6e12d39721b20c2376ffe568afef85b1a
                     android:textSize="18sp"
                     android:textStyle="bold"/>
                 <TextView
                     android:id="@+id/news_short_Descrip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
 
+=======
+>>>>>>> f7d32da6e12d39721b20c2376ffe568afef85b1a
                     android:textStyle="bold"/>
                 <TextView
                     android:id="@+id/news_full_Descrip"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+<<<<<<< HEAD
 
+=======
+>>>>>>> f7d32da6e12d39721b20c2376ffe568afef85b1a
                     android:textStyle="bold"/>
 
                 <ImageView

@@ -176,7 +176,7 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
                             public Map<String, String> getHeaders() throws AuthFailureError {
                                 Map<String, String> params = new HashMap<String, String>();
                                 params.put("Accept", "application/json");
-                                params.put("Authorization", "Bearer " +TokenClass.Token);
+                                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImZmMTliZGU4NTZmODZiMTZiMDUxYjk2OGI3YTk5ZmRlYzM1MDk2YjBhNzJiN2YyMWQ1MGVkNmU2NDMwMzQ0ZTIxZGE5YWZiMDkxZGU5MzZjIn0.eyJhdWQiOiIzIiwianRpIjoiZmYxOWJkZTg1NmY4NmIxNmIwNTFiOTY4YjdhOTlmZGVjMzUwOTZiMGE3MmI3ZjIxZDUwZWQ2ZTY0MzAzNDRlMjFkYTlhZmIwOTFkZTkzNmMiLCJpYXQiOjE1MzI0Mjg5NjYsIm5iZiI6MTUzMjQyODk2NiwiZXhwIjoxNTYzOTY0OTY2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.TiGb0ea0wLkAVp9AstLs2EmH3RD8wORc-HjxeTXiQ_RRNAMUOcmUoV8E7g9SwdMjywztsZbYOekY_fQD0xnpY26gkaxSaaDVeZKYrnN-WM--zWWzHKpi9wUp9QUnVBh36Ah1Akqu-hwhCFKTplF7ZMS1NM9LKxOyNd2uwFsv-neScT2vQFvGYgxla2tmzqo9tzpXXPzFEn1uLQvg4lsr-EDZs_9CvB_Bef-WyLRZfKtJTEzbcd4FvviQdZCVYuzHkI-VixlMoBRAEWqMWBnUI0xBepOqC4gfv7s4Qs03M0vhu18rTXJ-nCfjhg3XA7wdYKBXe9sFNNTcTe7A0rnWIKRsIH6dQxipw0HqtXFOR-kgG6p0fFgY30oo_P8OSp8RwYNVYw118jsXKh24YR5twXyvXAeZoi-iNbU8qpJNVp1cWTRIUvbtosSt9ct8lj70zKpuyFRZgfT_FEfdW32UQ_6d9VC_7NjlyDFlmZazCfYOgEYsdOPmU1xTy4xGnEyNgj0jCbi_BNt7KnefER2i41leombzq14d8wqkdm_num53EPWTOxlaXRF85jOrjKv5a6WEFYOzTCHSXWeIIcYfYFnOdqsWXeSSlNZ4xD1DITObUbUl30lGkkNSY0v5yePFL9-hNVByGY7LrMH4TNFiWn5-g0MAIo5DOHK8gHAmWJg");
 
                                 return params;
                             }

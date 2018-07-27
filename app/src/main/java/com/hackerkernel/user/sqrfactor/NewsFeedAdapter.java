@@ -1,11 +1,14 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -43,7 +46,7 @@ import java.util.Map;
 import static android.content.Context.MODE_PRIVATE;
 
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyViewHolder> {
-    private ArrayList<NewsFeedStatus> newsFeedStatuses;
+    private ArrayList<NewsFeedStatus.NewsFeedStatus> newsFeedStatuses;
     private Context context;
     int flag = 0;
     private PopupWindow popupWindow;
@@ -51,7 +54,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     private DatabaseReference ref;
 
 
-    public NewsFeedAdapter(ArrayList<NewsFeedStatus> newsFeedStatuses, Context context) {
+    public NewsFeedAdapter(ArrayList<NewsFeedStatus.NewsFeedStatus> newsFeedStatuses, Context context) {
         this.newsFeedStatuses = newsFeedStatuses;
         this.context = context;
     }
@@ -66,48 +69,54 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
+        final NewsFeedStatus.NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
+
 
         holder.time.setText(newsFeedStatus.getTime());
         Log.v("status",newsFeedStatus.getType());
-//        if(newsFeedStatus.getType().equals("status"))
-//        {
-//            Log.v("status1",newsFeedStatus.getType());
-//            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
-//            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
-//            holder.shortDescription.setText(newsFeedStatus.getFullDescription());
-//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
-//                    .into(holder.postImage);
-//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
-//                    .into(holder.authImageUrl);
-//        }
 //
-//       else if(newsFeedStatus.getType().equals("design"))
-//        {
-//            Log.v("status2",newsFeedStatus.getType());
-//            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
-//            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
-//            holder.postTitle.setText(newsFeedStatus.getPostTitle());
-//            holder.shortDescription.setText(newsFeedStatus.getShortDescription());
-//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
-//                    .into(holder.postImage);
-//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
-//                    .into(holder.authImageUrl);
-//        }
-//
-//        else if(newsFeedStatus.getType().equals("article"))
-//        {
-//            Log.v("status2",newsFeedStatus.getType());
-//            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
-//            holder.postTitle.setText(newsFeedStatus.getPostTitle());
-//            holder.shortDescription.setText(newsFeedStatus.getShortDescription());
-//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
-//                    .into(holder.postImage);
-//            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
-//                    .into(holder.authImageUrl);
-//        }
+
+//        holder.time.setText(newsFeedStatus.getTime());
+        Log.v("status",newsFeedStatus.getType());
+        if(newsFeedStatus.getType().equals("status"))
+        {
+            Log.v("status1",newsFeedStatus.getType());
+            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            holder.shortDescription.setText(newsFeedStatus.getFullDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
+                    .into(holder.postImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authImageUrl);
+        }
+
+       else if(newsFeedStatus.getType().equals("design"))
+        {
+            Log.v("status2",newsFeedStatus.getType());
+            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.shortDescription.setText(newsFeedStatus.getShortDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+                    .into(holder.postImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authImageUrl);
+        }
+
+        else if(newsFeedStatus.getType().equals("article"))
+        {
+            Log.v("status2",newsFeedStatus.getType());
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.shortDescription.setText(newsFeedStatus.getShortDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+                    .into(holder.postImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authImageUrl);
+        }
+
         String dtc = newsFeedStatus.getTime();
-        Log.v("dtc",dtc);
+       // Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
         Log.v("sdf1",sdf1.toString());
@@ -250,11 +259,13 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
             like.setOnClickListener(new View.OnClickListener()
             {
+
                 @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onClick(View v) {
 
                     if (flag == 0) {
+                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
                        likelist.setTextColor(context.getColor(R.color.sqr));
                         int result = Integer.parseInt(newsFeedStatuses.get(getAdapterPosition()).getLike())+1;
                        likelist.setText(result+" Like");
@@ -270,6 +281,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                         flag = 1;
                     }
                     else {
+                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.gray));
                        likelist.setTextColor(context.getColor(R.color.gray));
                         int result = Integer.parseInt(newsFeedStatuses.get(getAdapterPosition()).getLike());
                       likelist.setText(result+" Like");
@@ -363,10 +375,10 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     }
     private void shareIt() {
     //sharing implementation here
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,"SqrFactor");
-        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, "professional network for the architecture community visit https://sqrfactor.com");
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT,"SqrFactor");
+        sharingIntent.putExtra(Intent.EXTRA_TEXT, "professional network for the architecture community visit https://sqrfactor.com");
         context.startActivity(Intent.createChooser(sharingIntent, "Share via"));
 
 

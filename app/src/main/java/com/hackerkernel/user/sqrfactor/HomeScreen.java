@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -161,16 +162,19 @@ public class HomeScreen extends ToolbarActivity {
                 }
                 if (id == R.id.navigation_logout){
 
+
                     //call api here for logout
                     RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+
                     StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/logout",
                             new Response.Listener<String>() {
                                 @Override
                                 public void onResponse(String response) {
                                     Log.v("ReponseFeed", response);
-//
+                                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
 
-                                    }
+                                }
+
                             },
                             new Response.ErrorListener() {
 
@@ -184,20 +188,25 @@ public class HomeScreen extends ToolbarActivity {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> params = new HashMap<String, String>();
                             params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer " + TokenClass.Token);
+                            params.put("Authorization", "Bearer "+TokenClass.Token);
 
                             return params;
                         }
 
                     };
 
-
                     requestQueue.add(myReq);
+
+
                     Intent intent = new Intent(HomeScreen.this,LoginScreen.class);
                     startActivity(intent);
                     finish();
 
                 }
+
+
+
+
 
 
                 menuItem.setChecked(false);
@@ -206,7 +215,7 @@ public class HomeScreen extends ToolbarActivity {
                 return false;
             }
         });
-    }
+}
 
     @Override
     public void onBackPressed() {

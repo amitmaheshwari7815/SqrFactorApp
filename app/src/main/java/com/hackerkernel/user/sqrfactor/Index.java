@@ -37,6 +37,7 @@ public class Index extends AppCompatActivity {
                     case 1:
                         Intent i2 = new Intent(getApplicationContext(), LoginScreen.class);
                         startActivity(i2);
+                        finish();
                         break;
 
                     case 2:

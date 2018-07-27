@@ -1,6 +1,8 @@
+
 package com.hackerkernel.user.sqrfactor;
 
 import com.google.gson.JsonObject;
+import com.hackerkernel.user.sqrfactor.comments_limited;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -10,14 +12,14 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class NewsFeedStatus implements Serializable {
-    private String type,credits_earned,is_Shared,deleted_at,paid_at,week_views,user_name_of_post;
+    private String type, credits_earned, is_Shared, deleted_at, paid_at, week_views, user_name_of_post;
     private int user_post_id;
-    public String userImageUrl,authImageUrl,authName,time,postTitle,shortDescription,postImage,fullDescription;
-    public String like,comments,share,slug;
-    public String commentProfileImageUrl,commentUserName,commentTime,commentDescription,commentLike;
-    public int postId,userId,sharedId, commentId;
+    public String userImageUrl, authImageUrl, authName, time, postTitle, shortDescription, postImage, fullDescription;
+    public String like, comments, share, slug;
+    public String commentProfileImageUrl, commentUserName, commentTime, commentDescription, commentLike;
+    public int postId, userId, sharedId, commentId;
     public transient JSONObject jsonObject;
-    public ArrayList<comments_limited> commentsLimitedArrayList=new ArrayList<>();
+    public ArrayList<comments_limited> commentsLimitedArrayList = new ArrayList<>();
 
 
     public NewsFeedStatus(int postId, int userId, int sharedId, int commentId, String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String like, String comments, String share, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike) {
@@ -56,56 +58,53 @@ public class NewsFeedStatus implements Serializable {
         this.jsonObject = jsonObject;
 
         try {
-                this.postId = jsonObject.getInt("id");
-                this.slug=jsonObject.getString("slug");
-                this.type=jsonObject.getString("type");
-                this.postTitle = jsonObject.getString("title");
-                this.userId = jsonObject.getInt("user_id");
-                this.userImageUrl = jsonObject.getString("image");
-                this.postImage = jsonObject.getString("banner_image");
-                this.shortDescription = jsonObject.getString("short_description");
-                this.fullDescription = jsonObject.getString("description");
-                this.credits_earned=jsonObject.getString("credits_earned");
-                this.week_views=jsonObject.getString("week_views");
-                this.credits_earned=jsonObject.getString("credits_earned");
-                this.paid_at=jsonObject.getString("paid_at");
-                this.deleted_at=jsonObject.getString("deleted_at");
-                this.user_post_id=jsonObject.getInt("user_post_id");
-                this.is_Shared=jsonObject.getString("is_Shared");
-                this.time =jsonObject.getString("updated_at");
-                this.comments =jsonObject.getString("comments_count");
-                this.sharedId = jsonObject.getInt("shared_id");
+            this.postId = jsonObject.getInt("id");
+            this.slug = jsonObject.getString("slug");
+            this.type = jsonObject.getString("type");
+            this.postTitle = jsonObject.getString("title");
+            this.userId = jsonObject.getInt("user_id");
+            this.userImageUrl = jsonObject.getString("image");
+            this.postImage = jsonObject.getString("banner_image");
+            this.shortDescription = jsonObject.getString("short_description");
+            this.fullDescription = jsonObject.getString("description");
+            this.credits_earned = jsonObject.getString("credits_earned");
+            this.week_views = jsonObject.getString("week_views");
+            this.credits_earned = jsonObject.getString("credits_earned");
+            this.paid_at = jsonObject.getString("paid_at");
+            this.deleted_at = jsonObject.getString("deleted_at");
+            this.user_post_id = jsonObject.getInt("user_post_id");
+            this.is_Shared = jsonObject.getString("is_Shared");
+            this.time = jsonObject.getString("updated_at");
+            this.comments = jsonObject.getString("comments_count");
+            this.sharedId = jsonObject.getInt("shared_id");
 
-                JSONObject user = jsonObject.getJSONObject("user");
-                this.authName=user.getString("first_name")+ user.getString("last_name");
-                this.authImageUrl = user.getString("profile");
-                this.user_name_of_post=user.getString("user_name");
+            JSONObject user = jsonObject.getJSONObject("user");
+            this.authName = user.getString("first_name") + user.getString("last_name");
+            this.authImageUrl = user.getString("profile");
+            this.user_name_of_post = user.getString("user_name");
 
-                JSONArray likes = jsonObject.getJSONArray("likes");
-                this.like = likes.length()+"";
+            JSONArray likes = jsonObject.getJSONArray("likes");
+            this.like = likes.length() + "";
 
-               JSONArray commentsLimited=jsonObject.getJSONArray("comments_limited");
+            JSONArray commentsLimited = jsonObject.getJSONArray("comments_limited");
 
-               for(int i=0;i<commentsLimited.length();i++)
-               {
-                   try {
-                       JSONObject jsonObject1=commentsLimited.getJSONObject(i);
-                        this.commentId = jsonObject1.getInt("id");
-                       comments_limited limited=new comments_limited(jsonObject1.getJSONArray("likes").length(),jsonObject1.getJSONObject("user").getString("first_name")+" "+jsonObject1.getJSONObject("user").getString("last_name"),
-                               jsonObject1.getJSONObject("user").getString("profile"),jsonObject1.getInt("id"),jsonObject1.getInt("user_id"),
-                               jsonObject1.getInt("commentable_id"),jsonObject1.getString("commentable_type"),
-                               jsonObject1.getString("body"),jsonObject1.getString("created_at"),jsonObject1.getString("updated_at"));
-                      this.commentsLimitedArrayList.add(limited);
-
-
-                   } catch (JSONException e) {
-                       e.printStackTrace();
-                   }
+            for (int i = 0; i < commentsLimited.length(); i++) {
+                try {
+                    JSONObject jsonObject1 = commentsLimited.getJSONObject(i);
+                    this.commentId = jsonObject1.getInt("id");
+                    comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
+                            jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
+                            jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
+                            jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
+                    this.commentsLimitedArrayList.add(limited);
 
 
-               }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
 
+            }
 
 
 //            this.comments = jsonObject.getString("comments_count");
@@ -113,13 +112,12 @@ public class NewsFeedStatus implements Serializable {
 //            this.like = jsonObject.getString("likes");
 
 
-
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-            public String getUserImageUrl() {
+    public String getUserImageUrl() {
         return userImageUrl;
     }
 

@@ -1,3 +1,4 @@
+
 package com.hackerkernel.user.sqrfactor;
 
 import android.app.Fragment;
@@ -29,6 +30,8 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
+import com.hackerkernel.user.sqrfactor.HomeScreen;
+import com.hackerkernel.user.sqrfactor.UserClass;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,33 +46,33 @@ public class LoginFragment extends Fragment {
     private SharedPreferences loginPreferences;
     private SharedPreferences.Editor loginPrefsEditor;
     private Boolean saveLogin;
-    private String username,password;
+    private String username, password;
     private Button login;
     private TextView forgot;
-    private EditText loginEmail,loginPassword;
+    private EditText loginEmail, loginPassword;
     private CheckBox loginRemberMe;
     private SharedPreferences.Editor editor;
-    private SharedPreferences  mPrefs;
+    private SharedPreferences mPrefs;
 
     //static interface Listener;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.fragment_login, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_login, container, false);
 
-        SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,getActivity().MODE_PRIVATE);
+        SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME", getActivity().MODE_PRIVATE);
         editor = sharedPref.edit();
 
-        mPrefs = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        mPrefs = getActivity().getSharedPreferences("User", MODE_PRIVATE);
 
-        login = (Button)rootView.findViewById(R.id.login);
-        forgot = (TextView)rootView.findViewById(R.id.forgot);
-        loginEmail=(EditText) rootView.findViewById(R.id.loginEmail);
-        loginPassword=(EditText) rootView.findViewById(R.id.loginPassword);
-        loginRemberMe=(CheckBox) rootView.findViewById(R.id.rememberMeLoginCheckBox);
+        login = (Button) rootView.findViewById(R.id.login);
+        forgot = (TextView) rootView.findViewById(R.id.forgot);
+        loginEmail = (EditText) rootView.findViewById(R.id.loginEmail);
+        loginPassword = (EditText) rootView.findViewById(R.id.loginPassword);
+        loginRemberMe = (CheckBox) rootView.findViewById(R.id.rememberMeLoginCheckBox);
 
-        loginPreferences =getActivity().getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPreferences = getActivity().getSharedPreferences("loginPrefs", MODE_PRIVATE);
         loginPrefsEditor = loginPreferences.edit();
         saveLogin = loginPreferences.getBoolean("saveLogin", false);
         if (saveLogin == true) {
@@ -83,8 +86,8 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                 Toast.makeText(getActivity().getApplicationContext(), "Token" + loginEmail.getText()+loginPassword.getText(), Toast.LENGTH_SHORT).show();
-               // if(!TextUtils.isEmpty(loginEmail.getText())&&!TextUtils.isEmpty(loginPassword.getText())) {
+                Toast.makeText(getActivity().getApplicationContext(), "Token" + loginEmail.getText() + loginPassword.getText(), Toast.LENGTH_SHORT).show();
+                // if(!TextUtils.isEmpty(loginEmail.getText())&&!TextUtils.isEmpty(loginPassword.getText())) {
 //                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 //                imm.hideSoftInputFromWindow(loginEmail.getWindowToken(), 0);
 
@@ -130,19 +133,19 @@ public class LoginFragment extends Fragment {
                     public void onResponse(String response) {
                         Log.v("Reponse", response);
                         try {
-                            JSONObject jsonObject=new JSONObject(response);
+                            JSONObject jsonObject = new JSONObject(response);
 
-                            UserClass userClass=new UserClass(jsonObject);
+                            UserClass userClass = new UserClass(jsonObject);
                             // notification listner for like and comment
-                            FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications"+userClass.getUserId());
+                            FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications" + userClass.getUserId());
 
-                            JSONObject TokenObject= jsonObject.getJSONObject("success");
+                            JSONObject TokenObject = jsonObject.getJSONObject("success");
                             String Token = TokenObject.getString("token");
                             Log.v("token", Token);
                             //Toast.makeText(getActivity().getApplicationContext(), "Token" + Token, Toast.LENGTH_SHORT).show();
                             //SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,MODE_PRIVATE);
                             //SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putString("TOKEN",Token);
+                            editor.putString("TOKEN", Token);
                             SharedPreferences.Editor prefsEditor = mPrefs.edit();
                             Gson gson = new Gson();
                             String json = gson.toJson(userClass);
@@ -156,7 +159,7 @@ public class LoginFragment extends Fragment {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        }
+                    }
                 },
                 new Response.ErrorListener() {
 
@@ -172,15 +175,17 @@ public class LoginFragment extends Fragment {
                 params.put("Accept", "application/json");
                 return params;
             }
+
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                params.put("email",loginEmail.getText().toString());
+                params.put("email", loginEmail.getText().toString());
                 params.put("password", loginPassword.getText().toString());
                 return params;
             }
         };
         requestQueue.add(myReq);
     }
-
 }
+
+
