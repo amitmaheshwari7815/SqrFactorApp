@@ -22,18 +22,27 @@ public class NewsFeedStatus implements Serializable {
     public ArrayList<comments_limited> commentsLimitedArrayList = new ArrayList<>();
 
 
-    public NewsFeedStatus(int postId, int userId, int sharedId, int commentId, String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String like, String comments, String share, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike) {
+    public NewsFeedStatus(String type, String credits_earned, String is_Shared, String deleted_at, String paid_at, String week_views, String user_name_of_post, int user_post_id, String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String fullDescription, String like, String comments, String share, String slug, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike, int postId, int userId, int sharedId, int commentId, JSONObject jsonObject, ArrayList<comments_limited> commentsLimitedArrayList) {
+        this.type = type;
+        this.credits_earned = credits_earned;
+        this.is_Shared = is_Shared;
+        this.deleted_at = deleted_at;
+        this.paid_at = paid_at;
+        this.week_views = week_views;
+        this.user_name_of_post = user_name_of_post;
+        this.user_post_id = user_post_id;
         this.userImageUrl = userImageUrl;
         this.authImageUrl = authImageUrl;
         this.authName = authName;
         this.time = time;
-
         this.postTitle = postTitle;
         this.shortDescription = shortDescription;
         this.postImage = postImage;
+        this.fullDescription = fullDescription;
         this.like = like;
         this.comments = comments;
         this.share = share;
+        this.slug = slug;
         this.commentProfileImageUrl = commentProfileImageUrl;
         this.commentUserName = commentUserName;
         this.commentTime = commentTime;
@@ -43,6 +52,8 @@ public class NewsFeedStatus implements Serializable {
         this.userId = userId;
         this.sharedId = sharedId;
         this.commentId = commentId;
+        this.jsonObject = jsonObject;
+        this.commentsLimitedArrayList = commentsLimitedArrayList;
     }
 
 
@@ -73,7 +84,7 @@ public class NewsFeedStatus implements Serializable {
             this.paid_at = jsonObject.getString("paid_at");
             this.deleted_at = jsonObject.getString("deleted_at");
             this.user_post_id = jsonObject.getInt("user_post_id");
-            this.is_Shared = jsonObject.getString("is_Shared");
+            this.is_Shared = jsonObject.getString("is_shared");
             this.time = jsonObject.getString("updated_at");
             this.comments = jsonObject.getString("comments_count");
             this.sharedId = jsonObject.getInt("shared_id");

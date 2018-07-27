@@ -66,8 +66,27 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             holder.notificationLine.setText("Liked your comment");
         }
         holder.name.setText(notificationsClass.getName());
-        holder.postTitle.setText(notificationsClass.getTitle());
-        String dtc = notificationsClassArrayList.get(position).getTime();
+        if(notificationsClass.getType().equals("status"))
+        {
+            Log.v("status1",notificationsClass.getType());
+            holder.description.setText(notificationsClass.getDescription());
+
+        }
+
+        else if(notificationsClass.getType().equals("design"))
+        {
+            Log.v("status2",notificationsClass.getType());
+            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.description.setText(notificationsClass.getDescription());
+        }
+
+        else if(notificationsClass.getType().equals("article"))
+        {
+            Log.v("status2",notificationsClass.getType());
+            holder.description.setText(notificationsClass.getDescription());
+        }
+        holder.description.setText(notificationsClass.getDescription());
+        String dtc = notificationsClass.getTime();
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
         Date date = null;
@@ -86,9 +105,6 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         long diff = today - thatDay.getTimeInMillis();
         long days = diff/(24*60*60*1000);
-        long hours = diff/(60*60*1000)%24;
-        long minutes = diff/(60*1000)%60;
-        long seconds = diff/(1000%60);
         holder.time.setText(days+ "2 days ago");
 
         Glide.with(context).load("https://archsqr.in/"+notificationsClass.getProfile())
@@ -98,12 +114,12 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     @Override
     public int getItemCount() {
-        return 4;
+        return notificationsClassArrayList.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView name,notificationLine,time,postTitle;
+        public TextView name,notificationLine,time,postTitle,description;
         public ImageView profile;
 
 
@@ -113,7 +129,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             notificationLine = (TextView)itemView.findViewById(R.id.notification_line);
             name = (TextView)itemView.findViewById(R.id.notification_name);
             time = (TextView)itemView.findViewById(R.id.notification_time);
-            postTitle = (TextView)itemView.findViewById(R.id.notification_title);
+            description= (TextView)itemView.findViewById(R.id.notification_title);
             profile =(ImageView)itemView.findViewById(R.id.notification_user_image);
         }
     }

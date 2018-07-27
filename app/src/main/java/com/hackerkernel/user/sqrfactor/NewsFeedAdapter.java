@@ -46,7 +46,7 @@ import java.util.Map;
 import static android.content.Context.MODE_PRIVATE;
 
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyViewHolder> {
-    private ArrayList<NewsFeedStatus.NewsFeedStatus> newsFeedStatuses;
+    private ArrayList<NewsFeedStatus> newsFeedStatuses;
     private Context context;
     int flag = 0;
     private PopupWindow popupWindow;
@@ -54,7 +54,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     private DatabaseReference ref;
 
 
-    public NewsFeedAdapter(ArrayList<NewsFeedStatus.NewsFeedStatus> newsFeedStatuses, Context context) {
+    public NewsFeedAdapter(ArrayList<NewsFeedStatus> newsFeedStatuses, Context context) {
         this.newsFeedStatuses = newsFeedStatuses;
         this.context = context;
     }
@@ -69,14 +69,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        final NewsFeedStatus.NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
+        final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
 
-
-        holder.time.setText(newsFeedStatus.getTime());
-        Log.v("status",newsFeedStatus.getType());
-//
-
-//        holder.time.setText(newsFeedStatus.getTime());
         Log.v("status",newsFeedStatus.getType());
         if(newsFeedStatus.getType().equals("status"))
         {
@@ -116,7 +110,6 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
         }
 
         String dtc = newsFeedStatus.getTime();
-       // Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
         Log.v("sdf1",sdf1.toString());

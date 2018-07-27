@@ -84,6 +84,7 @@ public class HomeScreen extends ToolbarActivity {
                 switch (tab.getPosition()){
 
                     case 0:
+                        break;
 
                     case 1:
                         tab.setIcon(R.drawable.envelope_filled);
@@ -231,70 +232,7 @@ public class HomeScreen extends ToolbarActivity {
         //ll.getChildAt(0).setSelected(true);
     }
 
-    /*private class SectionsPagerAdapter extends FragmentStatePagerAdapter{
 
-
-        public SectionsPagerAdapter(FragmentManager fm) {
-            super(fm);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-
-            switch (position){
-
-                case 0:
-                    return new TrophyFragment();
-
-                case 1:
-                    return new MessagesFragment();
-
-                case 2:
-                    return new TrophyFragment();
-
-            }
-
-            return null;
-
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-        /*@Nullable
-        @Override
-        public CharSequence getPageTitle(int position) {
-
-            switch (position){
-
-                case 0:
-                    return "Status";
-
-                case 1:
-                    return "Status";
-
-                case 2:
-                    return "Status";
-
-                case 3:
-                    return "Status";
-
-            }
-
-            return null;
-
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START))
-            drawer.closeDrawers();
-        else
-            super.onBackPressed();
-    }*/
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);

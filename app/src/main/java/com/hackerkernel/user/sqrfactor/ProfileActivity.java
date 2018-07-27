@@ -7,6 +7,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -15,8 +16,23 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProfileActivity extends ToolbarActivity {
     private ArrayList<ProfileClass> profileClassList = new ArrayList<>();
@@ -59,6 +75,7 @@ public class ProfileActivity extends ToolbarActivity {
         editProfile = (Button)findViewById(R.id.profile_editprofile);
         coverImage = (ImageView) findViewById(R.id.profile_cover_image);
         profileImage = (ImageView) findViewById(R.id.profile_profile_image);
+        profileName =(TextView)findViewById(R.id.profile_profile_name);
         profileStatusImage = (ImageView) findViewById(R.id.profile_status_image);
         followCnt = (TextView) findViewById(R.id.profile_followerscnt);
         followingCnt = (TextView) findViewById(R.id.profile_followingcnt);
@@ -188,6 +205,53 @@ public class ProfileActivity extends ToolbarActivity {
 
             }
         });
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/detail/sqrfactor",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("MorenewsFeedFromServer", response);
+                        Toast.makeText(ProfileActivity.this, response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            ProfileClass profileClass = new ProfileClass(jsonObject);
+                            profileClassList.add(profileClass);
+                            followCnt.setText(profileClass.getFollowerscnt());
+                            followingCnt.setText(profileClass.getFollowingcnt());
+                            portfolioCnt.setText(profileClass.getPortfoliocnt());
+                            bluePrintCnt.setText(profileClass.getBluePrintcnt());
+                            profileName.setText(profileClass.getUser_name());
+                            Glide.with(getApplicationContext()).load("https://archsqr.in/"+profileClass.getProfile())
+                                    .into(profileImage);
+
+                            profileAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
 
     }
+
 }
