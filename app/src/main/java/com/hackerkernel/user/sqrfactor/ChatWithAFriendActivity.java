@@ -85,7 +85,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         friendProfile = intent.getExtras().getString("FriendProfileUrl");
         friendName = intent.getExtras().getString("FriendName");
         //getActionBar().setTitle(friendName);
-       // getSupportActionBar().setTitle(friendName);
+        getSupportActionBar().setTitle(friendName);
         //friendNametext.setText(friendName);
 
 

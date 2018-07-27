@@ -69,6 +69,7 @@
 
         <CheckBox
             android:layout_width="wrap_content"
+            android:id="@+id/rememberMeLoginCheckBox"
             android:layout_height="wrap_content" />
 
         <TextView

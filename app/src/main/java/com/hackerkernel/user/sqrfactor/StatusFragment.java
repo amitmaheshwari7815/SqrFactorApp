@@ -107,8 +107,8 @@ public class StatusFragment extends Fragment {
         layoutManager = new LinearLayoutManager(this.getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
-       // newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
-       // recyclerView.setAdapter(newsFeedAdapter);
+        newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
+        recyclerView.setAdapter(newsFeedAdapter);
         Log.v("status","hello");
 
 

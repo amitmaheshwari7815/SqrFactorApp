@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -12,7 +13,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,9 +40,16 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class LoginFragment extends Fragment {
 
-    Button login;
-    TextView forgot;
-    EditText loginEmail,loginPassword;
+    private SharedPreferences loginPreferences;
+    private SharedPreferences.Editor loginPrefsEditor;
+    private Boolean saveLogin;
+    private String username,password;
+    private Button login;
+    private TextView forgot;
+    private EditText loginEmail,loginPassword;
+    private CheckBox loginRemberMe;
+    private SharedPreferences.Editor editor;
+    private SharedPreferences  mPrefs;
 
     //static interface Listener;
 
@@ -49,16 +59,24 @@ public class LoginFragment extends Fragment {
         ViewGroup rootView = (ViewGroup)inflater.inflate(R.layout.fragment_login, container, false);
 
         SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,getActivity().MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPref.edit();
+        editor = sharedPref.edit();
 
-        final SharedPreferences  mPrefs = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        mPrefs = getActivity().getSharedPreferences("User",MODE_PRIVATE);
 
         login = (Button)rootView.findViewById(R.id.login);
         forgot = (TextView)rootView.findViewById(R.id.forgot);
         loginEmail=(EditText) rootView.findViewById(R.id.loginEmail);
         loginPassword=(EditText) rootView.findViewById(R.id.loginPassword);
+        loginRemberMe=(CheckBox) rootView.findViewById(R.id.rememberMeLoginCheckBox);
 
-
+        loginPreferences =getActivity().getSharedPreferences("loginPrefs", MODE_PRIVATE);
+        loginPrefsEditor = loginPreferences.edit();
+        saveLogin = loginPreferences.getBoolean("saveLogin", false);
+        if (saveLogin == true) {
+            loginEmail.setText(loginPreferences.getString("username", ""));
+            loginPassword.setText(loginPreferences.getString("password", ""));
+            loginRemberMe.setChecked(true);
+        }
 
 
         login.setOnClickListener(new View.OnClickListener() {
@@ -67,80 +85,23 @@ public class LoginFragment extends Fragment {
             public void onClick(View v) {
                  Toast.makeText(getActivity().getApplicationContext(), "Token" + loginEmail.getText()+loginPassword.getText(), Toast.LENGTH_SHORT).show();
                // if(!TextUtils.isEmpty(loginEmail.getText())&&!TextUtils.isEmpty(loginPassword.getText())) {
-                RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-                    StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/login",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String response) {
-                                    Log.v("Reponse", response);
-                                    try {
-                                        JSONObject jsonObject=new JSONObject(response);
+//                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(loginEmail.getWindowToken(), 0);
 
-                                        UserClass userClass=new UserClass(jsonObject);
-                                        // notification listner for like and comment
-                                        FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications"+userClass.getUserId());
+                username = loginEmail.getText().toString();
+                password = loginPassword.getText().toString();
 
-                                        JSONObject TokenObject= jsonObject.getJSONObject("success");
-                                        String Token = TokenObject.getString("token");
-                                        Log.v("token", Token);
-                                        //Toast.makeText(getActivity().getApplicationContext(), "Token" + Token, Toast.LENGTH_SHORT).show();
-                                        //SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,MODE_PRIVATE);
-                                        //SharedPreferences.Editor editor = sharedPref.edit();
-                                        editor.putString("TOKEN",Token);
-                                        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-                                        Gson gson = new Gson();
-                                        String json = gson.toJson(userClass);
-                                        prefsEditor.putString("MyObject", json);
-                                        prefsEditor.commit();
-                                        editor.commit();
+                if (loginRemberMe.isChecked()) {
+                    loginPrefsEditor.putBoolean("saveLogin", true);
+                    loginPrefsEditor.putString("username", username);
+                    loginPrefsEditor.putString("password", password);
+                    loginPrefsEditor.commit();
+                } else {
+                    loginPrefsEditor.clear();
+                    loginPrefsEditor.commit();
+                }
 
-//                                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("PREF_NAME",getActivity().MODE_PRIVATE);
-//                                        String token = sharedPreferences.getString("TOKEN","sqr");
-//                                        Log.v("Token0",token);
-                                        Intent i = new Intent(getActivity(), HomeScreen.class);
-                                        startActivity(i);
-
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-
-                                   // Toast.makeText(getActivity().getApplicationContext(), "Token" + response.toString(), Toast.LENGTH_SHORT).show();
-
-                                    //interval=parseInterval(response);
-                                    // Log.v("Interval",interval+"");
-                                    //callback.onSuccess(interval);
-                                }
-                            },
-                            new Response.ErrorListener() {
-
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-
-                                }
-                            }) {
-
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Accept", "application/json");
-                            return params;
-                        }
-                        @Override
-                        protected Map<String, String> getParams() {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("email",loginEmail.getText().toString());
-                            params.put("password", loginPassword.getText().toString());
-                            return params;
-                        }
-                    };
-//                    VolleySingletonClass.getInstance(getContext()).addToRequestQue(myReq);
-                requestQueue.add(myReq);
-//                }
-//
-//                else {
-//                    Toast.makeText(getContext(),"Email or passwprd Empty",Toast.LENGTH_LONG).show();
-//                }
-
+                doSomethingElse();
 
 
             }
@@ -159,6 +120,67 @@ public class LoginFragment extends Fragment {
 
         return rootView;
 
+    }
+
+    public void doSomethingElse() {
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/login",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("Reponse", response);
+                        try {
+                            JSONObject jsonObject=new JSONObject(response);
+
+                            UserClass userClass=new UserClass(jsonObject);
+                            // notification listner for like and comment
+                            FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications"+userClass.getUserId());
+
+                            JSONObject TokenObject= jsonObject.getJSONObject("success");
+                            String Token = TokenObject.getString("token");
+                            Log.v("token", Token);
+                            //Toast.makeText(getActivity().getApplicationContext(), "Token" + Token, Toast.LENGTH_SHORT).show();
+                            //SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,MODE_PRIVATE);
+                            //SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString("TOKEN",Token);
+                            SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                            Gson gson = new Gson();
+                            String json = gson.toJson(userClass);
+                            prefsEditor.putString("MyObject", json);
+                            prefsEditor.commit();
+                            editor.commit();
+                            Intent i = new Intent(getActivity(), HomeScreen.class);
+                            startActivity(i);
+                            getActivity().finish();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                        }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("email",loginEmail.getText().toString());
+                params.put("password", loginPassword.getText().toString());
+                return params;
+            }
+        };
+        requestQueue.add(myReq);
     }
 
 }

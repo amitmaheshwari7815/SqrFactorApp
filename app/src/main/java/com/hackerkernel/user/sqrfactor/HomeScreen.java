@@ -16,6 +16,21 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public class HomeScreen extends ToolbarActivity {
 
     Toolbar toolbar;
@@ -144,9 +159,50 @@ public class HomeScreen extends ToolbarActivity {
                     startActivity(intent);
 
                 }
+                if (id == R.id.navigation_logout){
+
+                    //call api here for logout
+                    RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+                    StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/logout",
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+                                    Log.v("ReponseFeed", response);
+//
+
+                                    }
+                            },
+                            new Response.ErrorListener() {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+
+                                }
+                            }) {
+
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> params = new HashMap<String, String>();
+                            params.put("Accept", "application/json");
+                            params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                            return params;
+                        }
+
+                    };
+
+
+                    requestQueue.add(myReq);
+                    Intent intent = new Intent(HomeScreen.this,LoginScreen.class);
+                    startActivity(intent);
+                    finish();
+
+                }
+
+
                 menuItem.setChecked(false);
                 drawerLayout.closeDrawers();
-                Toast.makeText(HomeScreen.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
+                //Toast.makeText(HomeScreen.this, menuItem.getTitle(), Toast.LENGTH_LONG).show();
                 return false;
             }
         });
