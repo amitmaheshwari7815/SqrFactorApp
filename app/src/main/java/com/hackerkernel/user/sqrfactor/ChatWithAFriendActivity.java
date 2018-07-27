@@ -114,7 +114,11 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
             }
         };
         // Adds the scroll listener to RecyclerView
+
 //        recycler.addOnScrollListener(scrollListener);
+
+        //recycler.addOnScrollListener(scrollListener);
+
 
 //        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
 //            @Override

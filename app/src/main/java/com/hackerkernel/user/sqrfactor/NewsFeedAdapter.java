@@ -71,7 +71,6 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
 
-        Log.v("status",newsFeedStatus.getType());
         if(newsFeedStatus.getType().equals("status"))
         {
             Log.v("status1",newsFeedStatus.getType());
@@ -353,6 +352,14 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                 if (flag == 0) {
                     commentLike.setTextColor(context.getColor(R.color.sqr));
                     flag = 1;
+                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json = mPrefs.getString("MyObject", "");
+                    UserClass userClass = gson.fromJson(json, UserClass.class);
+                    NotificationClass notificationClass=new NotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Commented");
+                    ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(notificationClass);
+
+
                 }
                 else {
                     commentLike.setTextColor(context.getColor(R.color.gray));

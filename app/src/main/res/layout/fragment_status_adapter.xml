@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
     <android.support.v7.widget.CardView
         android:id="@+id/news_post_card"
         android:layout_width="match_parent"
@@ -89,11 +90,15 @@
                     android:layout_height="wrap_content"
                     android:textStyle="bold"/>
 
+
                 <TextView
                     android:id="@+id/news_short_Descrip"
                     android:layout_width="match_parent"
+
                     android:layout_height="wrap_content"
-                    android:textStyle="bold"/>
+                    android:textStyle="bold"
+                    android:textSize="18sp"/>
+
 
                 <TextView
                     android:id="@+id/news_full_Descrip"
