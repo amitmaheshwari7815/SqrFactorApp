@@ -68,7 +68,7 @@
         android:weightSum="4">
 
         <CheckBox
-            android:id="@+id/rememberMeLoginCheckBox"
+
             android:layout_width="wrap_content"
             android:id="@+id/rememberMeLoginCheckBox"
             android:layout_height="wrap_content" />

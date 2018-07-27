@@ -85,7 +85,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         friendProfile = intent.getExtras().getString("FriendProfileUrl");
         friendName = intent.getExtras().getString("FriendName");
         //getActionBar().setTitle(friendName);
-        getSupportActionBar().setTitle(friendName);
+        //getSupportActionBar().setTitle(friendName);
         //friendNametext.setText(friendName);
 
 
@@ -114,7 +114,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
             }
         };
         // Adds the scroll listener to RecyclerView
-        recycler.addOnScrollListener(scrollListener);
+        //recycler.addOnScrollListener(scrollListener);
 
 //        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
 //            @Override
@@ -517,7 +517,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjdkNWFhZjYxOWUwYTA5YmMyYTI0NWUxYmM2YjNhZWQ2MGVhNjE2OThlYTc3ODFiZjQyYTczZTNiYzg1NzRkM2MxZmFhZGY3MThjZWVmMjQ0In0.eyJhdWQiOiIzIiwianRpIjoiN2Q1YWFmNjE5ZTBhMDliYzJhMjQ1ZTFiYzZiM2FlZDYwZWE2MTY5OGVhNzc4MWJmNDJhNzNlM2JjODU3NGQzYzFmYWFkZjcxOGNlZWYyNDQiLCJpYXQiOjE1MzE5OTQwMTgsIm5iZiI6MTUzMTk5NDAxOCwiZXhwIjoxNTYzNTMwMDE4LCJzdWIiOiIxMDYiLCJzY29wZXMiOltdfQ.PAxn8PQGfuXIOOj4hOjT_GhP3GBrLH_XtfrClo-AlgPYH4H0lfjh2wpwSQrPMLL3_WT3wkSvEhEhcUQGMuC1zhb6Ncv1h8grHq5P8gLyXXU3qTo_hcwm4jsNvadG4KZMPGthvRR2rz864JSKRdkHs4wXaAb0aIkZXJeOSRJ-m1AOUqgMv0FKEio3Zz-PMqX42i8FDoZi7OnHrBtorwg7zU88csNdaLbpI8XkcfzZxo-oONHSN4YBl8A48Mdr6nRX8nTEcwR8H17cw_1eQ4wGml04_z4wkeGVdS8vcS55rDFIAVZnKR2LWDkhXT0USPjreG5E90QtNPLSOLxmAvyQ-c-t_V2diki4TWHojpA-BpvGIVNxBIzHyzjwvD9ec6rFqO3c0B5YlmXp_4edHyP6KZ3vpNuEMSVZa_2v0pgNUnJOTzumwoitFYHaS_0AcIiJLze1nSkhjOnAYpag6tuLQq-BGNSd4xz8v9HeE9o53RbZ5W-u-H6CSLXS1thzX4mUAxML2VBwo0rdFs1hTOMx9XeSM3C6d4rPYFtaT6GXi6FR902IkyAEexPvIRaHvtEf_BOPB1HeZtRMTeBaAi32tnWvOmy9cik613Rn8mFGvVYT_yJCWIpu4wteRnfJ_y3KTeHKs3a4cDkO_mgRK11AtPIzFJ9nshUkqx5pyMdbcyE");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
                 return params;
             }
         };

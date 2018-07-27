@@ -113,7 +113,7 @@ public class NotificationsActivity extends ToolbarActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6Ijg2Mjc1NzgxMmIzMmM3MWY5NGRhMWM3MDEzZGNjYTYzMzA0ODIzNzYyMTFmNzAwMGI0MTQxYjY2MDEzMGUyYTAzZjJjZTY1NTkwYTUxZjY3In0.eyJhdWQiOiIzIiwianRpIjoiODYyNzU3ODEyYjMyYzcxZjk0ZGExYzcwMTNkY2NhNjMzMDQ4MjM3NjIxMWY3MDAwYjQxNDFiNjYwMTMwZTJhMDNmMmNlNjU1OTBhNTFmNjciLCJpYXQiOjE1MzIwODMyNTksIm5iZiI6MTUzMjA4MzI1OSwiZXhwIjoxNTYzNjE5MjU5LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.o61HxX3vrr-O8UfzSfNy5J2qIisywW8EodRcDbGEY896kjjkYQN3xWBmiP2zaxlDeloZjtlYtYa_1AYKhXreOlhB5SmE3xeXulKQFVPRtlfzfEWtoGvhhBfggqnhq0qa3zlWX6nty7Eu0qyAwtCPPrKEEGPi3TDcVI7OWXC0v-_drkP7fqiVxH02AThSeH4XeDbkvw7bNkZHFgvZesbkrTvWqW0v4UAA7VcZw_n6icVW_Ce2xYLsxrpmVKtLxTWp0731qU5KVB861R5Xzh4Wbew7SoipjjZiyY9ZWqegUoSZi-oMgS5YIuGKMqmj8u9Hy7Ug7O4bmC_Mu4Mkhtz7Pi3bt6oCA1tgjnqkkeRRJriV9JnBm-DliwCCnyKYijQjzKYeV_vo62FkzGAViBUOLkU0bgD3cLfy314ipvRAd_OasRQv9riRtH50FkKkqz7vqI1WDrDciE1Tnz2HbdxjHHeOixvZZrOqMqghY87dsG4fPJ_gNFuml4yCllfBy-o2la13D2OOmryeEs3WVNHi0MatS4srfPg1AzxUXD5sPS0AT_jvso9Cz5DtWtyw0K_eRQJW-p-pmlta9gkC7E0zRenwm4wG7Jc76aiUJOzVVbBaBzSsDsdQOExjlp7AW_kzIzVI8gM1eXMdVsAaXqXo_774IBgAjKve4So4VL5RnUU");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
 
                 return params;
             }

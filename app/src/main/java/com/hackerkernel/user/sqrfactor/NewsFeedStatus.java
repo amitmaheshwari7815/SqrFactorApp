@@ -73,7 +73,7 @@ public class NewsFeedStatus implements Serializable {
             this.paid_at = jsonObject.getString("paid_at");
             this.deleted_at = jsonObject.getString("deleted_at");
             this.user_post_id = jsonObject.getInt("user_post_id");
-            this.is_Shared = jsonObject.getString("is_Shared");
+            this.is_Shared = jsonObject.getString("is_shared");
             this.time = jsonObject.getString("updated_at");
             this.comments = jsonObject.getString("comments_count");
             this.sharedId = jsonObject.getInt("shared_id");

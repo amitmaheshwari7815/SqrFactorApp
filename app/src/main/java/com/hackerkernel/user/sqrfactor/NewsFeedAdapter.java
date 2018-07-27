@@ -46,7 +46,7 @@ import java.util.Map;
 import static android.content.Context.MODE_PRIVATE;
 
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyViewHolder> {
-    private ArrayList<NewsFeedStatus.NewsFeedStatus> newsFeedStatuses;
+    private ArrayList<NewsFeedStatus> newsFeedStatuses;
     private Context context;
     int flag = 0;
     private PopupWindow popupWindow;
@@ -54,7 +54,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     private DatabaseReference ref;
 
 
-    public NewsFeedAdapter(ArrayList<NewsFeedStatus.NewsFeedStatus> newsFeedStatuses, Context context) {
+    public NewsFeedAdapter(ArrayList<NewsFeedStatus> newsFeedStatuses, Context context) {
         this.newsFeedStatuses = newsFeedStatuses;
         this.context = context;
     }
@@ -69,15 +69,15 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        final NewsFeedStatus.NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
+        final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
 
 
-        holder.time.setText(newsFeedStatus.getTime());
-        Log.v("status",newsFeedStatus.getType());
+       // holder.time.setText(newsFeedStatus.getTime());
+        //Log.v("status",newsFeedStatus.getType());
 //
 
 //        holder.time.setText(newsFeedStatus.getTime());
-        Log.v("status",newsFeedStatus.getType());
+//        Log.v("status",newsFeedStatus.getType());
         if(newsFeedStatus.getType().equals("status"))
         {
             Log.v("status1",newsFeedStatus.getType());
@@ -360,6 +360,14 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                 if (flag == 0) {
                     commentLike.setTextColor(context.getColor(R.color.sqr));
                     flag = 1;
+                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json = mPrefs.getString("MyObject", "");
+                    UserClass userClass = gson.fromJson(json, UserClass.class);
+                    NotificationClass notificationClass=new NotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Commented");
+                    ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(notificationClass);
+
+
                 }
                 else {
                     commentLike.setTextColor(context.getColor(R.color.gray));
