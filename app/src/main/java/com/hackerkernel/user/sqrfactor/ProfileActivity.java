@@ -59,7 +59,7 @@ public class ProfileActivity extends ToolbarActivity {
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        recyclerView = findViewById(R.id.news_recycler);
+        recyclerView = findViewById(R.id.profile_recycler);
         layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);

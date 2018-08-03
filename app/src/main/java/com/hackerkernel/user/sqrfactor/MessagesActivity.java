@@ -40,6 +40,8 @@ public class MessagesActivity extends ToolbarActivity {
     LinearLayoutManager layoutManager;
     public static String userProfile,userName;
     public static int userId;
+    public static FirebaseDatabase database;
+    public static DatabaseReference ref;
 
 
     public static String getUserProfile() {
@@ -74,6 +76,9 @@ public class MessagesActivity extends ToolbarActivity {
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        database= FirebaseDatabase.getInstance();
+
+        ref = database.getReference();
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.back_arrow);

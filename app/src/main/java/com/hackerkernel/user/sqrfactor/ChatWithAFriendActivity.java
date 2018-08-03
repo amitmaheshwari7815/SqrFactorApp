@@ -61,8 +61,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
     private static final int MAX_ITEMS_PER_REQUEST = 20;
     private static final int NUMBER_OF_ITEMS = 100;
     private static final int SIMULATED_LOADING_TIME_IN_MS = 1500;
-    public FirebaseDatabase database;
-    public DatabaseReference ref;
+
 
     private EndlessRecyclerOnScrollListener scrollListener;
 
@@ -73,9 +72,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         setContentView(R.layout.activity_chat_with_afriend);
 
 
-        database= FirebaseDatabase.getInstance();
 
-        ref = database.getReference();
         friendNametext = (TextView) findViewById(R.id.friendName);
         messageToSend = (EditText) findViewById(R.id.messageToSend);
         sendMessageButton = (ImageButton) findViewById(R.id.sendButton);
@@ -104,15 +101,15 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         recycler.setAdapter(chatWithAFriendActivityAdapter);
         //recycler.addOnScrollListener(createInfiniteScrollListener());
 
-        scrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
-            @Override
-            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                fetchMoreChatDataFromServer();
-                // Triggered only when new data needs to be appended to the list
-                // Add whatever code is needed to append new items to the bottom of the list
-                //fetchMoreChatDataFromServer();
-            }
-        };
+//        scrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
+//            @Override
+//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+//                fetchMoreChatDataFromServer();
+//                // Triggered only when new data needs to be appended to the list
+//                // Add whatever code is needed to append new items to the bottom of the list
+//                //fetchMoreChatDataFromServer();
+//            }
+//        };
         // Adds the scroll listener to RecyclerView
 
 //        recycler.addOnScrollListener(scrollListener);
@@ -221,12 +218,6 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
 
         //recycler.smoothScrollToPosition(recycler.getAdapter().getItemCount() - 1);
-
-
-
-
-
-
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/myallMSG/getChat/" + id,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -248,7 +239,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
                             //Collections.reverse(messageClassArrayList);
                             chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                            recycler.scrollToPosition(messageClassArrayList.size()-1);
+                            //recycler.scrollToPosition(messageClassArrayList.size()-1);
                             FirebaseListner();
 
 
@@ -295,7 +286,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                 SendMessageToServer();
                 LastMessage lastMessage=new LastMessage(MessagesActivity.userId,messageToSend.getText().toString());
 
-                ref.child(id+"").setValue(lastMessage);
+                MessagesActivity.ref.child(id+"").setValue(lastMessage);
                 Toast.makeText(ChatWithAFriendActivity.this, "Messeage sent..", Toast.LENGTH_LONG).show();
             }
         });
@@ -374,7 +365,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
                             //Collections.reverse(messageClassArrayList);
                             chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                            recycler.scrollToPosition(messageClassArrayList.size()-1);
+                           // recycler.scrollToPosition(messageClassArrayList.size()-1);
 
 
 
@@ -417,7 +408,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void FirebaseListner()
     {
-        ref.child(MessagesActivity.userId+"").addValueEventListener(new ValueEventListener() {
+        MessagesActivity.ref.child(MessagesActivity.userId+"").addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -440,7 +431,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                     //Collections.reverse(messageClassArrayList);
                     //recycler.smoothScrollToPosition(recycler.getAdapter().getItemCount() - 1);
                     chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                    recycler.scrollToPosition(messageClassArrayList.size()-1);
+                    //recycler.scrollToPosition(messageClassArrayList.size()-1);
                     //recycler.scrollToPosition(messageClassArrayList.size()-1);
 //                    chatWithAFriendActivityAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
 //                        @Override
@@ -490,7 +481,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                         messageToSend.setText("");
                         chatWithAFriendActivityAdapter.notifyDataSetChanged();
 
-                        recycler.scrollToPosition(messageClassArrayList.size()-1);
+                       // recycler.scrollToPosition(messageClassArrayList.size()-1);
 
 
                     }

@@ -16,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -28,6 +29,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -110,7 +113,6 @@ public class StatusFragment extends Fragment {
         newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
         recyclerView.setAdapter(newsFeedAdapter);
         Log.v("status","hello");
-
 
         camera = rootView.findViewById(R.id.news_camera);
         displayImage = rootView.findViewById(R.id.news_upload_image);

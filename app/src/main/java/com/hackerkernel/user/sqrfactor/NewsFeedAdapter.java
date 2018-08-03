@@ -71,6 +71,13 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
 
+
+       // holder.time.setText(newsFeedStatus.getTime());
+        //Log.v("status",newsFeedStatus.getType());
+//
+
+//        holder.time.setText(newsFeedStatus.getTime());
+//        Log.v("status",newsFeedStatus.getType());
         if(newsFeedStatus.getType().equals("status"))
         {
             Log.v("status1",newsFeedStatus.getType());
@@ -109,6 +116,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
         }
 
         String dtc = newsFeedStatus.getTime();
+       // Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
         Log.v("sdf1",sdf1.toString());
@@ -184,6 +192,12 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             fullDescription=(TextView)itemView.findViewById(R.id.news_full_Descrip);
             like=(ImageButton) itemView.findViewById(R.id.news_post_like);
             comments=(TextView)itemView.findViewById(R.id.news_comment);
+            comments.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
             share=(TextView)itemView.findViewById(R.id.news_share);
             commentUserName=(TextView)itemView.findViewById(R.id.news_comment_name);
             commentTime=(TextView)itemView.findViewById(R.id.news_comment_time);
@@ -267,8 +281,20 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                         Gson gson = new Gson();
                         String json = mPrefs.getString("MyObject", "");
                         UserClass userClass = gson.fromJson(json, UserClass.class);
-                        NotificationClass notificationClass=new NotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Like");
-                        ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(notificationClass);
+
+                        Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
+                        if(newsFeedStatuses.get(getAdapterPosition()).getType().equals("status"))
+                        {
+                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),"Like",userClass.getUser_name());
+                            ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
+
+                        }
+                        else
+                        {
+                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Like",userClass.getUser_name());
+                            ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
+
+                        }
 
                         flag = 1;
                     }
@@ -356,8 +382,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                     Gson gson = new Gson();
                     String json = mPrefs.getString("MyObject", "");
                     UserClass userClass = gson.fromJson(json, UserClass.class);
-                    NotificationClass notificationClass=new NotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Commented");
-                    ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(notificationClass);
+                    PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Commented",userClass.getUser_name());
+                    ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
 
 
                 }

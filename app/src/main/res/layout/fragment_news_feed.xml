@@ -7,21 +7,46 @@
     tools:context=".NewsFeedFragment"
     android:orientation="vertical">
 
-    <android.support.design.widget.TabLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/tabs2"
+        android:orientation="horizontal"
+        android:gravity="center"
         android:background="@color/White"
-        app:tabIndicatorColor="@android:color/transparent">
+        android:weightSum="2">
 
-    </android.support.design.widget.TabLayout>
-
+        <Button
+            android:id="@+id/newsFeedbtn"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="News Feed"
+            android:layout_weight="1"
+            android:textStyle="bold"
+            android:textColor="#888da8"
+            android:textAllCaps="false"
+            android:background="@drawable/gray_border"/>
+        <Button
+            android:id="@+id/whatsRedbtn"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="What's Red?"
+            android:padding="10sp"
+            android:textAllCaps="false"
+            android:textColor="#888da8"
+            android:textStyle="bold"
+            android:background="@drawable/gray_border"/>
+    </LinearLayout>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/fragment"
         android:orientation="vertical">
-
     </LinearLayout>
+    <include layout="@layout/layout_fab_view"/>
+</FrameLayout>
 
 </LinearLayout>

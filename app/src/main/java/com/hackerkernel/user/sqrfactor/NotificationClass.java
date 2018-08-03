@@ -6,46 +6,32 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 
-public class NotificationClass implements Serializable {
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-    private int notificationFromId;
-    private String notificationSenderUrl;
-    private int postId;
-    private String notificationTitle;
-    private String notificationBody;
-    private String notificationType;
-    public String type, time, name, profile, body, postType, title,description;
-    public int userId, commentID, commentType;
+import java.io.Serializable;
+
+public class NotificationClass implements Serializable {
+    public String type, time, name, profile, body,postType,title,description;
+    public int postId, userId, commentID, commentType;
     public JSONObject jsonObject;
 
 
-    public NotificationClass(int userId, String profile, int postId, String postTitle, String shortDescription, String like) {
-
-    }
-
-    public NotificationClass(int notificationFromId, String notificationSenderUrl, int postId, String notificationTitle, String notificationBody, String notificationType, String type, String time, String name, String profile, String body, String postType, String title, String description, int userId, int commentID, int commentType, JSONObject jsonObject) {
-        this.notificationFromId = notificationFromId;
-        this.notificationSenderUrl = notificationSenderUrl;
-        this.postId = postId;
-        this.notificationTitle = notificationTitle;
-        this.notificationBody = notificationBody;
-        this.notificationType = notificationType;
+    public NotificationClass(String type, String time, String name, String profile,String description, String body,String postType,String title, int userId, int postId, int commentID, int commentType) {
         this.type = type;
         this.time = time;
         this.name = name;
         this.profile = profile;
         this.body = body;
+        this.userId = userId;
+        this.postId = postId;
+        this.commentID = commentID;
+        this.commentType = commentType;
         this.postType = postType;
         this.title = title;
         this.description = description;
-        this.userId = userId;
-        this.commentID = commentID;
-        this.commentType = commentType;
-        this.description = description;
-        this.jsonObject = jsonObject;
     }
-
-
 
     public NotificationClass(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
@@ -61,7 +47,7 @@ public class NotificationClass implements Serializable {
             this.profile = userfrom.getString("profile");
 
             JSONArray post = jsonObject.getJSONArray("post");
-            for (int j = 0; j < post.length(); j++) {
+            for (int j = 0; j < post.length(); j++){
                 JSONObject postObject = post.getJSONObject(j);
                 this.postType = postObject.getString("type");
                 this.title = postObject.getString("title");
@@ -75,7 +61,6 @@ public class NotificationClass implements Serializable {
         }
 
     }
-
     public String getType() {
         return type;
     }
@@ -116,20 +101,12 @@ public class NotificationClass implements Serializable {
         this.body = body;
     }
 
-    public String getPostType() {
-        return postType;
+    public int getPostId() {
+        return postId;
     }
 
-    public void setPostType(String postType) {
-        this.postType = postType;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
+    public void setPostId(int postId) {
+        this.postId = postId;
     }
 
     public int getUserId() {
@@ -156,27 +133,8 @@ public class NotificationClass implements Serializable {
         this.commentType = commentType;
     }
 
-    public JSONObject getJsonObject() {
-        return jsonObject;
-    }
-
-    public void setJsonObject(JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
-    }
-    public int getNotificationFromId() {
-        return notificationFromId;
-    }
-
-    public void setNotificationFromId(int notificationFromId) {
-        this.notificationFromId = notificationFromId;
-    }
-
-    public String getNotificationSenderUrl() {
-        return notificationSenderUrl;
-    }
-
-    public void setNotificationSenderUrl(String notificationSenderUrl) {
-        this.notificationSenderUrl = notificationSenderUrl;
+    public String getPostType() {
+        return postType;
     }
 
     public String getDescription() {
@@ -187,35 +145,25 @@ public class NotificationClass implements Serializable {
         this.description = description;
     }
 
-    public int getPostId() {
-        return postId;
+    public void setPostType(String postType) {
+        this.postType = postType;
     }
 
-    public void setPostId(int postId) {
-        this.postId = postId;
+    public String getTitle() {
+        return title;
     }
 
-    public String getNotificationTitle() {
-        return notificationTitle;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public void setNotificationTitle(String notificationTitle) {
-        this.notificationTitle = notificationTitle;
+    public JSONObject getJsonObject() {
+        return jsonObject;
+
     }
 
-    public String getNotificationBody() {
-        return notificationBody;
-    }
-
-    public void setNotificationBody(String motificationBody) {
-        this.notificationBody = motificationBody;
-    }
-
-    public String getNotificationType() {
-        return notificationType;
-    }
-
-    public void setNotificationType(String notificationType) {
-        this.notificationType = notificationType;
+    public void setJsonObject(JSONObject jsonObject) {
+        this.jsonObject = jsonObject;
     }
 }
+

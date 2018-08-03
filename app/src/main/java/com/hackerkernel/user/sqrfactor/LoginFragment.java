@@ -99,13 +99,12 @@ public class LoginFragment extends Fragment {
                     loginPrefsEditor.putString("username", username);
                     loginPrefsEditor.putString("password", password);
                     loginPrefsEditor.commit();
+                    doSomethingElse();
                 } else {
                     loginPrefsEditor.clear();
                     loginPrefsEditor.commit();
+                    doSomethingElse();
                 }
-
-                doSomethingElse();
-
 
             }
         });

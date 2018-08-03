@@ -66,25 +66,25 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
             holder.notificationLine.setText("Liked your comment");
         }
         holder.name.setText(notificationsClass.getName());
-        if(notificationsClass.getType().equals("status"))
-        {
-            Log.v("status1",notificationsClass.getType());
-            holder.description.setText(notificationsClass.getDescription());
-
-        }
-
-        else if(notificationsClass.getType().equals("design"))
-        {
-            Log.v("status2",notificationsClass.getType());
-            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
-            holder.description.setText(notificationsClass.getDescription());
-        }
-
-        else if(notificationsClass.getType().equals("article"))
-        {
-            Log.v("status2",notificationsClass.getType());
-            holder.description.setText(notificationsClass.getDescription());
-        }
+//        if(notificationsClass.getType().equals("status"))
+//        {
+//            Log.v("status1",notificationsClass.getType());
+//            holder.description.setText(notificationsClass.getDescription());
+//
+//        }
+//
+//        else if(notificationsClass.getType().equals("design"))
+//        {
+//            Log.v("status2",notificationsClass.getType());
+//            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+//            holder.description.setText(notificationsClass.getDescription());
+//        }
+//
+//        else if(notificationsClass.getType().equals("article"))
+//        {
+//            Log.v("status2",notificationsClass.getType());
+//            holder.description.setText(notificationsClass.getDescription());
+//        }
         holder.description.setText(notificationsClass.getDescription());
         String dtc = notificationsClass.getTime();
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);

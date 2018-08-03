@@ -1,5 +1,8 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,6 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -35,6 +39,7 @@ public class RedActivity extends ToolbarActivity {
     int currentItems, totalItems, scrolledItems;
     private RedAdapter redAdapter;
     private LinearLayoutManager layoutManager;
+    private Button btn1,btn2,btn3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,36 @@ public class RedActivity extends ToolbarActivity {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        btn1 = findViewById(R.id.red_newsFeedbtn);
+        btn2 = findViewById(R.id.red_whatsRedbtn);
+        btn3 = findViewById(R.id.red_Topbtn);
+
+
+        btn1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Fragment fragment= new Fragment();
+                FragmentTransaction transaction = getFragmentManager().beginTransaction();
+                transaction.replace(R.id.fragment, fragment); // fragment container id in first parameter is the  container(Main layout id) of Activity
+                transaction.addToBackStack(null);  // this will manage backstack
+                transaction.commit();
+            }
+        });
+        btn2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent myIntent = new Intent(RedActivity.this,RedActivity.class);
+                startActivity(myIntent);
+            }
+        });
+        btn3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RedActivity.this,TopContributors.class);
+                startActivity(intent);
             }
         });
 
