@@ -8,4 +8,5 @@
     <color name="tab_bg">#fafbfd</color>
     <color name="White">#FFF</color>
     <color name="line">#ece6f5</color>
+    <color name="border">#FF9C9C9C</color>
 </resources>

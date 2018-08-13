@@ -85,7 +85,7 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 //            Log.v("status2",notificationsClass.getType());
 //            holder.description.setText(notificationsClass.getDescription());
 //        }
-        holder.description.setText(notificationsClass.getDescription());
+        holder.description.setText(notificationsClass.getTitle());
         String dtc = notificationsClass.getTime();
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);

@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -35,10 +38,20 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.MyVi
     public void onBindViewHolder(@NonNull final MyViewAdapter holder, int position) {
 
         FollowerClass followerClass=followerClassArrayList.get(position);
-        holder.name.setText(followerClass.getName());
-        holder.place.setText(followerClass.getPlace());
-        holder.post.setText(followerClass.getPost());
-        holder.portfolio.setText(followerClass.getPortfolio());
+        if(followerClass.getName().equals("null"))
+        {
+            holder.name.setText(followerClass.getFirstName()+" "+followerClass.getLastName());
+        }
+
+        else {
+            holder.name.setText(followerClass.getName());
+        }
+
+        holder.place.setText(followerClass.getCity()+" ,"+followerClass.getState()+" ,"+followerClass.getCountry());
+        Glide.with(context).load("https://archsqr.in/"+followerClass.getProfile())
+                .into(holder.profileImage);
+        holder.portfolio.setText("Portfolio "+followerClass.getPortfolioCount());
+        holder.post.setText("Posts "+followerClass.getPostCount());
 
         holder.moreImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,16 +93,25 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.MyVi
     public class MyViewAdapter extends RecyclerView.ViewHolder {
         TextView name,place,post,portfolio;
         ImageView moreImage;
-        ImageView prfileImage;
+        ImageView profileImage;
 
         public MyViewAdapter(View itemView) {
             super(itemView);
 
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(context,UserProfileActivity.class);
+                    intent.putExtra("User_id",followerClassArrayList.get(getAdapterPosition()).getId());
+                    intent.putExtra("ProfileUserName",followerClassArrayList.get(getAdapterPosition()).getUserName());
+                    context.startActivity(intent);
+                }
+            });
             name=(TextView)itemView.findViewById(R.id.name);
             place=(TextView)itemView.findViewById(R.id.place);
             post=(TextView)itemView.findViewById(R.id.post);
             portfolio=(TextView)itemView.findViewById(R.id.portfolio);
-            //prfileImage=(ImageView)itemView.findViewById(R.id.imageProfile);
+            profileImage=(ImageView)itemView.findViewById(R.id.imageProfile);
             moreImage=(ImageView)itemView.findViewById(R.id.moregrey);
 
         }

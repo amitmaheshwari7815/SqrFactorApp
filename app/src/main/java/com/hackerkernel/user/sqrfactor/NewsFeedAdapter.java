@@ -13,13 +13,19 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -48,7 +54,8 @@ import static android.content.Context.MODE_PRIVATE;
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyViewHolder> {
     private ArrayList<NewsFeedStatus> newsFeedStatuses;
     private Context context;
-    int flag = 0;
+    private int flag = 0;
+    private int flag1 = 0;
     private PopupWindow popupWindow;
     private FirebaseDatabase database;
     private DatabaseReference ref;
@@ -145,11 +152,35 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
         holder.comments.setText(newsFeedStatus.getComments()+" Comment");
         holder.comments.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
+                Toast.makeText(context,"comment button",Toast.LENGTH_LONG).show();
+                if(flag1 == 0) {
+                    holder.comments.setTextColor(context.getColor(R.color.sqr));
+                    flag1 = 1;
+                    database= FirebaseDatabase.getInstance();
+                    ref = database.getReference();
+                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json = mPrefs.getString("MyObject", "");
+                    UserClass userClass = gson.fromJson(json, UserClass.class);
+                    PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatus.getPostId(),newsFeedStatus.getPostTitle(),newsFeedStatus.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
+                    ref.child("Notifications").child(newsFeedStatus.getUserId()+"").setValue(notificationClass);
+
+                }
+                else {
+                    holder.comments.setTextColor(context.getColor(R.color.gray));
+                    flag1 = 0;
+                }
+
+                //context.startActivity(new Intent(context,CommentsPage.class));
                 Intent intent = new Intent(context, CommentsPage.class);
                 intent.putExtra("PostDataClass",newsFeedStatuses.get(position)); //second param is Serializable
                 context.startActivity(intent);
+
+
+
 
             }
         });
@@ -170,10 +201,12 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
          ImageView userImageUrl,authImageUrl,postImage,commentProfileImageUrl;
-         TextView authName,time,postTitle,shortDescription,fullDescription,comments,share,
-                 commentUserName,commentTime,commentDescription,commentLike,writeComment;
-         ImageButton like;
-         Button likelist,commentPostbtn;
+         TextView authName,time,postTitle,shortDescription,fullDescription,comments,share,commentPostbtn,
+                 commentUserName,commentTime,commentDescription;
+         ImageButton commentLike;
+         TextView likelist;
+         CheckBox like;
+         EditText writeComment;
 
 
          TextView postId,userId;
@@ -189,23 +222,17 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             time=(TextView)itemView.findViewById(R.id.news_post_time);
             postTitle=(TextView)itemView.findViewById(R.id.news_post_title);
             shortDescription=(TextView)itemView.findViewById(R.id.news_short_Descrip);
-            fullDescription=(TextView)itemView.findViewById(R.id.news_full_Descrip);
-            like=(ImageButton) itemView.findViewById(R.id.news_post_like);
+//            fullDescription=(TextView)itemView.findViewById(R.id.news_full_Descrip);
+            like=(CheckBox)itemView.findViewById(R.id.news_post_like);
             comments=(TextView)itemView.findViewById(R.id.news_comment);
-            comments.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                }
-            });
             share=(TextView)itemView.findViewById(R.id.news_share);
             commentUserName=(TextView)itemView.findViewById(R.id.news_comment_name);
             commentTime=(TextView)itemView.findViewById(R.id.news_comment_time);
             commentDescription=(TextView)itemView.findViewById(R.id.news_comment_descrip);
-            commentLike=(TextView)itemView.findViewById(R.id.news_commnent_like);
-            likelist =(Button) itemView.findViewById(R.id.news_post_likeList);
-            writeComment =(TextView)itemView.findViewById(R.id.news_user_commnentEdit);
-            commentPostbtn =(Button)itemView.findViewById(R.id.news_comment_post);
+            commentLike=(ImageButton)itemView.findViewById(R.id.news_commnent_like);
+            likelist =(TextView) itemView.findViewById(R.id.news_post_likeList);
+            writeComment =(EditText)itemView.findViewById(R.id.news_user_commnentEdit);
+            commentPostbtn = (TextView) itemView.findViewById(R.id.news_comment_post);
             commentPostbtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -263,15 +290,13 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
             });
 
-            like.setOnClickListener(new View.OnClickListener()
-            {
-
+            like.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
-                public void onClick(View v) {
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                     if (flag == 0) {
-                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
+//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
                        likelist.setTextColor(context.getColor(R.color.sqr));
                         int result = Integer.parseInt(newsFeedStatuses.get(getAdapterPosition()).getLike())+1;
                        likelist.setText(result+" Like");
@@ -285,13 +310,13 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                         Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
                         if(newsFeedStatuses.get(getAdapterPosition()).getType().equals("status"))
                         {
-                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),"Like",userClass.getUser_name());
+                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),"Like",userClass.getUser_name()+" liked your post");
                             ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
 
                         }
                         else
                         {
-                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Like",userClass.getUser_name());
+                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Like",userClass.getUser_name()+" liked your post");
                             ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
 
                         }
@@ -299,8 +324,9 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                         flag = 1;
                     }
                     else {
-                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.gray));
-                       likelist.setTextColor(context.getColor(R.color.gray));
+//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.gray));
+//                        like.setBackgroundResource(R.drawable.ic_like_icon);
+                        likelist.setTextColor(context.getColor(R.color.gray));
                         int result = Integer.parseInt(newsFeedStatuses.get(getAdapterPosition()).getLike());
                       likelist.setText(result+" Like");
                         flag = 0;
@@ -368,35 +394,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                 shareIt();
             }
         });
-            commentLike.setOnClickListener(new View.OnClickListener() {
 
-            int flag = 0;
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v) {
-
-                if (flag == 0) {
-                    commentLike.setTextColor(context.getColor(R.color.sqr));
-                    flag = 1;
-                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
-                    Gson gson = new Gson();
-                    String json = mPrefs.getString("MyObject", "");
-                    UserClass userClass = gson.fromJson(json, UserClass.class);
-                    PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Commented",userClass.getUser_name());
-                    ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
-
-
-                }
-                else {
-                    commentLike.setTextColor(context.getColor(R.color.gray));
-                    flag = 0;
-                    }
-
-                context.startActivity(new Intent(context,CommentsPage.class));
-
-            }
-
-        });
         }
     }
     private void shareIt() {

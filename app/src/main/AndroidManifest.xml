@@ -132,11 +132,14 @@
             android:label="Portfolios" />
         <activity
             android:name=".FollowingActivity"
-            android:label="Following"></activity>
+            android:label="Following" />
         <activity android:name=".MessagesActivity" />
         <activity android:name=".ChatWithAFriendActivity" />
-        <activity android:name=".UserProfileActivity"></activity>
-        <activity android:name=".TopContributors"></activity>
+        <activity android:name=".UserProfileActivity" />
+        <activity android:name=".TopContributors" />
+        <activity android:name=".CompanyFirmDetails" />
+        <activity android:name=".EmployeeMemberDetails" />
+        <activity android:name=".ChangePassword"></activity>
     </application>
 
 </manifest>

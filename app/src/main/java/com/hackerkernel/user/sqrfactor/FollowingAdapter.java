@@ -3,6 +3,7 @@ package com.hackerkernel.user.sqrfactor;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,13 +12,15 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.ArrayList;
 
 public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.MyViewAdapter> {
-   private ArrayList<FollowerClass> followerClassArrayList;
+   private ArrayList<FollowingClass> followerClassArrayList;
    private Context context;
 
-    public FollowingAdapter(ArrayList<FollowerClass> followerClassArrayList, Context context) {
+    public FollowingAdapter(ArrayList<FollowingClass> followerClassArrayList, Context context) {
         this.followerClassArrayList = followerClassArrayList;
         this.context = context;
     }
@@ -32,11 +35,26 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.MyVi
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewAdapter holder, int position) {
-        FollowerClass followerClass=followerClassArrayList.get(position);
-        holder.name.setText(followerClass.getName());
-        holder.place.setText(followerClass.getPlace());
-        holder.post.setText(followerClass.getPost());
-        holder.portfolio.setText(followerClass.getPortfolio());
+        FollowingClass followingClass=followerClassArrayList.get(position);
+
+        Log.v("duta",followingClass.getCity()+" "+followingClass.getName()+" "+followingClass.getFirstName()+" "+followingClass.getLastName()+" "+followingClass
+        .getProfile_url()+" "+followingClass.getProfile_url()+" "+followingClass.getPortfoliCount()+" "+followingClass.getPostCount());
+        if(followingClass.getName().equals("null"))
+        {
+            holder.name.setText(followingClass.getFirstName()+" "+followingClass.getLastName());
+        }
+        else {
+            holder.name.setText(followingClass.getName());
+        }
+
+
+
+
+        Glide.with(context).load("https://archsqr.in/"+followingClass.getProfile())
+                .into(holder.prfileImage);
+        holder.place.setText(followingClass.getCity()+" ,"+followingClass.getState()+" ,"+followingClass.getCountry());
+        holder.post.setText("Posts :"+followingClass.getPostCount());
+        holder.portfolio.setText("Portfolio :"+followingClass.getPortfoliCount());
         holder.moreImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

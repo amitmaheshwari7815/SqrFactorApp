@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,7 +32,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class RedActivity extends ToolbarActivity {
+public class RedActivity extends AppCompatActivity {
+    Toolbar toolbar;
     private ProgressBar progressBar;
     private ArrayList<NewsFeedStatus> newsstatus = new ArrayList<>();
     private RecyclerView recyclerView;
@@ -74,7 +76,8 @@ public class RedActivity extends ToolbarActivity {
         btn1 = findViewById(R.id.red_newsFeedbtn);
         btn2 = findViewById(R.id.red_whatsRedbtn);
         btn3 = findViewById(R.id.red_Topbtn);
-
+        PageRefersh();
+        progressBar.setVisibility(View.VISIBLE);
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -89,8 +92,8 @@ public class RedActivity extends ToolbarActivity {
         btn2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent myIntent = new Intent(RedActivity.this,RedActivity.class);
-                startActivity(myIntent);
+//                progressBar.setVisibility(View.VISIBLE);
+                PageRefersh();
             }
         });
         btn3.setOnClickListener(new View.OnClickListener() {
@@ -102,6 +105,34 @@ public class RedActivity extends ToolbarActivity {
         });
 
 
+
+
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+//                    isScrolling = true;
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                currentItems = layoutManager.getChildCount();
+//                totalItems = layoutManager.getItemCount();
+//                scrolledItems = layoutManager.findFirstVisibleItemPosition();
+//                if (isScrolling && (currentItems + scrolledItems == totalItems)) {
+//                    isScrolling = false;
+//                    fetchDataFromServer();
+//                }
+//            }
+//        });
+
+
+    }
+    public void PageRefersh(){
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/whats-red",
                 new Response.Listener<String>() {
@@ -119,6 +150,7 @@ public class RedActivity extends ToolbarActivity {
                                 newsstatus.add(newsFeedStatus1);
                             }
                             redAdapter.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
 
 
                         } catch (JSONException e) {
@@ -147,33 +179,9 @@ public class RedActivity extends ToolbarActivity {
         };
 
         requestQueue.add(myReq);
-
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                    isScrolling = true;
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                currentItems = layoutManager.getChildCount();
-                totalItems = layoutManager.getItemCount();
-                scrolledItems = layoutManager.findFirstVisibleItemPosition();
-                if (isScrolling && (currentItems + scrolledItems == totalItems)) {
-                    isScrolling = false;
-                    fetchDataFromServer();
-                }
-            }
-        });
-
-
     }
+
+
 
     public void fetchDataFromServer() {
         progressBar.setVisibility(View.VISIBLE);

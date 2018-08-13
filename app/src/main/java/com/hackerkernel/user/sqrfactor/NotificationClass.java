@@ -13,12 +13,12 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class NotificationClass implements Serializable {
-    public String type, time, name, profile, body,postType,title,description;
+    public String type, time, name, profile, body,postType,title,description,shortDescription;
     public int postId, userId, commentID, commentType;
     public JSONObject jsonObject;
 
 
-    public NotificationClass(String type, String time, String name, String profile,String description, String body,String postType,String title, int userId, int postId, int commentID, int commentType) {
+    public NotificationClass(String type, String time, String name, String profile,String description,String shortDescription, String body,String postType,String title, int userId, int postId, int commentID, int commentType) {
         this.type = type;
         this.time = time;
         this.name = name;
@@ -31,6 +31,7 @@ public class NotificationClass implements Serializable {
         this.postType = postType;
         this.title = title;
         this.description = description;
+        this.shortDescription = shortDescription;
     }
 
     public NotificationClass(JSONObject jsonObject) {
@@ -54,6 +55,7 @@ public class NotificationClass implements Serializable {
                 this.postId = postObject.getInt("id");
                 this.userId = postObject.getInt("user_id");
                 this.description = postObject.getString("description");
+                this.shortDescription = postObject.getString("short_description");
             }
 
         } catch (JSONException e) {
@@ -155,6 +157,14 @@ public class NotificationClass implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getShortDescription() {
+        return shortDescription;
+    }
+
+    public void setShortDescription(String shortDescription) {
+        this.shortDescription = shortDescription;
     }
 
     public JSONObject getJsonObject() {

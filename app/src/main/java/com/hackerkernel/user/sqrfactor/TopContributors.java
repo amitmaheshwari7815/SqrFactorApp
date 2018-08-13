@@ -1,6 +1,6 @@
 package com.hackerkernel.user.sqrfactor;
 
-import android.app.FragmentManager;
+import android.support.v4.app.FragmentManager;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -19,11 +19,10 @@ import java.util.List;
 
 public class TopContributors extends AppCompatActivity {
 
-    private ViewPager viewPager;
-    private TabsPagerAdapter mAdapter;
-    private TabLayout tabLayout;
-    private Toolbar toolbar;
 
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,34 +39,49 @@ public class TopContributors extends AppCompatActivity {
                 finish();
             }
         });
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         viewPager = (ViewPager) findViewById(R.id.viewPager);
+        setupViewPager(viewPager);
+
         tabLayout = (TabLayout) findViewById(R.id.top_tabs);
-        mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
-        viewPager.setAdapter(mAdapter);
         tabLayout.setupWithViewPager(viewPager);
-        viewPager.setOffscreenPageLimit(3);
-
-        createTabs();
-
-
     }
 
-    private void createTabs() {
+    private void setupViewPager(ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        adapter.addFragment(new ArchitectureCollege(), "Architecture Colleges");
+        adapter.addFragment(new ContributorsFragment(), "Top Contributors");
+        adapter.addFragment(new ArchitectureFirms(), "Architecture Firms");
+        viewPager.setAdapter(adapter);
+    }
 
-        LinearLayout tabOne = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.tabs_name, null);
-        TextView iv_tab1 = tabOne.findViewById(R.id.iv_tab);
-        iv_tab1.setText("Architecture Colleges");
-        tabLayout.getTabAt(0).setCustomView(tabOne);
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-        LinearLayout tabTwo = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.tabs_name, null);
-        TextView iv_tab2 = tabTwo.findViewById(R.id.iv_tab);
-        iv_tab2.setText("Top Contributors");
-        tabLayout.getTabAt(1).setCustomView(tabTwo);
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
+        }
 
-        LinearLayout tabThree = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.tabs_name, null);
-        TextView iv_tab3 = tabThree.findViewById(R.id.iv_tab);
-        iv_tab3.setText("Architecture Firms");
-        tabLayout.getTabAt(2).setCustomView(tabThree);
+        @Override
+        public Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
+
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
+        }
     }
 }

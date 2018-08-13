@@ -19,7 +19,7 @@
             android:layout_height="match_parent"
             android:text="News Feed"
             android:layout_weight="1"
-            android:textStyle="bold"
+            android:fontFamily="@font/roboto_medium"
             android:textColor="#888da8"
             android:textAllCaps="false"
             android:background="@drawable/gray_border"/>
@@ -31,7 +31,7 @@
             android:text="What's Red?"
             android:textAllCaps="false"
             android:textColor="#888da8"
-            android:textStyle="bold"
+            android:fontFamily="@font/roboto_medium"
             android:background="@drawable/gray_border"/>
         <Button
             android:id="@+id/red_Topbtn"
@@ -41,18 +41,17 @@
             android:text="Top Contributors"
             android:textAllCaps="false"
             android:textColor="#888da8"
-            android:textStyle="bold"
+            android:fontFamily="@font/roboto_medium"
             android:background="@drawable/gray_border"/>
     </LinearLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/red_recycler">
-
     </android.support.v7.widget.RecyclerView>
     <ProgressBar
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/progress_bar_red"
         android:layout_gravity="center_horizontal"
         android:elevation="4dp"

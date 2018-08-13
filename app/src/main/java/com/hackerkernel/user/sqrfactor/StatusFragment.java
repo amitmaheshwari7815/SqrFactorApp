@@ -237,30 +237,30 @@ public class StatusFragment extends Fragment {
         }
 
 
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if(newState== AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
-                {
-                    isScrolling=true;
-                }
-            }
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                currentItems=layoutManager.getChildCount();
-                totalItems= layoutManager.getItemCount();
-                scrolledItems=layoutManager.findFirstVisibleItemPosition();
-                if(isScrolling&&(currentItems+scrolledItems==totalItems))
-                {
-                    isScrolling=false;
-                    fetchDataFromServer();
-                }
-            }
-        });
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                if(newState== AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+//                {
+//                    isScrolling=true;
+//                }
+//            }
+//
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//
+//                currentItems=layoutManager.getChildCount();
+//                totalItems= layoutManager.getItemCount();
+//                scrolledItems=layoutManager.findFirstVisibleItemPosition();
+//                if(isScrolling&&(currentItems+scrolledItems==totalItems))
+//                {
+//                    isScrolling=false;
+//                    fetchDataFromServer();
+//                }
+//            }
+//        });
 
         return rootView;
 

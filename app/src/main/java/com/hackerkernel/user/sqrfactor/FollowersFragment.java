@@ -42,12 +42,12 @@ public class FollowersFragment extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
 ////        adding dummy data for testing
-        FollowerClass followerClass=new FollowerClass("Sameer Shekhar","Chappra,  saran,  Bihar","5","10","url");
-        followerClassArrayList.add(followerClass);
-        FollowerClass followerClass1=new FollowerClass("Amit Maheshwari","Bangalore,  KA","6","5","url");
-        followerClassArrayList.add(followerClass1);
-        FollowersAdapter followersAdapter=new FollowersAdapter(followerClassArrayList,getContext());
-        recyclerView1.setAdapter(followersAdapter);
+//        FollowerClass followerClass=new FollowerClass("Sameer Shekhar","Chappra,  saran,  Bihar","5","10","url");
+//        followerClassArrayList.add(followerClass);
+//        FollowerClass followerClass1=new FollowerClass("Amit Maheshwari","Bangalore,  KA","6","5","url");
+//        followerClassArrayList.add(followerClass1);
+//        FollowersAdapter followersAdapter=new FollowersAdapter(followerClassArrayList,getContext());
+//        recyclerView1.setAdapter(followersAdapter);
         return view;
     }
 
