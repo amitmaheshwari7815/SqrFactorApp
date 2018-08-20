@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
@@ -22,6 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,8 +39,7 @@ public class FollowingActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private RecyclerView recyclerView1;
     private ArrayList<FollowingClass> followerClassArrayList = new ArrayList<>();
-    private int user_id;
-    private String profileUserName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,10 +55,6 @@ public class FollowingActivity extends AppCompatActivity {
                 finish();
             }
         });
-        Intent intent = getIntent();
-        user_id = intent.getIntExtra("User_id",0);
-        profileUserName = intent.getStringExtra("ProfileUserName");
-
 
         recyclerView1 = findViewById(R.id.recyclerView_following);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -76,8 +73,13 @@ public class FollowingActivity extends AppCompatActivity {
 
     public void LoadData()
     {
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/"+profileUserName+"?action=following",
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/"+userClass.getUser_name()+"?action=following",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

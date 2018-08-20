@@ -119,7 +119,7 @@
                 app:hintTextAppearance="@color/colorPrimary">
 
                 <EditText
-                    android:id="@+id/service_offered"
+                    android:id="@+id/other_service_offered"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"

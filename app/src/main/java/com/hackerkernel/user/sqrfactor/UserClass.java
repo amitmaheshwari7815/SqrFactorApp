@@ -97,6 +97,14 @@ public class UserClass implements Serializable{
         this.profile = profile;
     }
 
+    public JSONObject getJsonObject() {
+        return jsonObject;
+    }
+
+    public void setJsonObject(JSONObject jsonObject) {
+        this.jsonObject = jsonObject;
+    }
+
     public UserClass(String user_name, String first_name, String last_name, String profile) {
         this.user_name = user_name;
         this.first_name = first_name;

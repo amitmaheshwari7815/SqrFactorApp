@@ -9,17 +9,29 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class UserProfileClass {
-    private String user_name,name,first_name,last_name,profile,email,mobile_number,user_type,post_time,postType,post_title,post_image,banner_image,short_description,description;
+    private String user_name,name,first_name,last_name,profile,email,mobile_number,user_type,
+            post_time,postType,post_title,post_image,banner_image,short_description,description;
     private String like,comment,share;
     public String commentProfileImageUrl,commentUserName,commentTime,commentDescription,commentLike;
     private int user_id,post_id,post_user_id,sharedId, commentId;
     private JSONObject jsonObject;
     private String followerscnt,followingcnt,portfoliocnt,bluePrintcnt;
+    private String nextPaegUrl;
+    private ArrayList<NewsFeedStatus> postDataClassArrayList=new ArrayList<>();
     public ArrayList<comments_limited> commentsLimitedArrayList=new ArrayList<>();
 
-    public UserProfileClass(int user_id,int post_id,int post_user_id,int sharedId, int commentId ,String followerscnt,String followingcnt,String portfoliocnt,String bluePrintcnt,String like,String comment,String share,String postType,String post_time,String post_title,String post_image,String banner_image,String short_description,String description,String commentDescription,String commentProfileImageUrl,String commentUserName, String commentLike,String commentTime,String name, String user_name, String first_name, String last_name, String profile, String email, String mobile_number, String user_type) {
+    public String getNextPaegUrl() {
+        return nextPaegUrl;
+    }
+
+    public void setNextPaegUrl(String nextPaegUrl) {
+        this.nextPaegUrl = nextPaegUrl;
+    }
+
+    public UserProfileClass(int user_id, int post_id, int post_user_id, int sharedId, int commentId , String followerscnt, String followingcnt, String portfoliocnt, String bluePrintcnt, String like, String comment, String share, String postType, String post_time, String post_title, String post_image, String banner_image, String short_description, String description, String commentDescription, String commentProfileImageUrl, String commentUserName, String commentLike, String commentTime, String name, String user_name, String first_name, String last_name, String profile, String email, String mobile_number, String user_type) {
         this.user_name = user_name;
         this.first_name = first_name;
+
         this.last_name = last_name;
         this.profile = profile;
         this.email = email;
@@ -50,13 +62,20 @@ public class UserProfileClass {
     }
 
 
+    public ArrayList<NewsFeedStatus> getPostDataClassArrayList() {
+        return postDataClassArrayList;
+    }
+
+    public void setPostDataClassArrayList(ArrayList<NewsFeedStatus> postDataClassArrayList) {
+        this.postDataClassArrayList = postDataClassArrayList;
+    }
 
     public UserProfileClass(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
 
         try {
             this.followingcnt = jsonObject.getString("followingCnt");
-            this.followerscnt = jsonObject.getString("followCnt");
+            this.followerscnt = jsonObject.getString("followerCnt");
             this.portfoliocnt = jsonObject.getString("portfolioCnt");
             this.bluePrintcnt = jsonObject.getString("blueprintCnt");
 
@@ -73,15 +92,24 @@ public class UserProfileClass {
             JSONObject jsonPost = jsonObject.getJSONObject("posts");
             JSONArray jsonArrayData = jsonPost.getJSONArray("data");
             for (int i = 0; i < jsonArrayData.length(); i++) {
+
+
                 JSONObject post= jsonArrayData.getJSONObject(i);
-                this.user_id = post.getInt("user_id");
-                this.post_title = post.getString("title");
-                this.banner_image = post.getString("banner_image");
-                this.short_description = post.getString("short_description");
-                this.description = post.getString("description");
-                this.post_image = post.getString("image");
-                this.post_time = post.getString("updated_at");
-                this.comment = post.getString("comments_count");
+
+                NewsFeedStatus newsFeedStatus=new NewsFeedStatus(post);
+//                postDataClass.setUserProfile(user.getString("profile"));
+//                postDataClass.setUserName(user.getString("user_name"));
+//                postDataClass.setFirstName(user.getString("first_name"));
+//                postDataClass.setLastName(user.getString("last_name"));
+//                this.user_id = post.getInt("user_id");
+//                this.post_title = post.getString("title");
+//                this.banner_image = post.getString("banner_image");
+//                this.short_description = post.getString("short_description");
+//                this.description = post.getString("description");
+//                this.post_image = post.getString("image");
+//                this.post_time = post.getString("updated_at");
+                //this.c = post.getInt("comments_count");
+                postDataClassArrayList.add(newsFeedStatus);
 
                 JSONArray likes = post.getJSONArray("likes");
                 this.like = likes.length()+"";
@@ -110,9 +138,9 @@ public class UserProfileClass {
             }
 
         } catch(JSONException e){
-                e.printStackTrace();
-            }
+            e.printStackTrace();
         }
+    }
     public ArrayList<comments_limited> getCommentsLimitedArrayList() {
         return commentsLimitedArrayList;
     }
@@ -120,7 +148,7 @@ public class UserProfileClass {
     public void setCommentsLimitedArrayList(ArrayList<comments_limited> commentsLimitedArrayList) {
         this.commentsLimitedArrayList = commentsLimitedArrayList;
     }
-            public String getUser_name() {
+    public String getUser_name() {
         return user_name;
     }
 

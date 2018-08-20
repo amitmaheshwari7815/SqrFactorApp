@@ -2,6 +2,7 @@ package com.hackerkernel.user.sqrfactor;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,20 +17,22 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
+import com.google.gson.Gson;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
 
 public class ProfessionalActivity extends AppCompatActivity {
 
-    private Button add,remove,add1,remove2;
+    private Button add,remove,add1,remove2,save;
     private boolean stDate=false;
     private boolean edDate=false;
     private LinearLayout newForm,newForm1;
     private TextInputLayout startDate,endDate;
     private Boolean isClicked=false;
     private Boolean isClicked1=false;
-    private EditText startDateText,endDateText;
+    private EditText startDateText,endDateText,COA,yearSinceService,role,companyCollege,salary;
     Toolbar toolbar;
 
     @Override
@@ -43,10 +46,16 @@ public class ProfessionalActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
+
+        COA = (EditText)findViewById(R.id.COARgistration);
+        yearSinceService = (EditText)findViewById(R.id.YearsSinceServiceText);
+        role = (EditText)findViewById(R.id.RoleText);
+        companyCollege = (EditText)findViewById(R.id.CompanyText);
         add=(Button)findViewById(R.id.Add);
         remove=(Button)findViewById(R.id.Remove);
         add1 =(Button)findViewById(R.id.Add1);
         remove2=(Button)findViewById(R.id.Remove2);
+        save =(Button)findViewById(R.id.save_professinal);
         startDate= (TextInputLayout) findViewById(R.id.StartDate);
         endDate=(TextInputLayout) findViewById(R.id.EndDate);
 
@@ -144,7 +153,28 @@ public class ProfessionalActivity extends AppCompatActivity {
             }
         });
 
-
+        SharedPreferences sharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("UserData","");
+        UserData userData = gson.fromJson(json,UserData.class);
+        if (userData.getCoa_registration() != null){
+            COA.setText(userData.getCoa_registration());
+        }
+        if (userData.getYears_since_service() != null){
+            yearSinceService.setText(userData.getYears_since_service());
+        }
+        if (userData.getRole() != null){
+            role.setText(userData.getRole());
+        }
+        if (userData.getCompany_firm_or_college_university() != null){
+            companyCollege.setText(userData.getCompany_firm_or_college_university());
+        }
+        if (userData.getSalary_stripend_other_details() != null){
+            salary.setText(userData.getSalary_stripend_other_details());
+        }
+        if (userData.getSalary_stripend_other_details() != null){
+            startDateText.setText(userData.getSalary_stripend_other_details());
+        }
     }
 
     private void updateLabel(Calendar myCalendar) {

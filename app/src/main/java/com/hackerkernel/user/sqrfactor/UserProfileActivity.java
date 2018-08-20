@@ -43,13 +43,15 @@ public class UserProfileActivity extends AppCompatActivity {
     private ImageView morebtn,coverImage,userProfileImage;
     private TextView userName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
     private Button followbtn,messagebtn;
-    private ArrayList<UserProfileClass> userProfileClassArrayList = new ArrayList<>();
-    private ArrayList<UserFollowClass> userFollowClassList = new ArrayList<>();
+    private ArrayList<NewsFeedStatus> userProfileClassArrayList = new ArrayList<>();
+    private ArrayList<PostDataClass> userFollowClassList = new ArrayList<>();
     private TextView userBlueprint, userPortfolio, userFollowers, userFollowing;
     LinearLayoutManager layoutManager;
     UserProfileAdapter userProfileAdapter;
     RecyclerView recyclerView;
     boolean flag = false;
+    private String profileNameOfUser;
+    private int user_id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,11 @@ public class UserProfileActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        Intent intent = getIntent();
+        user_id = intent.getIntExtra("User_id",0);
+        profileNameOfUser = intent.getStringExtra("ProfileUserName");
+        Toast.makeText(getApplicationContext(),user_id+" "+profileNameOfUser,Toast.LENGTH_LONG).show();
 
         messagebtn = (Button) findViewById(R.id.user_messagebtn);
         coverImage = (ImageView) findViewById(R.id.user_coverImage);
@@ -118,11 +125,17 @@ public class UserProfileActivity extends AppCompatActivity {
         userFollowers = (TextView) findViewById(R.id.user_followersClick);
         userFollowing = (TextView) findViewById(R.id.user_followingClick);
 
+
+
+
+
         userBlueprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(UserProfileActivity.this, BlueprintActivity.class);
-                startActivity(i);
+                //Intent i = new Intent(UserProfileActivity.this, BlueprintActivity.class);
+                //startActivity(i);
+                LoadData();
+
             }
         });
 
@@ -156,67 +169,80 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                RequestQueue requestQueue1 = Volley.newRequestQueue(getApplicationContext());
-                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/follow_user",
-                        new Response.Listener<String>() {
-                            @Override
-                            public void onResponse(String s) {
-                                Log.v("ResponseLike",s);
-                                try {
-                                    JSONObject jsonObject = new JSONObject(s);
-                                    UserFollowClass userFollowClass = new UserFollowClass(jsonObject);
-                                    flag = userFollowClass.isReturnType();
-                                    if (flag == false) {
-                                        Log.v("follow",flag+"");
-                                        followbtn.setText("Follow");
-                                        flag = true;
-                                    }
-                                    else {
-                                        Log.v("following",flag+"");
-                                        followbtn.setText("Following");
-                                        flag = false;
-                                    }
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError volleyError) {
-
-                                //Showing toast
-//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                            }
-                        }){
-                    @Override
-                    public Map<String, String> getHeaders() throws AuthFailureError {
-                        Map<String, String> params = new HashMap<String, String>();
-                        params.put("Accept", "application/json");
-                        params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjhmMDE5OTRkMmY4YzMxMzI3ZmNiMzE1OTU1ZDU4NTMyMjU2Y2VlYjZkOGIxZGYwMDVhYzcxZWNlMTAzYjYyODZkNzc3OTBkMGQ4M2IwNDMzIn0.eyJhdWQiOiIzIiwianRpIjoiOGYwMTk5NGQyZjhjMzEzMjdmY2IzMTU5NTVkNTg1MzIyNTZjZWViNmQ4YjFkZjAwNWFjNzFlY2UxMDNiNjI4NmQ3Nzc5MGQwZDgzYjA0MzMiLCJpYXQiOjE1MzI1MjUwNzYsIm5iZiI6MTUzMjUyNTA3NiwiZXhwIjoxNTY0MDYxMDc2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.gvi8MaHlApevKCCcjO0glCle3s5PlS5V7nBrFZaj-U2Hlt3dbvDq-2RgSM0Kwmoxx3QYgErz6BER289-VXdGYyGFwniZTsbpyT_uK62RoUB0Bx9XHkmeeqijWEGQObsbi8JbR__1o6ixBaDkW2nEvWvYvAFFqMpGJ2GHdIEZWRdTDDatP1fimmrQhLNf8Qvf8u7IIWXsbgb8LUtplGE_tEGcQIYJ8cvZpd7REQ2A8ijSq6dVW3HADxjfbWGEdV8JKfS5tdbdCfwXxBJ0MufYlNxnuxnPKrsDNCG6Ym-7-YhX-h6DnxVBpjsLPM37YPd2b4tuDrVQNB7GMi2x1TozODJh3cvJA-2ezufZFX8I2E6-ahRq0vMtkCmLv4tAWB_lmxQSS5NOEKhXJF4lH4_t6qdgPZn1kEY6u16hPo-398xa6MOtSGKl-sjiTS7qdug51MprIlHIwmr4vmqEU_8uYVBFkfpRBIbbgSkHEhpTB2K7Ny740lBziTrpM8QdTPpU7JGru1L5C58TJ2nXRkcUIwLspSPzV0UJgoyGRbEwAj4cQvtebXbpkUOUgkwZCUZdXj0PeTYLNLJsuB6P5iNjqybjjsleUunoUU7l9vhGQAoUdlvc76Ju0bZ01CCU5sLvqeEhqQ1fYF5XTj-A-JLA19NuEQgiV9FkXn54o8ts6fs");
-
-                        return params;
-                    }
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String,String> params = new HashMap<>();
-
-                        params.put("to_user","106");
-                        return params;
-                    }
-                };
-
-                //Adding request to the queue
-                requestQueue1.add(stringRequest);
+                FollowMethod();
             }
 
 
         });
+        FollowMethod();
+        LoadData();
 
+    }
+
+    public void FollowMethod()
+    {
+
+        RequestQueue requestQueue1 = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/follow_user",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.v("ResponseLike",s);
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            UserFollowClass userFollowClass = new UserFollowClass(jsonObject);
+                            flag = userFollowClass.isReturnType();
+                            if (flag == false) {
+                                Log.v("follow",flag+"");
+                                followbtn.setText("Follow");
+                                flag = true;
+                            }
+                            else {
+                                Log.v("following",flag+"");
+                                followbtn.setText("Following");
+                                flag = false;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                        //Showing toast
+//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+
+                params.put("to_user",user_id+"");
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue1.add(stringRequest);
+
+    }
+
+    public void LoadData()
+    {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/detail/hackerkernel",
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/corrupted_desires",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -224,14 +250,19 @@ public class UserProfileActivity extends AppCompatActivity {
                         Toast.makeText(UserProfileActivity.this, response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
+//                            if(jsonObject.has("message"))
+//                            {
+//                                if(jsonObject.getString("message").equals("No posts found"));
+//                                return;
+//                            }
                             UserProfileClass userProfileClass = new UserProfileClass(jsonObject);
-                                userProfileClassArrayList.add(userProfileClass);
-                                followCnt.setText(userProfileClass.getFollowerscnt());
-                                followingCnt.setText(userProfileClass.getFollowingcnt());
-                                portfolioCnt.setText(userProfileClass.getPortfoliocnt());
-                                bluePrintCnt.setText(userProfileClass.getBluePrintcnt());
-                                userName.setText(userProfileClass.getUser_name());
-                                Glide.with(getApplicationContext()).load("https://archsqr.in/"+userProfileClass.getProfile())
+                            userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
+                            followCnt.setText(userProfileClass.getFollowerscnt());
+                            followingCnt.setText(userProfileClass.getFollowingcnt());
+                            portfolioCnt.setText(userProfileClass.getPortfoliocnt());
+                            bluePrintCnt.setText(userProfileClass.getBluePrintcnt());
+                            userName.setText(userProfileClass.getUser_name());
+                            Glide.with(getApplicationContext()).load("https://archsqr.in/"+userProfileClass.getProfile())
                                     .into(userProfileImage);
 
                             userProfileAdapter.notifyDataSetChanged();
@@ -253,8 +284,7 @@ public class UserProfileActivity extends AppCompatActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjhmMDE5OTRkMmY4YzMxMzI3ZmNiMzE1OTU1ZDU4NTMyMjU2Y2VlYjZkOGIxZGYwMDVhYzcxZWNlMTAzYjYyODZkNzc3OTBkMGQ4M2IwNDMzIn0.eyJhdWQiOiIzIiwianRpIjoiOGYwMTk5NGQyZjhjMzEzMjdmY2IzMTU5NTVkNTg1MzIyNTZjZWViNmQ4YjFkZjAwNWFjNzFlY2UxMDNiNjI4NmQ3Nzc5MGQwZDgzYjA0MzMiLCJpYXQiOjE1MzI1MjUwNzYsIm5iZiI6MTUzMjUyNTA3NiwiZXhwIjoxNTY0MDYxMDc2LCJzdWIiOiIxMDUiLCJzY29wZXMiOltdfQ.gvi8MaHlApevKCCcjO0glCle3s5PlS5V7nBrFZaj-U2Hlt3dbvDq-2RgSM0Kwmoxx3QYgErz6BER289-VXdGYyGFwniZTsbpyT_uK62RoUB0Bx9XHkmeeqijWEGQObsbi8JbR__1o6ixBaDkW2nEvWvYvAFFqMpGJ2GHdIEZWRdTDDatP1fimmrQhLNf8Qvf8u7IIWXsbgb8LUtplGE_tEGcQIYJ8cvZpd7REQ2A8ijSq6dVW3HADxjfbWGEdV8JKfS5tdbdCfwXxBJ0MufYlNxnuxnPKrsDNCG6Ym-7-YhX-h6DnxVBpjsLPM37YPd2b4tuDrVQNB7GMi2x1TozODJh3cvJA-2ezufZFX8I2E6-ahRq0vMtkCmLv4tAWB_lmxQSS5NOEKhXJF4lH4_t6qdgPZn1kEY6u16hPo-398xa6MOtSGKl-sjiTS7qdug51MprIlHIwmr4vmqEU_8uYVBFkfpRBIbbgSkHEhpTB2K7Ny740lBziTrpM8QdTPpU7JGru1L5C58TJ2nXRkcUIwLspSPzV0UJgoyGRbEwAj4cQvtebXbpkUOUgkwZCUZdXj0PeTYLNLJsuB6P5iNjqybjjsleUunoUU7l9vhGQAoUdlvc76Ju0bZ01CCU5sLvqeEhqQ1fYF5XTj-A-JLA19NuEQgiV9FkXn54o8ts6fs");
-
+                params.put("Authorization", "Bearer "+TokenClass.Token);
                 return params;
             }
 
@@ -263,6 +293,4 @@ public class UserProfileActivity extends AppCompatActivity {
         requestQueue.add(myReq);
 
     }
-
 }
-

@@ -96,22 +96,31 @@
                 android:layout_height="60sp"
                 android:background="@drawable/gray_border"
                 android:layout_margin="10sp"
+                android:weightSum="10"
                 android:padding="10sp">
 
                 <TextView
                     android:id="@+id/employee_attachment"
-                    android:layout_width="315dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:gravity="center_vertical"
                     android:hint="Attachment"
+                    android:layout_weight="7"
                     android:inputType="text"
                     android:textSize="18dp" />
                 <ImageView
-                    android:layout_width="match_parent"
+                    android:layout_width="24dp"
                     android:layout_height="match_parent"
-                    android:layout_gravity="end"
+                    android:src="@drawable/profilepic"
+                    android:visibility="invisible"
+                    android:layout_weight="1"
+                    android:id="@+id/employee_attachment_image"/>
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="2"
                     android:src="@drawable/ic_attach_file_black_24dp"
                     android:id="@+id/employee_attachment_icon"/>
 

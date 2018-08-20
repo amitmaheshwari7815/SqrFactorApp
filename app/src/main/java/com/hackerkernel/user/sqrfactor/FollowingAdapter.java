@@ -17,8 +17,8 @@ import com.bumptech.glide.Glide;
 import java.util.ArrayList;
 
 public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.MyViewAdapter> {
-   private ArrayList<FollowingClass> followerClassArrayList;
-   private Context context;
+    private ArrayList<FollowingClass> followerClassArrayList;
+    private Context context;
 
     public FollowingAdapter(ArrayList<FollowingClass> followerClassArrayList, Context context) {
         this.followerClassArrayList = followerClassArrayList;
@@ -38,7 +38,7 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.MyVi
         FollowingClass followingClass=followerClassArrayList.get(position);
 
         Log.v("duta",followingClass.getCity()+" "+followingClass.getName()+" "+followingClass.getFirstName()+" "+followingClass.getLastName()+" "+followingClass
-        .getProfile_url()+" "+followingClass.getProfile_url()+" "+followingClass.getPortfoliCount()+" "+followingClass.getPostCount());
+                .getProfile_url()+" "+followingClass.getProfile_url()+" "+followingClass.getPortfoliCount()+" "+followingClass.getPostCount());
         if(followingClass.getName().equals("null"))
         {
             holder.name.setText(followingClass.getFirstName()+" "+followingClass.getLastName());

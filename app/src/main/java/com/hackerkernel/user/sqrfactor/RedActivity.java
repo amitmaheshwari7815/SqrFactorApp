@@ -3,7 +3,9 @@ package com.hackerkernel.user.sqrfactor;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -76,7 +78,15 @@ public class RedActivity extends AppCompatActivity {
         btn1 = findViewById(R.id.red_newsFeedbtn);
         btn2 = findViewById(R.id.red_whatsRedbtn);
         btn3 = findViewById(R.id.red_Topbtn);
-        PageRefersh();
+
+        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.red_pullToRefresh);
+        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                PageRefersh(); // your code
+                pullToRefresh.setRefreshing(false);
+            }
+        });
         progressBar.setVisibility(View.VISIBLE);
 
         btn1.setOnClickListener(new View.OnClickListener() {
@@ -107,29 +117,30 @@ public class RedActivity extends AppCompatActivity {
 
 
 
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-//                    isScrolling = true;
-//                }
-//            }
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                currentItems = layoutManager.getChildCount();
-//                totalItems = layoutManager.getItemCount();
-//                scrolledItems = layoutManager.findFirstVisibleItemPosition();
-//                if (isScrolling && (currentItems + scrolledItems == totalItems)) {
-//                    isScrolling = false;
-//                    fetchDataFromServer();
-//                }
-//            }
-//        });
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScrolling = true;
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                currentItems = layoutManager.getChildCount();
+                totalItems = layoutManager.getItemCount();
+                scrolledItems = layoutManager.findFirstVisibleItemPosition();
+                if (isScrolling && (currentItems + scrolledItems == totalItems)) {
+                    isScrolling = false;
+                    fetchDataFromServer();
+                }
+            }
+        });
+        PageRefersh();
 
     }
     public void PageRefersh(){
@@ -233,4 +244,5 @@ public class RedActivity extends AppCompatActivity {
 
         requestQueue.add(myReq);
     }
+
 }

@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -8,6 +9,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -61,6 +63,10 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
     private static final int MAX_ITEMS_PER_REQUEST = 20;
     private static final int NUMBER_OF_ITEMS = 100;
     private static final int SIMULATED_LOADING_TIME_IN_MS = 1500;
+    public static DatabaseReference ref;
+    public static FirebaseDatabase database;
+    private Toolbar toolbar;
+    private String isOnline;
 
 
     private EndlessRecyclerOnScrollListener scrollListener;
@@ -76,14 +82,27 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         friendNametext = (TextView) findViewById(R.id.friendName);
         messageToSend = (EditText) findViewById(R.id.messageToSend);
         sendMessageButton = (ImageButton) findViewById(R.id.sendButton);
+        toolbar=(Toolbar)findViewById(R.id.toolbar);
+
 
         Intent intent = getIntent();
         id = intent.getExtras().getInt("FriendId");
         friendProfile = intent.getExtras().getString("FriendProfileUrl");
         friendName = intent.getExtras().getString("FriendName");
-        //getActionBar().setTitle(friendName);
-        //getSupportActionBar().setTitle(friendName);
-        //friendNametext.setText(friendName);
+        isOnline=intent.getExtras().getString("isOnline");
+        Log.v("Record",id+" "+friendProfile+" "+friendName);
+
+
+        database= FirebaseDatabase.getInstance();
+        toolbar.setTitle(friendName);
+        if(isOnline.equals("True"))
+        {
+            toolbar.setSubtitle("Online");
+            toolbar.setSubtitleTextColor(Color.GREEN);
+        }
+        else {
+            toolbar.setSubtitle("Offline");
+        }
 
 
         recycler = (RecyclerView) findViewById(R.id.recycler);
@@ -95,129 +114,9 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         recycler.setLayoutManager(layoutManager);
-        //recycler.addOnScrollListener(createInfiniteScrollListener());
-        //recycler.scrollToPosition(messageClassArrayList.size()-1);
         chatWithAFriendActivityAdapter = new ChatWithAFriendActivityAdapter(messageClassArrayList, this, id, friendProfile, friendName);
         recycler.setAdapter(chatWithAFriendActivityAdapter);
-        //recycler.addOnScrollListener(createInfiniteScrollListener());
 
-//        scrollListener = new EndlessRecyclerOnScrollListener(layoutManager) {
-//            @Override
-//            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-//                fetchMoreChatDataFromServer();
-//                // Triggered only when new data needs to be appended to the list
-//                // Add whatever code is needed to append new items to the bottom of the list
-//                //fetchMoreChatDataFromServer();
-//            }
-//        };
-        // Adds the scroll listener to RecyclerView
-
-//        recycler.addOnScrollListener(scrollListener);
-
-        //recycler.addOnScrollListener(scrollListener);
-
-
-//        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if(newState== RecyclerView.SCROLL_AXIS_VERTICAL)
-//                {
-//                    isScrolling=true;
-//
-//                }
-//                if(newState==RecyclerView.SCROLL_STATE_IDLE)
-//                {
-//                    fetchMoreChatDataFromServer();
-//                }
-//            }
-
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                if(dy>0)
-//                {
-//                    currentItems=layoutManager.getChildCount();
-//                    totalItems= layoutManager.getItemCount();
-//                    scrolledItems=layoutManager.findFirstVisibleItemPosition();
-//                    if(isScrolling&&(currentItems+scrolledItems==totalItems))
-//                    {
-//                        isScrolling=false;
-//                        fetchMoreChatDataFromServer();
-//                    }
-//                }
-//
-//            }
-//        });
-//
-
-
-
-
-//        recycler.setOnScrollListener(new RecyclerView.OnScrollListener() {
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                Log.v("value",dy+"");
-//                int totalItem = layoutManager.getItemCount();
-//                int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-//
-//                if (!mLoading && lastVisibleItem == totalItem - 1) {
-//                    mLoading = true;
-//                    fetchMoreChatDataFromServer();
-//                    mLoading = false;
-//                }
-//            }
-//        });
-
-
-
-//        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if(newState== AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
-//                {
-//                    isScrolling=true;
-//                    Toast.makeText(getApplicationContext(),"Fetching more chat",Toast.LENGTH_LONG).show();
-//
-//                }
-//            }
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                Log.v("value",dy+" "+dx);
-//                if(dy<0)
-//                {
-//                    currentItems=layoutManager.getChildCount();
-//                    totalItems= layoutManager.getItemCount();
-//                    scrolledItems=layoutManager.findFirstVisibleItemPosition();
-//                    Toast.makeText(getApplicationContext(),"items"+currentItems+" "+scrolledItems+" ="+totalItems,Toast.LENGTH_LONG).show();
-//                    if(isScrolling)
-//                    {
-//                        if(currentItems+scrolledItems==totalItems)
-//                        {
-//
-//                            Toast.makeText(getApplicationContext(),"chat data",Toast.LENGTH_LONG).show();
-//                            fetchMoreChatDataFromServer();
-//                            isScrolling=false;
-//                        }
-//                    }
-//
-//
-//                }
-//
-//            }
-//        });
-
-
-
-
-        //recycler.smoothScrollToPosition(recycler.getAdapter().getItemCount() - 1);
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/myallMSG/getChat/" + id,
                 new Response.Listener<String>() {
                     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -239,13 +138,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
                             //Collections.reverse(messageClassArrayList);
                             chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                            //recycler.scrollToPosition(messageClassArrayList.size()-1);
                             FirebaseListner();
-
-
-
-//                            recycler.smoothScrollToPosition(messageClassArrayList.size()-1);
-
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -284,9 +177,9 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //
                 SendMessageToServer();
-                LastMessage lastMessage=new LastMessage(MessagesActivity.userId,messageToSend.getText().toString());
+                LastMessage lastMessage=new LastMessage(MessagesActivity.userId,messageToSend.getText().toString(),MessagesActivity.userName);
 
-                MessagesActivity.ref.child(id+"").setValue(lastMessage);
+                MessagesActivity.ref.child("Chats").child(id+"").setValue(lastMessage);
                 Toast.makeText(ChatWithAFriendActivity.this, "Messeage sent..", Toast.LENGTH_LONG).show();
             }
         });
@@ -344,8 +237,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
 
     public  void fetchMoreChatDataFromServer() {
-        //progressBar.setVisibility(View.VISIBLE);
-        //Toast.makeText(g, "chat response", Toast.LENGTH_LONG).show();
+
 
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/myallMSG/getChat/"+id,
                 new Response.Listener<String>() {
@@ -365,14 +257,8 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
                             //Collections.reverse(messageClassArrayList);
                             chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                           // recycler.scrollToPosition(messageClassArrayList.size()-1);
-
-
-
-
-//                            recycler.smoothScrollToPosition(messageClassArrayList.size()-1);
-
-
+                            //recycler.scrollToPosition(messageClassArrayList.size()-1);
+                            recycler.scrollToPosition(messageClassArrayList.size());
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -392,6 +278,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
                 params.put("Authorization", "Bearer "+TokenClass.Token);
+
                 return params;
             }
 
@@ -400,19 +287,14 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
         requestQueue.add(myReq);
     }
-
-
-
-
-
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
     public void FirebaseListner()
     {
-        MessagesActivity.ref.child(MessagesActivity.userId+"").addValueEventListener(new ValueEventListener() {
+        MessagesActivity.ref.child("Chats").child(MessagesActivity.userId+"").addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
 
                 LastMessage lastMessage = dataSnapshot.getValue(LastMessage.class);
                 if(lastMessage!=null && id==lastMessage.getSenderId())
@@ -423,26 +305,13 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
                     if(messageClassArrayList.size()!=0)
                     {
-                        messageClass= new MessageClass(messageClassArrayList.get(messageClassArrayList.size()-1).getMessageId()+1,id,MessagesActivity.userId,lastMessage.getMessage(),"1",formatter.format(date),formatter.format(date));
-//                        messageClassArrayList.remove()
+                        messageClass=
+                                new MessageClass(messageClassArrayList.get(messageClassArrayList.size()-1).getMessageId()+1,id,MessagesActivity.userId,lastMessage.getMessage(),"1",formatter.format(date),formatter.format(date));
+
                     }
-                    //Collections.reverse(messageClassArrayList);
+
                     messageClassArrayList.add(messageClass);
-                    //Collections.reverse(messageClassArrayList);
-                    //recycler.smoothScrollToPosition(recycler.getAdapter().getItemCount() - 1);
                     chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                    //recycler.scrollToPosition(messageClassArrayList.size()-1);
-                    //recycler.scrollToPosition(messageClassArrayList.size()-1);
-//                    chatWithAFriendActivityAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-//                        @Override
-//                        public void onItemRangeInserted(int positionStart, int itemCount) {
-//                            layoutManager.smoothScrollToPosition(recycler, null, chatWithAFriendActivityAdapter.getItemCount()-1);
-//                        }
-//                    });
-//                    recycler.smoothScrollToPosition(messageClassArrayList.size()-1);
-
-
-
                     Toast.makeText(ChatWithAFriendActivity.this,"MessageFromServer"+lastMessage.getMessage(),Toast.LENGTH_LONG).show();
                 }
 
@@ -479,9 +348,8 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                         messageClassArrayList.add(messageClass);
                         //Collections.reverse(messageClassArrayList);
                         messageToSend.setText("");
-                        chatWithAFriendActivityAdapter.notifyDataSetChanged();
+                        chatWithAFriendActivityAdapter.notifyItemInserted(messageClassArrayList.size());
 
-                       // recycler.scrollToPosition(messageClassArrayList.size()-1);
 
 
                     }

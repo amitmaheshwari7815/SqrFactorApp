@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -26,7 +27,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProfileActivity extends ToolbarActivity {
-    private ArrayList<ProfileClass> profileClassList = new ArrayList<>();
+    private ArrayList<ProfileClass1> profileClassList = new ArrayList<>();
     private ImageView displayImage;
     private ImageView camera;// button
     public ImageButton mRemoveButton;
@@ -56,7 +59,10 @@ public class ProfileActivity extends ToolbarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
-
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.profile_recycler);
@@ -74,8 +80,13 @@ public class ProfileActivity extends ToolbarActivity {
         writePost = (EditText)findViewById(R.id.profile_profile_write_post);
         editProfile = (Button)findViewById(R.id.profile_editprofile);
         coverImage = (ImageView) findViewById(R.id.profile_cover_image);
+
+
         profileImage = (ImageView) findViewById(R.id.profile_profile_image);
-        profileName =(TextView)findViewById(R.id.profile_profile_name);
+        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                .into(profileImage);
+        profileName.setText(userClass.getFirst_name()+"" +userClass.getLast_name());
+
         profileStatusImage = (ImageView) findViewById(R.id.profile_status_image);
         followCnt = (TextView) findViewById(R.id.profile_followerscnt);
         followingCnt = (TextView) findViewById(R.id.profile_followingcnt);
@@ -88,6 +99,19 @@ public class ProfileActivity extends ToolbarActivity {
             @Override
             public void onClick(View view) {
                 finish();
+            }
+        });
+
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent=new Intent(getApplicationContext(),Settings.class);
+                intent.putExtra("portFolioCount",portfolioCnt.getText().toString());
+                intent.putExtra("followingCount",followingCnt.getText().toString());
+                intent.putExtra("followersCount",followCnt.getText().toString());
+                intent.putExtra("bluePrintCount",bluePrintCnt.getText().toString());
+                startActivity(intent);
             }
         });
 
@@ -137,8 +161,9 @@ public class ProfileActivity extends ToolbarActivity {
         blueprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(ProfileActivity.this, BlueprintActivity.class);
-                startActivity(i);
+//                Intent i = new Intent(ProfileActivity.this, BlueprintActivity.class);
+//                startActivity(i);
+                LoadData();
             }
         });
 
@@ -205,31 +230,49 @@ public class ProfileActivity extends ToolbarActivity {
 
             }
         });
+
+        LoadData();
+
+
+    }
+
+    public void LoadData(){
+
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/detail/sqrfactor",
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/"+userClass.getUser_name(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("MorenewsFeedFromServer", response);
-                        Toast.makeText(ProfileActivity.this, response, Toast.LENGTH_LONG).show();
+                        Log.v("ReponseFeed", response);
+                        Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            ProfileClass profileClass = new ProfileClass(jsonObject);
-                            profileClassList.add(profileClass);
-                            followCnt.setText(profileClass.getFollowerscnt());
-                            followingCnt.setText(profileClass.getFollowingcnt());
-                            portfolioCnt.setText(profileClass.getPortfoliocnt());
-                            bluePrintCnt.setText(profileClass.getBluePrintcnt());
-                            profileName.setText(profileClass.getUser_name());
-                            Glide.with(getApplicationContext()).load("https://archsqr.in/"+profileClass.getProfile())
-                                    .into(profileImage);
+                            followCnt.setText(jsonObject.getString("followerCnt"));
+                            followingCnt.setText(jsonObject.getString("followingCnt"));
+                            bluePrintCnt.setText(jsonObject.getString("blueprintCnt"));
+                            portfolioCnt.setText(jsonObject.getString("portfolioCnt"));
 
-                            profileAdapter.notifyDataSetChanged();
+                            JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                            if (jsonPost!=null)
+                            {
+                                JSONArray jsonArrayData = jsonPost.getJSONArray("data");
+                                for (int i = 0; i < jsonArrayData.length(); i++) {
+                                    ProfileClass1 profileClass1 = new ProfileClass1(jsonArrayData.getJSONObject(i));
+                                    profileClassList.add(profileClass1);
+                                }
+                                profileAdapter.notifyDataSetChanged();
+                            }
+
+
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
-
                 },
                 new Response.ErrorListener() {
 
@@ -250,7 +293,9 @@ public class ProfileActivity extends ToolbarActivity {
 
         };
 
+
         requestQueue.add(myReq);
+
 
     }
 

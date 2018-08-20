@@ -219,6 +219,7 @@
                     android:text="Save all Changes"
                     android:textColor="@color/White"
                     android:textAllCaps="false"
+                    android:fontFamily="@font/roboto_medium"
                     android:background="@drawable/sqr_factor_btn_color"/>
 
             </LinearLayout>

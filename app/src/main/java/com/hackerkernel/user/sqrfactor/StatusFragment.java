@@ -118,16 +118,24 @@ public class StatusFragment extends Fragment {
         displayImage = rootView.findViewById(R.id.news_upload_image);
         btnSubmit = rootView.findViewById(R.id.news_postButton);
         writePost = rootView.findViewById(R.id.news_editPost);
+        writePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
+                getActivity().startActivity(intent);
+                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            }
+        });
         dialog = new ProgressDialog(this.getActivity());
         dialog.setMessage("Uploading Image...");
         dialog.setCancelable(false);
         final RelativeLayout relativeLayout = rootView.findViewById(R.id.rl);
-        relativeLayout.setVisibility(View.GONE);
+//        relativeLayout.setVisibility(View.GONE);
         jsonObject = new JSONObject();
 
-        mRemoveButton = rootView.findViewById(R.id.ib_remove);
-        displayImage.setVisibility(View.GONE);
-        mRemoveButton.setVisibility(View.GONE);
+//        mRemoveButton = rootView.findViewById(R.id.ib_remove);
+//        displayImage.setVisibility(View.GONE);
+//        mRemoveButton.setVisibility(View.GONE);
 
         sharedPreferences = this.getActivity().getSharedPreferences("PREF_NAME", this.getActivity().MODE_PRIVATE);
         token = sharedPreferences.getString("TOKEN", "sqr");
@@ -196,45 +204,45 @@ public class StatusFragment extends Fragment {
         requestQueue.add(myReq);
 
 
-        mRemoveButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                relativeLayout.setVisibility(View.GONE);
-                displayImage.setImageBitmap(null);
-                displayImage.setVisibility(View.GONE);
-                mRemoveButton.setVisibility(View.GONE);
+//        mRemoveButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                relativeLayout.setVisibility(View.GONE);
+//                displayImage.setImageBitmap(null);
+//                displayImage.setVisibility(View.GONE);
+//                mRemoveButton.setVisibility(View.GONE);
+//
+//
+//            }
+//
+//        });
+//        camera.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                relativeLayout.setVisibility(View.VISIBLE);
+//                displayImage.setVisibility(View.VISIBLE);
+//                mRemoveButton.setVisibility(View.VISIBLE);
+//                showFileChooser();
+//
+//            }
+//        });
 
 
-            }
-
-        });
-        camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                relativeLayout.setVisibility(View.VISIBLE);
-                displayImage.setVisibility(View.VISIBLE);
-                mRemoveButton.setVisibility(View.VISIBLE);
-                showFileChooser();
-
-            }
-        });
-
-
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                uploadImage();
-            }
-        });
-
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkPermission()) {
-                // Code for above or equal 23 API Oriented Device
-                // Your Permission granted already .Do next code
-            } else {
-                requestPermission();
-            }
-        }
+//        btnSubmit.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                uploadImage();
+//            }
+//        });
+//
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            if (checkPermission()) {
+//                // Code for above or equal 23 API Oriented Device
+//                // Your Permission granted already .Do next code
+//            } else {
+//                requestPermission();
+//            }
+//        }
 
 
 //        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {

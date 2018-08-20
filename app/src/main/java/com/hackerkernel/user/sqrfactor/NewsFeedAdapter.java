@@ -59,6 +59,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     private PopupWindow popupWindow;
     private FirebaseDatabase database;
     private DatabaseReference ref;
+    private String userName;
 
 
     public NewsFeedAdapter(ArrayList<NewsFeedStatus> newsFeedStatuses, Context context) {
@@ -122,6 +123,17 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                     .into(holder.authImageUrl);
         }
 
+        holder.authName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,UserProfileActivity.class);
+                Log.v("Data",newsFeedStatus.getUserId()+" "+userName+" "+newsFeedStatus.getPostId());
+                intent.putExtra("User_id",newsFeedStatus.getUserId());
+                intent.putExtra("ProfileUserName",userName);
+                context.startActivity(intent);
+
+            }
+        });
         String dtc = newsFeedStatus.getTime();
        // Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);

@@ -1,11 +1,14 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,20 +16,42 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class EducationDetailsActivity extends AppCompatActivity {
     private LinearLayout newForm;
-    private Button add,remove;
+    private Button add_eduDetails,remove_eduother,save_eduDetails;
     private boolean stDate=false;
+    ArrayList<String> courseArray=new ArrayList<>();
+    ArrayList<String> collegeArray=new ArrayList<>();
+    ArrayList<String> admissionYearArray=new ArrayList<>();
+    ArrayList<String> graduationYearArray=new ArrayList<>();
+    //ArrayList<String> course=new ArrayList<>();
+
     private boolean edDate=false;
-    private TextInputLayout startDate,endDate;
-    private EditText startDateText,endDateText;
+    private EditText courseText,collegeText,admissionText,graduationText,courseText1,collegeText1,admissionText1,graduationText1;
+
     private Boolean isClicked= false;
-    Toolbar toolbar;
+    private Toolbar toolbar;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,14 +62,32 @@ public class EducationDetailsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
-        startDateText= (EditText)findViewById(R.id.admissionText);
-        endDateText=(EditText)findViewById(R.id.graduationText);
-        add=(Button)findViewById(R.id.Add_eduDetails);
-        remove=(Button)findViewById(R.id.Remove_eduother);
+
+
+        save_eduDetails=(Button)findViewById(R.id.save_eduDetails);
+        courseText=(EditText)findViewById(R.id.courseText);
+        collegeText=(EditText)findViewById(R.id.collegeText);
+        admissionText= (EditText)findViewById(R.id.admissionText);
+        graduationText=(EditText)findViewById(R.id.graduationText);
+
+        courseText1=(EditText)findViewById(R.id.courseText1);
+        collegeText1=(EditText)findViewById(R.id.collegeText1);
+        admissionText1= (EditText)findViewById(R.id.admissionText1);
+        graduationText1=(EditText)findViewById(R.id.graduationText1);
+
+        add_eduDetails=(Button)findViewById(R.id.Add_eduDetails);
+        remove_eduother=(Button)findViewById(R.id.Remove_eduother);
         newForm=(LinearLayout) findViewById(R.id.linear_edu);
 
+        save_eduDetails.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveDataToServer();
+            }
+        });
+
         newForm.setVisibility(View.GONE);
-        add.setOnClickListener(new View.OnClickListener() {
+        add_eduDetails.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(!isClicked)
@@ -56,7 +99,7 @@ public class EducationDetailsActivity extends AppCompatActivity {
             }
         });
 
-        remove.setOnClickListener(new View.OnClickListener() {
+        remove_eduother.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(newForm!=null && isClicked)
@@ -84,7 +127,7 @@ public class EducationDetailsActivity extends AppCompatActivity {
 
         };
 
-        startDateText.setOnClickListener(new View.OnClickListener() {
+        admissionText.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -96,7 +139,7 @@ public class EducationDetailsActivity extends AppCompatActivity {
             }
         });
 
-        endDateText.setOnClickListener(new View.OnClickListener() {
+        graduationText.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -113,9 +156,9 @@ public class EducationDetailsActivity extends AppCompatActivity {
         String myFormat = "dd/MM/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);
         if(stDate==true)
-            startDateText.setText(sdf.format(myCalendar.getTime()));
+            admissionText.setText(sdf.format(myCalendar.getTime()));
         if(edDate==true)
-            endDateText.setText(sdf.format(myCalendar.getTime()));
+            graduationText.setText(sdf.format(myCalendar.getTime()));
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -146,6 +189,106 @@ public class EducationDetailsActivity extends AppCompatActivity {
 
         return super.onCreateOptionsMenu(menu);
     }
+
+    public void saveDataToServer()
+    {
+        RequestQueue requestQueue1 = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/parse/work-education-detail",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.v("ResponseLike",s);
+                        Toast.makeText(EducationDetailsActivity.this,s,Toast.LENGTH_SHORT).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(s);
+                            collegeText.setText("");
+                            courseText.setText("");
+                            admissionText.setText("");
+                            graduationText.setText("");
+                            collegeText1.setText("");
+                            courseText1.setText("");
+                            admissionText1.setText("");
+                            graduationText1.setText("");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                if(!TextUtils.isEmpty(courseText.getText().toString()))
+                {
+                    params.put("course[0]",courseText.getText().toString());
+                    //courseArray.add(courseText.getText().toString());
+                }
+                if(!TextUtils.isEmpty(courseText1.getText().toString()))
+                {
+                    //courseArray.add(courseText1.getText().toString());
+                    params.put("course[1]",courseText1.getText().toString());
+                }
+//                JSONArray course = new JSONArray(courseArray);
+
+
+                if(!TextUtils.isEmpty(collegeText.getText().toString()))
+                {
+                    //collegeArray.add(collegeText.getText().toString());
+                    params.put("college_university[0]",collegeText.getText().toString());
+                }
+                if(!TextUtils.isEmpty(collegeText1.getText().toString()))
+                {
+                    params.put("college_university[1]",collegeText.getText().toString());
+                }
+//                JSONArray c = new JSONArray(collegeArray);
+
+
+                if(!TextUtils.isEmpty(admissionText.getText().toString()))
+                {
+                    //admissionYearArray.add(admissionText.getText().toString());
+                    params.put("year_of_admission[0]",admissionText.getText().toString());
+                }
+                if(!TextUtils.isEmpty(admissionText1.getText().toString()))
+                {
+                    params.put("year_of_admission[1]",admissionText1.getText().toString());
+                }
+                //JSONArray a = new JSONArray(admissionYearArray);
+
+
+                if(!TextUtils.isEmpty(graduationText.getText().toString()))
+                {
+//                    graduationYearArray.add(graduationText.getText().toString());
+                    params.put("year_of_graduation[0]",graduationText.getText().toString());
+                }
+                if(!TextUtils.isEmpty(graduationText1.getText().toString()))
+                {
+                    params.put("year_of_graduation[1]",graduationText1.getText().toString());
+                }
+                //JSONArray g = new JSONArray(graduationYearArray);
+
+
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue1.add(stringRequest);
+
+
+    }
 }
-
-

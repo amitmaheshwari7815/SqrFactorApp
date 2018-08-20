@@ -4,6 +4,8 @@ public class LastMessage {
 
     private int senderId;
     private String message;
+    private String senderName;
+
 
     public LastMessage()
     {
@@ -11,9 +13,18 @@ public class LastMessage {
     }
 
 
-    public LastMessage(int senderId, String message) {
+    public LastMessage(int senderId, String message,String senderName) {
         this.senderId = senderId;
         this.message = message;
+        this.senderName=senderName;
+    }
+
+    public String getSenderName() {
+        return senderName;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
     }
 
     public int getSenderId() {

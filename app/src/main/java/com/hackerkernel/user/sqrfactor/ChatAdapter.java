@@ -37,10 +37,32 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         ChatFriends chatFriend = chatFriends.get(position);
-        holder.frndName.setText(chatFriend.getUserName());
+
+        //if(chatFriend.getUserName().equals())
+
+        //Log.v("DATattatatata",chatFriend.getName()+" "+chatFriend.getUserName());
+        String name=chatFriend.getName();
+        if(name.equals("null"))
+        {
+            holder.frndName.setText(chatFriend.getUserName());
+        }
+        else
+        {
+            holder.frndName.setText(chatFriend.getName());
+        }
         Glide.with(context).load("https://archsqr.in/"+chatFriend.getUserProfile())
                 .into(holder.frndProfile);
         holder.chatMessage.setText("hello");
+        if(chatFriend.getIsOnline().equals("True"))
+        {
+            holder.online.setVisibility(View.VISIBLE);
+            //Toast.makeText(context,chatFriend.getIsOnline()+"",Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            holder.online.setVisibility(View.GONE);
+            //Toast.makeText(context,chatFriend.getIsOnline()+"",Toast.LENGTH_LONG).show();
+        }
 
 
     }
@@ -51,8 +73,9 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        ImageView frndProfile;
+        ImageView frndProfile,online;
         TextView frndName,chatMessage;
+
 
 
         public MyViewHolder(View itemView) {
@@ -62,14 +85,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
                 public void onClick(View v) {
                     Intent intent=new Intent(context,ChatWithAFriendActivity.class);
                     intent.putExtra("FriendId",chatFriends.get(getAdapterPosition()).getUserID());
-                    intent.putExtra("FriendName",chatFriends.get(getAdapterPosition()).getUserName());
+                    if(chatFriends.get(getAdapterPosition()).getName().equals("null"))
+                    {
+                        intent.putExtra("FriendName",chatFriends.get(getAdapterPosition()).getUserName());
+                    }
+                    else
+                    {
+                        intent.putExtra("FriendName",chatFriends.get(getAdapterPosition()).getName());
+                    }
                     intent.putExtra("FriendProfileUrl",chatFriends.get(getAdapterPosition()).getUserProfile());
+                    intent.putExtra("isOnline",chatFriends.get(getAdapterPosition()).getIsOnline());
                     context.startActivity(intent);
                 }
             });
             frndProfile =(ImageView)itemView.findViewById(R.id.chat_frnd_profile);
             frndName =(TextView) itemView.findViewById(R.id.chat_frnd_name);
             chatMessage =(TextView)itemView.findViewById(R.id.chat_last_message);
+            online=(ImageView) itemView.findViewById(R.id.onlineicon);
         }
     }
 }

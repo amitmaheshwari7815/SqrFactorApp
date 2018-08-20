@@ -1,12 +1,15 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.app.DatePickerDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,6 +25,8 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 
+import com.google.gson.Gson;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,7 +35,7 @@ import java.util.Locale;
 
 public class BasicDetails extends AppCompatActivity {
 
-    private Button addEmail;
+    private Button addEmail,addOccupation,save;
     Spinner spin;
     Spinner countrySpinner;
     String spin_val=null;
@@ -42,6 +47,7 @@ public class BasicDetails extends AppCompatActivity {
     private boolean email3=false;
     private CheckBox checkBox1,checkBox2,checkBox3,checkBox4,checkBox5,checkBox6;
     private int count=0;
+    private EditText firstName,lastName,Email,mobileNumber,DOB,uid,shortBio,facebookLink,linkedinLink,TwitterLink,InstagramLink;
     Toolbar toolbar;
     ArrayList<String> countries = new ArrayList<String>();
     @Override
@@ -54,7 +60,26 @@ public class BasicDetails extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
+        firstName = (EditText)findViewById(R.id.fNametext);
+        lastName = (EditText)findViewById(R.id.lNametext);
+        mobileNumber = (EditText)findViewById(R.id.mobileText);
+        DOB = (EditText)findViewById(R.id.dateOfBirthText);
+        Email = (EditText)findViewById(R.id.Emailtext);
+        uid = (EditText)findViewById(R.id.UIDtext);
+        shortBio = (EditText)findViewById(R.id.shortBioTecxt);
+        facebookLink = (EditText)findViewById(R.id.facebookLinktext);
+        linkedinLink = (EditText)findViewById(R.id.LinkedinLinktext);
+        TwitterLink = (EditText)findViewById(R.id.TwitterLinktext);
+        InstagramLink = (EditText)findViewById(R.id.InstagramLinktext);
         addEmail = (Button) findViewById(R.id.AddEmail);
+        addOccupation =(Button) findViewById(R.id.AddOccupation);
+        save =(Button)findViewById(R.id.SaveandNext);
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                checkDataEntered();
+            }
+        });
         linearLayout2 =(LinearLayout) findViewById(R.id.linearLayout2);
         linearLayout2.setVisibility(View.GONE);
         addEmail.setOnClickListener(new View.OnClickListener() {
@@ -277,7 +302,67 @@ public class BasicDetails extends AppCompatActivity {
                 }
             }
         });
+
+        final SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson1 = new Gson();
+        String json1 = sharedPreferences.getString("UserData","");
+        UserData userData = gson1.fromJson(json1,UserData.class);
+        if (userClass.getFirst_name() != null){
+            firstName.setText(userClass.getFirst_name());
+        }
+        if (userClass.getLast_name() != null){
+            lastName.setText(userClass.getLast_name());
+        }
+        if (userClass.getEmail() != null){
+            Email.setText(userClass.getEmail());
+        }
+        if (userClass.getMobile() != null){
+            mobileNumber.setText(userClass.getMobile());
+        }
+        if (userData.getName_of_the_company() != null){
+            shortBio.setText(userData.getShot_bio());
+        }
+        if (userData.getName_of_the_company() != null){
+            DOB.setText(userData.getFirm_or_company_name());
+        }
+        if (userData.getName_of_the_company() != null){
+            uid.setText(userData.getFirm_or_company_registration_number());
+        }
+        if (userData.getFacebook_link() != null){
+            facebookLink.setText(userData.getFacebook_link());
+        }
+        if (userData.getName_of_the_company() != null){
+            linkedinLink.setText(userData.getFirm_or_company_registration_number());
+        }
+        if (userData.getName_of_the_company() != null){
+            TwitterLink.setText(userData.getFirm_or_company_registration_number());
+        }
+        if (userData.getName_of_the_company() != null){
+            InstagramLink.setText(userData.getFirm_or_company_registration_number());
+        }
+
     }
+    boolean isEmail(EditText text){
+            CharSequence email = text.getText().toString();
+            return (!TextUtils.isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches());
+        }
+        boolean isEmpty(EditText text){
+        CharSequence str = text.getText().toString();
+        return TextUtils.isEmpty(str);
+        }
+        void checkDataEntered(){
+        if(isEmail(Email)== false){
+            email.setError("Enter valid email!");
+        }
+            if(isEmpty(Email)== false){
+                email.setError("Email is required!");
+            }
+        }
 
     private void updateLabe(Calendar myCalendar) {
         String myFormat = "dd/MM/yy";

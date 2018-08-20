@@ -44,11 +44,16 @@
             android:fontFamily="@font/roboto_medium"
             android:background="@drawable/gray_border"/>
     </LinearLayout>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/red_pullToRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/red_recycler">
     </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

@@ -18,8 +18,8 @@ import java.util.ArrayList;
 
 public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.MyViewAdapter> {
 
-   private ArrayList<FollowerClass> followerClassArrayList;
-   private Context context;
+    private ArrayList<FollowerClass> followerClassArrayList;
+    private Context context;
 
     public FollowersAdapter(ArrayList<FollowerClass> followerClassArrayList, Context context) {
         this.followerClassArrayList = followerClassArrayList;

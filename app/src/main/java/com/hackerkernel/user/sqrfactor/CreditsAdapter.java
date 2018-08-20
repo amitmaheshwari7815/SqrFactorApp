@@ -30,11 +30,28 @@ public class CreditsAdapter extends RecyclerView.Adapter<CreditsAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
-       CreditsClass creditsClass=creditsClassArrayList.get(position);
-       holder.article.setText(creditsClass.getArticle());
-       holder.totalViews.setText(creditsClass.getTotalViews());
-       holder.firstWeekViews.setText(creditsClass.getfirstWeekViews());
-       holder.credits.setText(creditsClass.getCredits());
+        CreditsClass creditsClass=creditsClassArrayList.get(position);
+        holder.article.setText(creditsClass.getTitle());
+        if(creditsClass.getTotalViews()!=null){
+            holder.totalViews.setText(creditsClass.getTotalViews());
+        }
+        else {
+            holder.totalViews.setText("0");
+        }
+        if(creditsClass.getFirstWeekViews()!=null) {
+            holder.firstWeekViews.setText(creditsClass.getFirstWeekViews());
+
+        }else {
+            holder.firstWeekViews.setText("0");
+        }
+
+        if(creditsClass.getCredits()!=null){
+            holder.credits.setText(creditsClass.getCredits());
+
+        }
+        else {
+            holder.credits.setText("0");
+        }
 
     }
 

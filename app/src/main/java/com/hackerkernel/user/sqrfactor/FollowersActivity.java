@@ -39,8 +39,6 @@ public class FollowersActivity extends AppCompatActivity {
     private RecyclerView recyclerView1;
     private LinearLayoutManager layoutManager;
     private FollowersAdapter followersAdapter;
-    private int user_id;
-    private String profileUserName;
 
 
     private ArrayList<FollowerClass> followerClassArrayList = new ArrayList<>();
@@ -60,10 +58,6 @@ public class FollowersActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        Intent intent = getIntent();
-        user_id = intent.getIntExtra("User_id",0);
-        profileUserName = intent.getStringExtra("ProfileUserName");
 
         recyclerView1 = findViewById(R.id.recyclerView_followers);
         layoutManager = new LinearLayoutManager(this);
@@ -92,7 +86,7 @@ public class FollowersActivity extends AppCompatActivity {
         UserClass userClass = gson.fromJson(json, UserClass.class);
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/sqrfactor?action=followers",
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/"+userClass.getUser_name()+"?action=followers",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {

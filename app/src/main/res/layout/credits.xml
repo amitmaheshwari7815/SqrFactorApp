@@ -32,229 +32,6 @@
             android:orientation="vertical"
             android:layout_marginTop="2dp">
 
-        <!--RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark">
-
-            <ImageButton
-                android:id="@+id/more"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentEnd="true"
-                android:layout_marginEnd="20dp"
-                android:background="@color/White"
-                android:src="@drawable/ic_more"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="20dp" />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true"
-                android:background="@drawable/home_banner"
-                android:layout_alignParentLeft="true" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="25dp"
-                android:text="Android Developer - SqrFactor"
-                android:textColor="@color/White"/>
-
-            <ImageView
-                android:id="@+id/p_image"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:background="@drawable/image_background"
-                android:padding="5dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/profilepic"
-                android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
-
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Amit Maheshwari"
-                android:textColor="#000"
-                android:textSize="17sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="(Bangalore, KA)"
-                android:textSize="17sp"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <Button
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/edit_profile_button"
-                android:text="  Edit Profile  "
-                android:textAlignment="center" />
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="80dp"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="45dp"
-                    android:text="0"
-                    android:textStyle="bold"
-                    android:textColor="#ea3e42"
-                    android:layout_marginLeft="45dp" />
-
-                <TextView
-                    android:id="@+id/credit_blueprint"
-                    style="@style/AppTheme"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="BluePrint"
-                    android:textColor="@drawable/selector_follow"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:layout_marginLeft="20dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="45dp"
-                    android:text="0"
-                    android:textStyle="bold"
-                    android:textColor="#ea3e42"
-                    android:layout_marginLeft="45dp" />
-
-                <TextView
-                    android:id="@+id/credit_portfolio"
-                    style="@style/AppTheme"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="Portfolio"
-                    android:textStyle="bold"
-                    android:textColor="@drawable/selector_follow"
-                    android:textSize="15sp"
-                    android:layout_marginLeft="20dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="45dp"
-                    android:text="0"
-                    android:textStyle="bold"
-                    android:textColor="#ea3e42"
-                    android:layout_marginLeft="45dp" />
-
-                <TextView
-                    android:id="@+id/credit_followers"
-                    style="@style/AppTheme"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="Followers"
-                    android:textColor="@drawable/selector_follow"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:layout_marginLeft="20dp" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="45dp"
-                    android:text="0"
-                    android:textStyle="bold"
-                    android:textColor="#ea3e42"
-                    android:layout_marginLeft="45dp" />
-
-                <TextView
-                    android:id="@+id/credit_following"
-                    style="@style/AppTheme"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="20dp"
-                    android:text="Following"
-                    android:textColor="@drawable/selector_follow"
-                    android:textStyle="bold"
-                    android:textSize="15sp"
-                    android:layout_marginLeft="20dp" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="5dp"
-            android:background="@color/gray"/>
-
-        <LinearLayout
-            android:id="@+id/fragmentContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"/-->
-
             <include layout="@layout/common_profile_section"/>
 
     <LinearLayout
@@ -267,7 +44,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:textStyle="bold"
+            android:fontFamily="@font/roboto_medium"
             android:textSize="15sp"
             android:text="You haven't posted any articles yet. Go ahead and create some amazing articles!" />
     </LinearLayout>
@@ -279,12 +56,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="To know more, read "/>
+            android:text="To know more, read "
+            android:fontFamily="@font/roboto"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="faqs"
+            android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"/>
 
     </LinearLayout>
@@ -306,7 +85,7 @@
                     android:layout_height="match_parent"
                     android:text="Article"
                     android:textSize="15sp"
-                    android:textColor="#2b2a2a"
+                    android:fontFamily="@font/roboto_medium"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:background="@drawable/gray_border"
@@ -317,7 +96,7 @@
                     android:layout_height="match_parent"
                     android:text="Total Views"
                     android:textSize="15sp"
-                    android:textColor="#2b2a2a"
+                    android:fontFamily="@font/roboto_medium"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:background="@drawable/gray_border"
@@ -328,7 +107,7 @@
                     android:layout_height="match_parent"
                     android:text="1st Week views"
                     android:textSize="15sp"
-                    android:textColor="#2b2a2a"
+                    android:fontFamily="@font/roboto_medium"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:background="@drawable/gray_border"
@@ -339,7 +118,8 @@
                     android:layout_height="match_parent"
                     android:text="Credits"
                     android:textSize="15sp"
-                    android:textColor="#f70505"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/sqr"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:background="@drawable/gray_border"
@@ -358,7 +138,31 @@
                 android:layout_marginEnd="5dp">
 
             </android.support.v7.widget.RecyclerView>
-
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_height="wrap_content">
+                <Button
+                    android:id="@+id/prevPage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Prev"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/White"
+                    android:textAllCaps="false"
+                    android:background="@drawable/backgroundbutton"/>
+                <Button
+                    android:id="@+id/nextPage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5sp"
+                    android:text="Next"
+                    android:fontFamily="@font/roboto_medium"
+                    android:textColor="@color/White"
+                    android:textAllCaps="false"
+                    android:background="@drawable/backgroundbutton"
+                    android:layout_marginLeft="5sp" />
+            </LinearLayout>
         </LinearLayout>
 
     </ScrollView>

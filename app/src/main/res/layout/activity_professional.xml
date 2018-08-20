@@ -14,7 +14,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/professional_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
             android:background="@color/sqr" />
 
     </android.support.design.widget.AppBarLayout>
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:text="Professional Details"
         android:textSize="20sp"
-        android:textStyle="bold"
+        android:fontFamily="@font/roboto_medium"
         android:padding="10dp"/>
 
     <View
@@ -59,6 +59,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="COA/Registeration"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -82,6 +83,7 @@
                     android:background="@android:color/transparent"
                     android:hint="Years Since Service"
                     android:inputType="text"
+                    android:fontFamily="@font/roboto"
                     android:padding="5sp" />
 
             </android.support.design.widget.TextInputLayout>
@@ -103,6 +105,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Role*"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -125,6 +128,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Company/Firm Or College/University"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -147,6 +151,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Start Date"
+                    android:fontFamily="@font/roboto"
                     android:inputType="date"
                     android:padding="5sp" />
 
@@ -170,6 +175,7 @@
                     android:background="@android:color/transparent"
                     android:hint="End Date of Working Currently"
                     android:inputType="date"
+                    android:fontFamily="@font/roboto"
                     android:padding="5sp" />
 
             </android.support.design.widget.TextInputLayout>
@@ -191,6 +197,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Salary/Stipend"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -208,6 +215,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:text="Add +"
+                    android:fontFamily="@font/roboto_medium"
                     android:textColor="@color/White"
                     android:textAllCaps="false"
                     android:background="@drawable/sqr_factor_btn_color" />
@@ -237,6 +245,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Role*"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -259,6 +268,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Company/Firm Or College/University"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -281,6 +291,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Start Date"
+                        android:fontFamily="@font/roboto"
                         android:inputType="date"
                         android:padding="5sp" />
 
@@ -302,6 +313,7 @@
                         android:layout_height="match_parent"
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
+                        android:fontFamily="@font/roboto"
                         android:hint="End Date of Working Currently"
                         android:inputType="date"
                         android:padding="5sp" />
@@ -325,6 +337,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Salary/Stipend"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -343,6 +356,7 @@
                         android:layout_gravity="end"
                         android:background="@drawable/sqr_factor_btn_color"
                         android:text="Add +"
+                        android:fontFamily="@font/roboto_medium"
                         android:textAllCaps="false"
                         android:textColor="@color/White" />
 
@@ -353,6 +367,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:text="Remove"
+                        android:fontFamily="@font/roboto_medium"
                         android:textColor="@color/White"
                         android:textAllCaps="false"
                         android:background="@drawable/gray_buttons"
@@ -385,6 +400,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Role*"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -408,6 +424,7 @@
                         android:background="@android:color/transparent"
                         android:hint="Company/Firm Or College/University"
                         android:inputType="text"
+                        android:fontFamily="@font/roboto"
                         android:padding="5sp" />
 
                 </android.support.design.widget.TextInputLayout>
@@ -429,6 +446,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Start Date"
+                        android:fontFamily="@font/roboto"
                         android:inputType="date"
                         android:padding="5sp" />
 
@@ -452,6 +470,7 @@
                         android:background="@android:color/transparent"
                         android:hint="End Date of Working Currently"
                         android:inputType="date"
+                        android:fontFamily="@font/roboto"
                         android:padding="5sp" />
 
                 </android.support.design.widget.TextInputLayout>
@@ -473,6 +492,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Salary/Stipend"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -492,6 +512,7 @@
                         android:layout_gravity="end"
                         android:background="@drawable/sqr_factor_btn_color"
                         android:text="Add +"
+                        android:fontFamily="@font/roboto_medium"
                         android:textAllCaps="false"
                         android:textColor="@color/White" />
 
@@ -502,6 +523,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:text="Remove"
+                        android:fontFamily="@font/roboto_medium"
                         android:textColor="@color/White"
                         android:textAllCaps="false"
                         android:background="@drawable/gray_buttons"
@@ -518,10 +540,11 @@
                 android:padding="10dp">
 
                 <Button
-                    android:id="@+id/save"
+                    android:id="@+id/save_professinal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Save"
+                    android:fontFamily="@font/roboto_medium"
                     android:textColor="@color/White"
                     android:textAllCaps="false"
                     android:background="@drawable/sqr_factor_btn_color"/>

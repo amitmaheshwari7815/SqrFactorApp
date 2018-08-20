@@ -2,31 +2,65 @@ package com.hackerkernel.user.sqrfactor;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Settings extends AppCompatActivity {
 
-    Toolbar toolbar;
-    ImageView menu;
-    TextView text1,text2,text3,text4;
-    TextView bluePrint,portfolio,followers,following;
+    private Toolbar toolbar;
+    private ImageView menu,profilePic;
+    private TextView text1,text2,text3,text4,text5,profileUserName;
+    private TextView bluePrint,portfolio,followers,following;
+    private ArrayList<UserData> userDataArrayList = new ArrayList<>();
+    private SharedPreferences.Editor editor;
+    private SharedPreferences mPrefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
+        profilePic=(ImageView)findViewById(R.id.userProfilePic);
         //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new SettingsFragment()).commit();
 
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+
+//        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+//                .into(profilePic);
+        // Log.v("image",userClass.getProfile());
+//        profileUserName.setText(userClass.getFirst_name()+" "+userClass.getLast_name());
         toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);
@@ -51,7 +85,10 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        bluePrint = (TextView)findViewById(R.id.blueprint);
+        Intent intent = getIntent();
+
+        bluePrint = (TextView)findViewById(R.id.blueprint1);
+        bluePrint.setText(intent.getStringExtra("bluePrintCount"));
         bluePrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -63,7 +100,8 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        portfolio = (TextView)findViewById(R.id.portfolio);
+        portfolio = (TextView)findViewById(R.id.portfolio1);
+        portfolio.setText(intent.getStringExtra("portFolioCount"));
         portfolio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +111,8 @@ public class Settings extends AppCompatActivity {
                 //.addToBackStack(null).commit();
             }
         });
-        followers = (TextView)findViewById(R.id.followers);
+        followers = (TextView)findViewById(R.id.followers1);
+        followers.setText(intent.getStringExtra("followersCount"));
         followers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -84,7 +123,8 @@ public class Settings extends AppCompatActivity {
 
             }
         });
-        following = (TextView)findViewById(R.id.following);
+        following = (TextView)findViewById(R.id.following1);
+        following.setText(intent.getStringExtra("followingCount"));
         following.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,71 +135,149 @@ public class Settings extends AppCompatActivity {
         });
 
         text1 = (TextView)findViewById(R.id.basic_details);
-        text1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Settings.this,BasicDetails.class);
-                startActivity(i);
-            }
-        });
         text2 = (TextView)findViewById(R.id.edu_details);
-        text2.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("ResourceAsColor")
-            @Override
-            public void onClick(View v) {
-                Intent j = new Intent(Settings.this,EducationDetailsActivity.class);
-                startActivity(j);
-            }
-        });
         text3 = (TextView)findViewById(R.id.prof_details);
-        text3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent k = new Intent(Settings.this,ProfessionalActivity.class);
-                startActivity(k);
-            }
-        });
         text4 = (TextView)findViewById(R.id.other_details);
-        text4.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent l = new Intent(Settings.this,OtherDetailsActivity.class);
-                startActivity(l);
-            }
-        });
+        text4.setVisibility(View.GONE);
+        text5 = (TextView)findViewById(R.id.change_password);
 
-        /*bluePrint = (TextView)findViewById(R.id.setting_blueprint);
-        bluePrint.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Settings.this,BluePrintFragment.class);
-                startActivity(i);
-            }
-        });
-        portfolio = (TextView)findViewById(R.id.setting_portfolio);
-        portfolio.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent j = new Intent(Settings.this,Portfolio.class);
-                startActivity(j);
-            }
-        });
-        followers = (TextView)findViewById(R.id.setting_followers);
-        followers.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent k = new Intent(Settings.this,FollowersFragment.class);
-                startActivity(k);
-            }
-        });
-        following = (TextView)findViewById(R.id.setting_following);
-        following.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent l = new Intent(Settings.this,FollowingFragment.class);
-                startActivity(l);
-            }
-        });*/
+
+        //Toast.makeText(this,"type"+userClass.getUserType(),Toast.LENGTH_LONG).show();
+
+        getUserDataFromServer();
+
+        if(userClass.getUserType().equals("work_individual"))
+        {
+
+            text1.setText("Basic Details");
+            text1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Settings.this,BasicDetails.class);
+                    startActivity(i);
+                }
+            });
+
+            text2.setText("Education Details");
+            text2.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("ResourceAsColor")
+                @Override
+                public void onClick(View v) {
+                    Intent j = new Intent(Settings.this,EducationDetailsActivity.class);
+                    startActivity(j);
+                }
+            });
+
+            text3.setText("Professional Details");
+            text3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent k = new Intent(Settings.this,ProfessionalActivity.class);
+                    startActivity(k);
+                }
+            });
+
+            text4.setVisibility(View.VISIBLE);
+            text4.setText("Other Details");
+            text4.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent l = new Intent(Settings.this,OtherDetailsActivity.class);
+                    startActivity(l);
+                }
+            });
+            text5.setText("Change Password");
+            text5.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent l = new Intent(Settings.this,ChangePassword.class);
+                    startActivity(l);
+                }
+            });
+
+        }
+        else if(userClass.getUserType().equals("work_architecture_college")) {
+            text1.setText("Basic Details");
+            text1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Settings.this, CollegeBasicDetails.class);
+                    startActivity(i);
+                }
+            });
+
+            text2.setText("College/University Details");
+            text2.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("ResourceAsColor")
+                @Override
+                public void onClick(View v) {
+                    Intent j = new Intent(Settings.this, CollegeDetails.class);
+                    startActivity(j);
+                }
+            });
+
+            text3.setText("Faculty Details");
+            text3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent k = new Intent(Settings.this, EmployeeMemberDetails.class);
+                    startActivity(k);
+                }
+            });
+
+            text4.setVisibility(View.GONE);
+
+            text5.setText("Change Password");
+            text5.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent l = new Intent(Settings.this, ChangePassword.class);
+                    startActivity(l);
+                }
+            });
+        }
+        else
+        {
+            text1.setText("Basic Details");
+            text1.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Settings.this,BasicFirmDetails.class);
+                    startActivity(i);
+                }
+            });
+
+            text2.setText("Company Firm Details");
+            text2.setOnClickListener(new View.OnClickListener() {
+                @SuppressLint("ResourceAsColor")
+                @Override
+                public void onClick(View v) {
+                    Intent j = new Intent(Settings.this,CompanyFirmDetails.class);
+                    startActivity(j);
+                }
+            });
+
+            text3.setText("Employee/Member Details");
+            text3.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent k = new Intent(Settings.this,EmployeeMemberDetails.class);
+                    startActivity(k);
+                }
+            });
+
+            text4.setVisibility(View.GONE);
+
+            text5.setText("Change Password");
+            text5.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent l = new Intent(Settings.this,ChangePassword.class);
+                    startActivity(l);
+                }
+            });
+
+        }
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -189,5 +307,56 @@ public class Settings extends AppCompatActivity {
         });
 
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private void getUserDataFromServer()
+    {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/edit",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonArray = jsonObject.getJSONArray("User Data");
+                            UserData  userData = new UserData(jsonArray.getJSONObject(0));
+                            // userDataArrayList.add(userData);
+                            Toast.makeText(getApplicationContext(), userData.getId()+userData.getName_of_the_company()+userData.getAddress(), Toast.LENGTH_LONG).show();
+
+                            mPrefs = getSharedPreferences("userData", MODE_PRIVATE);
+                            SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                            Gson gson = new Gson();
+                            String json = gson.toJson(userData);
+                            prefsEditor.putString("UserData", json);
+                            prefsEditor.commit();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
     }
 }

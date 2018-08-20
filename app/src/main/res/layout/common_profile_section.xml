@@ -20,6 +20,7 @@
             android:adjustViewBounds="true"/>
 
         <ImageView
+            android:id="@+id/userProfilePic"
             android:layout_width="80sp"
             android:layout_height="80sp"
             android:layout_alignParentTop="true"
@@ -33,8 +34,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="KEANU REEVES"
+            android:text="SqrFactor"
+            android:textAllCaps="false"
             android:textColor="#000"
+            android:fontFamily="@font/roboto_medium"
             android:textSize="15sp"
             android:layout_marginTop="190sp"/>
 
@@ -48,34 +51,42 @@
         android:layout_marginTop="5dp">
 
         <TextView
+            android:id="@+id/blueprint1"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="5"
+            android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"
             android:gravity="center"/>
 
         <TextView
+            android:id="@+id/portfolio1"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
+            android:fontFamily="@font/roboto"
             android:text="2"
             android:textColor="@color/sqr"/>
 
         <TextView
+            android:id="@+id/followers1"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="3"
+            android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"
             android:gravity="center"/>
 
         <TextView
+            android:id="@+id/following1"
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="21"
+            android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"
             android:gravity="center"/>
 
@@ -97,6 +108,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Blueprint"
+            android:fontFamily="@font/roboto"
             android:gravity="center"
             android:textColor="@drawable/selector_follow"/>
 
@@ -107,6 +119,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:text="Portfolio"
+            android:fontFamily="@font/roboto"
             android:textColor="@drawable/selector_follow"/>
 
         <TextView
@@ -115,6 +128,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Followers"
+            android:fontFamily="@font/roboto"
             android:gravity="center"
             android:textColor="@drawable/selector_follow"/>
 
@@ -124,6 +138,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="Following"
+            android:fontFamily="@font/roboto"
             android:gravity="center"
             android:textColor="@drawable/selector_follow"/>
 
@@ -144,6 +159,8 @@
         android:background="@drawable/edit_profile"
         android:textColor="#000"
         android:text="Edit Profile"
+        android:textAllCaps="false"
+        android:fontFamily="@font/roboto_medium"
         android:paddingLeft="10sp"
         android:paddingStart="10sp"
         android:paddingRight="10sp"

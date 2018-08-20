@@ -138,8 +138,15 @@
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".TopContributors" />
         <activity android:name=".CompanyFirmDetails" />
-        <activity android:name=".EmployeeMemberDetails" />
-        <activity android:name=".ChangePassword"></activity>
+        <activity android:name=".EmployeeMemberDetails">
+        </activity>
+        <activity android:name=".ChangePassword">
+        </activity>
+        <activity android:name=".BasicFirmDetails">
+        </activity>
+        <activity android:name=".CollegeBasicDetails" />
+        <activity android:name=".CollegeDetails" />
+        <activity android:name=".PostActivity"></activity>
     </application>
 
 </manifest>

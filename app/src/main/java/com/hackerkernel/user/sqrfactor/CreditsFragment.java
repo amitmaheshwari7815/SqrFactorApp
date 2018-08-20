@@ -28,11 +28,12 @@ public class CreditsFragment extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
+
         //adding dummy data for testing
-        CreditsClass creditsClass=new CreditsClass("ther sbdhsd need to ambadb","25","26","$20 reedmens");
-        creditsClassArrayList.add(creditsClass);
-        CreditsClass creditsClass1=new CreditsClass("ther sbdhsd need to ambadb","25","26","$20 reedmens");
-        creditsClassArrayList.add(creditsClass1);
+//        CreditsClass creditsClass=new CreditsClass("ther sbdhsd need to ambadb","25","26","$20 reedmens");
+//        creditsClassArrayList.add(creditsClass);
+//        CreditsClass creditsClass1=new CreditsClass("ther sbdhsd need to ambadb","25","26","$20 reedmens");
+//        creditsClassArrayList.add(creditsClass1);
 
         CreditsAdapter creditsAdapter=new CreditsAdapter(getContext(),creditsClassArrayList);
         recyclerView.setAdapter(creditsAdapter);

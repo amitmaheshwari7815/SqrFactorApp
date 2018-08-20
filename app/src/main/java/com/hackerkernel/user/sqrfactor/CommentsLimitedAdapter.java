@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -46,7 +47,9 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
-        holder.commentText.setText(comments_limitedArrayList.get(position).getComment_limited_body());
+
+
+        holder.commentBody.setText(comments_limitedArrayList.get(position).getBody());
 
         holder.buttonLike.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -56,26 +59,27 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
 
                     holder.buttonLike.setTextColor(context.getColor(R.color.sqr));
                     int result = comments_limitedArrayList.get(position).getLikeCount()+1;
-                    holder.buttonLike.setText(result+" Like");
+                    holder.numberOfLikes.setText(result+" Like");
                     flag = 1;
                 }
                 else {
                     holder.buttonLike.setTextColor(context.getColor(R.color.gray));
                     int result = comments_limitedArrayList.get(position).getLikeCount();
-                    holder.buttonLike.setText(result+" Like");
+                    holder.numberOfLikes.setText(result+" Like");
                     flag = 0;
                 }
 
             }
         });
-        holder.commenterUser.setText(comments_limitedArrayList.get(position).getCommentUserName());
+        //holder.commenterUser.setText(comments_limitedArrayList.get(position).getUserClass().getUser_name());
 
         Glide.with(context).
-                load(comments_limitedArrayList.get(position).getCommentUserPrfile())
+                load("https://archsqr.in/"+comments_limitedArrayList.get(position).getCommentUserPrfile())
                 .centerCrop().into(holder.commenterProfile);
 
-
-        String dtc = comments_limitedArrayList.get(position).getComment_limited_updated_at();
+       holder.commenterUserName.setText(comments_limitedArrayList.get(position).getCommentUserName());
+       holder.numberOfLikes.setText(comments_limitedArrayList.get(position).getLikeCount()+"");
+        String dtc = comments_limitedArrayList.get(position).getUpdated_at();
         Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
@@ -112,17 +116,18 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView commentText,commenterUser,timeAgo;
+        TextView commentBody,commenterUserName,timeAgo,numberOfLikes;
         ImageView commenterProfile;
         Button buttonLike;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            commentText=(TextView)itemView.findViewById(R.id.commentBody);
-            commenterUser=(TextView)itemView.findViewById(R.id.commenterUserName);
+            commentBody=(TextView)itemView.findViewById(R.id.commentBody);
+            commenterUserName=(TextView)itemView.findViewById(R.id.commenterUserName);
             timeAgo=(TextView)itemView.findViewById(R.id.timeAgo);
             commenterProfile=(ImageView)itemView.findViewById(R.id.commenterProfileImage);
             buttonLike=(Button)itemView.findViewById(R.id.commentLike);
+            numberOfLikes=(TextView)itemView.findViewById(R.id.numberOfLike);
         }
     }
 }

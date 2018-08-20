@@ -118,8 +118,25 @@ Week Winners and 3 words for a week will be announced at 11 PM on dates – 10, 
         <item>Blah</item>
         <item>Blah</item>
     </string-array>
+
+    <string-array name="Company">
+        <item>Select Firm/Company</item>
+        <item>Sole Propritorship</item>
+        <item>Partnership</item>
+        <item>Limited Liability Partnership(LLP)</item>
+        <item>Limited Liability Companies(LLC)</item>
+        <item>Private Limited Company</item>
+        <item>Public Limited Company</item>
+        <item>Registered Outside India</item>
+        <item>Not Registered</item>
+        <item>None Profit Organization</item>
+        <item>Registered Society</item>
+        <item>Other</item>
+    </string-array>
+
+
     <string name="search">Search here...</string>
-    <string name="save_next"><![CDATA[Save&Next]]></string>
+    <string name="save_next"><![CDATA[Save & Next]]></string>
     <string name="blockProfile">Block Profile</string>
     <string name="reportProfile">Report Profile</string>
     <string name="turnOfNotification">Turn Off Notifications</string>

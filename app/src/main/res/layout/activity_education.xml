@@ -14,7 +14,7 @@
         <android.support.v7.widget.Toolbar
             android:id="@+id/edu_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
             android:background="@color/sqr"/>
 
     </android.support.design.widget.AppBarLayout>
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:text="Education Details"
         android:textSize="20sp"
-        android:textStyle="bold"
+        android:fontFamily="@font/roboto_medium"
         android:padding="10dp"/>
 
     <View
@@ -59,6 +59,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Course"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -81,6 +82,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="College/University"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -103,6 +105,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Year Of Admission"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -125,6 +128,7 @@
                     android:layout_gravity="center_horizontal"
                     android:background="@android:color/transparent"
                     android:hint="Year Of Graduation*"
+                    android:fontFamily="@font/roboto"
                     android:inputType="text"
                     android:padding="5sp" />
 
@@ -134,14 +138,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:gravity="center"
                 android:padding="10dp">
 
                 <Button
                     android:id="@+id/Add_eduDetails"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center"
+                    android:layout_gravity="end"
                     android:text="Add"
+                    android:fontFamily="@font/roboto_medium"
                     android:textColor="@color/White"
                     android:textAllCaps="false"
                     android:background="@drawable/sqr_factor_btn_color" />
@@ -171,6 +177,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Course"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -193,6 +200,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="College/University"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -215,6 +223,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Year Of Admission"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -237,6 +246,7 @@
                         android:layout_gravity="center_horizontal"
                         android:background="@android:color/transparent"
                         android:hint="Year Of Graduation*"
+                        android:fontFamily="@font/roboto"
                         android:inputType="text"
                         android:padding="5sp" />
 
@@ -254,6 +264,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:text="Remove"
+                        android:fontFamily="@font/roboto_medium"
                         android:textColor="@color/White"
                         android:textAllCaps="false"
                         android:background="@drawable/gray_buttons"/>
@@ -273,6 +284,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/save_next"
+                    android:fontFamily="@font/roboto"
                     android:textColor="@color/White"
                     android:textAllCaps="false"
                     android:background="@drawable/sqr_factor_btn_color"/>
