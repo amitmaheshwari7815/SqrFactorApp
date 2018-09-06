@@ -1,5 +1,6 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +30,8 @@ public class PortfolioActivity extends AppCompatActivity {
 
     Toolbar toolbar;
     private RecyclerView recyclerView;
+    private String userName;
+    PortfolioAdapter portfolioAdapter;
     private ArrayList<PortfolioClass> portfolioArrayList=new ArrayList<>();
 
     @Override
@@ -54,59 +57,61 @@ public class PortfolioActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
-        PortfolioAdapter portfolioAdapter = new PortfolioAdapter(portfolioArrayList,this);
-//
-        PortfolioClass portfolioClass = new PortfolioClass("url","Architectural wonders of the...","Amit","5","4");
-        portfolioArrayList.add(portfolioClass);
-//
+        portfolioAdapter = new PortfolioAdapter(portfolioArrayList,this);
+
+        Intent intent=getIntent();
+        if(intent!=null)
+        {
+            userName=intent.getStringExtra("UserName");
+        }
         recyclerView.setAdapter(portfolioAdapter);
-//        RequestQueue requestQueue = Volley.newRequestQueue(this);
-//        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/sqrfactor?action=followers",
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        Log.v("MorenewsFeedFromServer", response);
-//                        Toast.makeText(PortfolioActivity.this, response, Toast.LENGTH_LONG).show();
-//                        try {
-//
-//                            JSONObject jsonObject = new JSONObject(response);
-//                            JSONArray follows=jsonObject.getJSONArray("follows");
-//                            for(int i=0;i<follows.length();i++)
-//                            {
-//                                FollowerClass followerClass=new FollowerClass(follows.getJSONObject(i));
-//                                followerClassArrayList.add(followerClass);
-//                            }
-//
-//                            followersAdapter.notifyDataSetChanged();
-//
-//
-//
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//
-//                },
-//                new Response.ErrorListener() {
-//
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//
-//                    }
-//                }) {
-//
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                Map<String, String> params = new HashMap<String, String>();
-//                params.put("Accept", "application/json");
-//                params.put("Authorization", "Bearer "+TokenClass.Token);
-//
-//                return params;
-//            }
-//
-//        };
-//
-//        requestQueue.add(myReq);
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/portfolio/"+userName,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("portfolioResponse", response);
+                        Toast.makeText(PortfolioActivity.this, response, Toast.LENGTH_LONG).show();
+                        try {
+
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray posts=jsonObject.getJSONArray("posts");
+                            for(int i=0;i<posts.length();i++)
+                            {
+                                PortfolioClass portfolioClass=new PortfolioClass(posts.getJSONObject(i));
+                                portfolioArrayList.add(portfolioClass);
+                            }
+
+                            portfolioAdapter.notifyDataSetChanged();
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
 
     }
 }

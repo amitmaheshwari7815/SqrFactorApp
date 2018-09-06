@@ -22,15 +22,7 @@ public class NewsFeedStatus implements Serializable {
     public ArrayList<comments_limited> commentsLimitedArrayList = new ArrayList<>();
 
 
-    public NewsFeedStatus(String type, String credits_earned, String is_Shared, String deleted_at, String paid_at, String week_views, String user_name_of_post, int user_post_id, String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String fullDescription, String like, String comments, String share, String slug, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike, int postId, int userId, int sharedId, int commentId, JSONObject jsonObject, ArrayList<comments_limited> commentsLimitedArrayList) {
-        this.type = type;
-        this.credits_earned = credits_earned;
-        this.is_Shared = is_Shared;
-        this.deleted_at = deleted_at;
-        this.paid_at = paid_at;
-        this.week_views = week_views;
-        this.user_name_of_post = user_name_of_post;
-        this.user_post_id = user_post_id;
+    public NewsFeedStatus(int postId, int userId, int sharedId, int commentId, String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String like, String comments, String share, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike) {
         this.userImageUrl = userImageUrl;
         this.authImageUrl = authImageUrl;
         this.authName = authName;
@@ -38,11 +30,9 @@ public class NewsFeedStatus implements Serializable {
         this.postTitle = postTitle;
         this.shortDescription = shortDescription;
         this.postImage = postImage;
-        this.fullDescription = fullDescription;
         this.like = like;
         this.comments = comments;
         this.share = share;
-        this.slug = slug;
         this.commentProfileImageUrl = commentProfileImageUrl;
         this.commentUserName = commentUserName;
         this.commentTime = commentTime;
@@ -52,8 +42,6 @@ public class NewsFeedStatus implements Serializable {
         this.userId = userId;
         this.sharedId = sharedId;
         this.commentId = commentId;
-        this.jsonObject = jsonObject;
-        this.commentsLimitedArrayList = commentsLimitedArrayList;
     }
 
 
@@ -103,10 +91,12 @@ public class NewsFeedStatus implements Serializable {
                 try {
                     JSONObject jsonObject1 = commentsLimited.getJSONObject(i);
                     this.commentId = jsonObject1.getInt("id");
-                    comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
-                            jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
-                            jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
-                            jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
+                    comments_limited limited=new comments_limited(jsonObject1);
+
+//                    comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
+//                            jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
+//                            jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
+//                            jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
                     this.commentsLimitedArrayList.add(limited);
 
 
@@ -116,12 +106,6 @@ public class NewsFeedStatus implements Serializable {
 
 
             }
-
-
-//            this.comments = jsonObject.getString("comments_count");
-//            this.share = jsonObject.getString("is_shared");
-//            this.like = jsonObject.getString("likes");
-
 
         } catch (JSONException e) {
             e.printStackTrace();

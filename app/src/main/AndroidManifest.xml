@@ -11,10 +11,10 @@
     <application
         android:allowBackup="true"
         android:hardwareAccelerated="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
@@ -72,10 +72,10 @@
             android:name=".CompetitionsActivity"
             android:label="Competitions"
             android:parentActivityName=".HomeScreen" />
-        <activity
-            android:name=".NotificationsActivity"
-            android:label="Notifications"
-            android:parentActivityName=".HomeScreen" />
+        <!-- <activity -->
+        <!-- android:name=".NotificationsActivity" -->
+        <!-- android:label="Notifications" -->
+        <!-- android:parentActivityName=".HomeScreen" /> -->
         <activity
             android:name=".JobActivity"
             android:label="Jobs/Internships"
@@ -133,20 +133,22 @@
         <activity
             android:name=".FollowingActivity"
             android:label="Following" />
-        <activity android:name=".MessagesActivity" />
         <activity android:name=".ChatWithAFriendActivity" />
         <activity android:name=".UserProfileActivity" />
         <activity android:name=".TopContributors" />
         <activity android:name=".CompanyFirmDetails" />
-        <activity android:name=".EmployeeMemberDetails">
-        </activity>
-        <activity android:name=".ChangePassword">
-        </activity>
-        <activity android:name=".BasicFirmDetails">
-        </activity>
+        <activity android:name=".EmployeeMemberDetails" />
+        <activity android:name=".ChangePassword" />
+        <activity android:name=".BasicFirmDetails" />
         <activity android:name=".CollegeBasicDetails" />
         <activity android:name=".CollegeDetails" />
-        <activity android:name=".PostActivity"></activity>
+        <activity android:name=".PostActivity" />
+        <activity android:name=".ImageActivity" />
+        <activity android:name="com.soundcloud.android.crop.CropImageActivity" />
+        <activity android:name=".Design2Activity" />
+        <activity android:name=".FullPostActivity" />
+        <activity android:name=".LikeListActivity" />
+        <activity android:name=".StatusPostActivity"></activity>
     </application>
 
 </manifest>

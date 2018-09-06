@@ -1,5 +1,6 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -45,8 +46,7 @@ public class ProfileActivity extends ToolbarActivity {
     private ProfileAdapter profileAdapter;
     RecyclerView recyclerView;
     Toolbar toolbar;
-    TabLayout tabLayout1;
-    ImageView morebtn, btn,coverImage,profileImage,profileStatusImage;
+    private ImageView morebtn, btn,coverImage,profileImage,profileStatusImage,profile_status_image;
     private TextView profileName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
     Button btnSubmit,editProfile;
     EditText writePost;
@@ -54,6 +54,10 @@ public class ProfileActivity extends ToolbarActivity {
     boolean flag = false;
     LinearLayoutManager layoutManager;
     TextView blueprint, portfolio, followers, following;
+    private UserClass userClass;
+    private static String nextPageUrl;
+    private boolean isLoading=false;
+    private static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,7 +66,8 @@ public class ProfileActivity extends ToolbarActivity {
         SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+
         toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.profile_recycler);
@@ -74,18 +79,33 @@ public class ProfileActivity extends ToolbarActivity {
 
         //ActionBar actionBar = getSupportActionBar();
         //actionBar.setDisplayHomeAsUpEnabled(true);
-        camera = (ImageView)findViewById(R.id.profile_profile_camera);
-        displayImage = (ImageView)findViewById(R.id.profile_upload_image);
-        btnSubmit = (Button)findViewById(R.id.profile_profile_postbtn);
+        profile_status_image=(ImageView)findViewById(R.id.profile_status_image);
         writePost = (EditText)findViewById(R.id.profile_profile_write_post);
+        writePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),PostActivity.class);
+                startActivity(intent);
+                overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            }
+        });
         editProfile = (Button)findViewById(R.id.profile_editprofile);
         coverImage = (ImageView) findViewById(R.id.profile_cover_image);
-
-
         profileImage = (ImageView) findViewById(R.id.profile_profile_image);
+        profileName =(TextView)findViewById(R.id.profile_profile_name);
         Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
                 .into(profileImage);
-        profileName.setText(userClass.getFirst_name()+"" +userClass.getLast_name());
+        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                .into(profile_status_image);
+        if(userClass.getFirst_name().equals("null"))
+        {
+            profileName.setText(userClass.getUser_name());
+        }
+
+        else {
+            profileName.setText(userClass.getFirst_name()+"" +userClass.getLast_name());
+        }
+
 
         profileStatusImage = (ImageView) findViewById(R.id.profile_status_image);
         followCnt = (TextView) findViewById(R.id.profile_followerscnt);
@@ -171,6 +191,7 @@ public class ProfileActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ProfileActivity.this, PortfolioActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
                 startActivity(i);
             }
         });
@@ -179,6 +200,7 @@ public class ProfileActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ProfileActivity.this, FollowersActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
                 startActivity(i);
             }
         });
@@ -187,53 +209,49 @@ public class ProfileActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(ProfileActivity.this, FollowingActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
                 startActivity(i);
-            }
-        });
-
-        tabLayout1 = (TabLayout)findViewById(R.id.tabs2);
-
-        tabLayout1.addTab(tabLayout1.newTab().setIcon(R.drawable.status)
-                .setText("Status"));
-        tabLayout1.addTab(tabLayout1.newTab().setIcon(R.drawable.design)
-                .setText("Design"));
-        tabLayout1.addTab(tabLayout1.newTab().setIcon(R.drawable.article)
-                .setText("Article"));
-
-        tabLayout1.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-
-                switch (tab.getPosition()){
-
-                    case 1:
-                        Intent i2 = new Intent(getApplicationContext(), DesignActivity.class);
-                        startActivity(i2);
-                        break;
-
-                    case 2:
-                        Intent i3 = new Intent(getApplicationContext(), ArticleActivity.class);
-                        startActivity(i3);
-                        break;
-
-                }
-
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
             }
         });
 
         LoadData();
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                isLoading=false;
+                //Toast.makeText(context,"moving down",Toast.LENGTH_SHORT).show();
+            }
 
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+
+                int lastId=layoutManager.findLastVisibleItemPosition();
+//                if(dy>0)
+//                {
+//                    Toast.makeText(context,"moving up",Toast.LENGTH_SHORT).show();
+//                }
+                if(dy>0 && lastId + 2 > layoutManager.getItemCount() && !isLoading)
+                {
+                    isLoading=true;
+                    Log.v("rolling",layoutManager.getChildCount()+" "+layoutManager.getItemCount()+" "+layoutManager.findLastVisibleItemPosition()+" "+
+                            layoutManager.findLastVisibleItemPosition());
+                    LoadMoreDataFromServer();
+
+                }
+            }
+        });
+
+
+
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //LoadData();
     }
 
     public void LoadData(){
@@ -298,5 +316,61 @@ public class ProfileActivity extends ToolbarActivity {
 
 
     }
+    public void LoadMoreDataFromServer(){
+
+
+        if(nextPageUrl!=null) {
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            StringRequest myReq = new StringRequest(Request.Method.GET, nextPageUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("ReponseFeed", response);
+                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                nextPageUrl = jsonObject.getString("nextPage");
+                                JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                                if (jsonPost != null) {
+                                    JSONArray jsonArrayData = jsonPost.getJSONArray("data");
+                                    for (int i = 0; i < jsonArrayData.length(); i++) {
+                                        ProfileClass1 profileClass1 = new ProfileClass1(jsonArrayData.getJSONObject(i));
+                                        profileClassList.add(profileClass1);
+                                    }
+                                    profileAdapter.notifyDataSetChanged();
+                                }
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                    return params;
+                }
+
+            };
+
+
+            requestQueue.add(myReq);
+        }
+
+
+    }
+
 
 }

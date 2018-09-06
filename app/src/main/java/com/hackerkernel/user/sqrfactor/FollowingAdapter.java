@@ -52,9 +52,9 @@ public class FollowingAdapter extends RecyclerView.Adapter<FollowingAdapter.MyVi
 
         Glide.with(context).load("https://archsqr.in/"+followingClass.getProfile())
                 .into(holder.prfileImage);
-        holder.place.setText(followingClass.getCity()+" ,"+followingClass.getState()+" ,"+followingClass.getCountry());
-        holder.post.setText("Posts :"+followingClass.getPostCount());
-        holder.portfolio.setText("Portfolio :"+followingClass.getPortfoliCount());
+        holder.place.setText(followingClass.getCity()+", "+followingClass.getState()+", "+followingClass.getCountry());
+        holder.post.setText(followingClass.getPostCount());
+        holder.portfolio.setText(followingClass.getPortfoliCount());
         holder.moreImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

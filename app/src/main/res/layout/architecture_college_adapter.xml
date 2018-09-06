@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:background="#ffffff"
         android:padding="10sp"
+        android:id="@+id/college_linear"
         android:orientation="horizontal">
 
         <ImageView

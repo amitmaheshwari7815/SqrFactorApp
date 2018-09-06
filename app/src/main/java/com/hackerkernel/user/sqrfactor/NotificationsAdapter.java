@@ -1,6 +1,8 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -14,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -21,6 +24,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import static android.content.Context.MODE_PRIVATE;
 
 
 public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdapter.ViewHolder>{
@@ -52,7 +57,30 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
     @Override
     public void onBindViewHolder(@NonNull NotificationsAdapter.ViewHolder holder, int position) {
-        NotificationClass notificationsClass=notificationsClassArrayList.get(position);
+        final NotificationClass notificationsClass=notificationsClassArrayList.get(position);
+        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,FullPostActivity.class);
+                intent.putExtra("Post_Slug_ID",notificationsClass.getSlug());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.profile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,UserProfileActivity.class);
+                intent.putExtra("User_id",notificationsClass.getUserId());
+                intent.putExtra("ProfileUserName",notificationsClass.getUser_name());
+                context.startActivity(intent);
+            }
+        });
+
         if(notificationsClass.getType().equals("App\\Notifications\\CommentNoti_Post")){
             holder.notificationLine.setText("Commented on you post");
         }
@@ -121,11 +149,13 @@ public class NotificationsAdapter extends RecyclerView.Adapter<NotificationsAdap
 
         public TextView name,notificationLine,time,postTitle,description;
         public ImageView profile;
+        public LinearLayout linearLayout;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
 
+            linearLayout = (LinearLayout) itemView.findViewById(R.id.notification_transfer);
             notificationLine = (TextView)itemView.findViewById(R.id.notification_line);
             name = (TextView)itemView.findViewById(R.id.notification_name);
             time = (TextView)itemView.findViewById(R.id.notification_time);

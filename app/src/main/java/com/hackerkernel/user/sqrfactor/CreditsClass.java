@@ -28,6 +28,7 @@ public class CreditsClass implements Serializable {
             this.title = jsonObject.getString("title");
             this.firstWeekViews = jsonObject.getString("week_views");
             this.credits = jsonObject.getString("credits_earned");
+            this.totalViews = jsonObject.getString("views_count");
         } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -47,11 +47,11 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.MyVi
             holder.name.setText(followerClass.getName());
         }
 
-        holder.place.setText(followerClass.getCity()+" ,"+followerClass.getState()+" ,"+followerClass.getCountry());
+        holder.place.setText(followerClass.getCity()+", "+followerClass.getState()+", "+followerClass.getCountry());
         Glide.with(context).load("https://archsqr.in/"+followerClass.getProfile())
                 .into(holder.profileImage);
-        holder.portfolio.setText("Portfolio "+followerClass.getPortfolioCount());
-        holder.post.setText("Posts "+followerClass.getPostCount());
+        holder.portfolio.setText(followerClass.getPortfolioCount());
+        holder.post.setText(followerClass.getPostCount());
 
         holder.moreImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +111,7 @@ public class FollowersAdapter extends RecyclerView.Adapter<FollowersAdapter.MyVi
             place=(TextView)itemView.findViewById(R.id.place);
             post=(TextView)itemView.findViewById(R.id.post);
             portfolio=(TextView)itemView.findViewById(R.id.portfolio);
-            profileImage=(ImageView)itemView.findViewById(R.id.imageProfile);
+            profileImage=(ImageView)itemView.findViewById(R.id.follower_image);
             moreImage=(ImageView)itemView.findViewById(R.id.moregrey);
 
         }

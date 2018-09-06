@@ -119,7 +119,26 @@
                     />
 
             </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:id="@+id/videoFrameLayoutDesign"
+                android:visibility="gone"
+                android:layout_height="wrap_content">
 
+                <Button
+                    android:id="@+id/video_post_design_close"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_margin="10dp"
+                    android:layout_gravity="right"
+                    android:background="@drawable/ic_close"/>
+                <WebView
+                    android:layout_width="match_parent"
+                    android:id="@+id/design_VideoView"
+                    android:layout_height="200dp"
+                    android:visibility="gone"
+                    tools:ignore="WebViewLayout" />
+            </FrameLayout>
             <ScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">

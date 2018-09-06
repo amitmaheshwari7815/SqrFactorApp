@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,10 +22,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.ServerError;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -33,6 +37,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,32 +45,39 @@ import java.util.Map;
 
 public class UserProfileActivity extends AppCompatActivity {
     private Toolbar toolbar;
-    private ImageView morebtn,coverImage,userProfileImage;
-    private TextView userName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
-    private Button followbtn,messagebtn;
-    private ArrayList<NewsFeedStatus> userProfileClassArrayList = new ArrayList<>();
+    private ImageView morebtn, coverImage, userProfileImage;
+    private TextView userName, followCnt, followingCnt, portfolioCnt, bluePrintCnt;
+    private Button followbtn, messagebtn;
+    private static ArrayList<NewsFeedStatus> userProfileClassArrayList = new ArrayList<>();
     private ArrayList<PostDataClass> userFollowClassList = new ArrayList<>();
     private TextView userBlueprint, userPortfolio, userFollowers, userFollowing;
     LinearLayoutManager layoutManager;
-    UserProfileAdapter userProfileAdapter;
+    static UserProfileAdapter userProfileAdapter;
+    private static Context context;
     RecyclerView recyclerView;
     boolean flag = false;
     private String profileNameOfUser;
     private int user_id;
+    public  String nextPageUrl;
+    private boolean isLoading =false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
 
+        context=getApplicationContext();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
 
         Intent intent = getIntent();
-        user_id = intent.getIntExtra("User_id",0);
+        user_id = intent.getIntExtra("User_id", 0);
         profileNameOfUser = intent.getStringExtra("ProfileUserName");
-        Toast.makeText(getApplicationContext(),user_id+" "+profileNameOfUser,Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), user_id + " " + profileNameOfUser, Toast.LENGTH_LONG).show();
+
+
+        //LoadData();
 
         messagebtn = (Button) findViewById(R.id.user_messagebtn);
         coverImage = (ImageView) findViewById(R.id.user_coverImage);
@@ -126,9 +138,6 @@ public class UserProfileActivity extends AppCompatActivity {
         userFollowing = (TextView) findViewById(R.id.user_followingClick);
 
 
-
-
-
         userBlueprint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,6 +152,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(UserProfileActivity.this, PortfolioActivity.class);
+                i.putExtra("UserName", profileNameOfUser);
                 startActivity(i);
             }
         });
@@ -151,6 +161,7 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(UserProfileActivity.this, FollowersActivity.class);
+                i.putExtra("UserName", profileNameOfUser);
                 startActivity(i);
             }
         });
@@ -159,12 +170,12 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(UserProfileActivity.this, FollowingActivity.class);
+                i.putExtra("UserName", profileNameOfUser);
                 startActivity(i);
             }
         });
         followbtn = (Button) findViewById(R.id.user_followButton);
-        followbtn.setOnClickListener(new View.OnClickListener()
-        {
+        followbtn.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
@@ -177,34 +188,64 @@ public class UserProfileActivity extends AppCompatActivity {
         FollowMethod();
         LoadData();
 
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                isLoading=false;
+                //Toast.makeText(context,"moving down",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+
+                int lastId=layoutManager.findLastVisibleItemPosition();
+//                if(dy>0)
+//                {
+//                    Toast.makeText(context,"moving up",Toast.LENGTH_SHORT).show();
+//                }
+                if(dy>0 && lastId + 3 > layoutManager.getItemCount() && !isLoading)
+                {
+                    isLoading=true;
+                    Log.v("rolling",layoutManager.getChildCount()+" "+layoutManager.getItemCount()+" "+layoutManager.findLastVisibleItemPosition()+" "+
+                            layoutManager.findLastVisibleItemPosition());
+                    LoadMoreDataFromServer();
+
+                }
+            }
+        });
+
     }
 
-    public void FollowMethod()
-    {
+    public void FollowMethod() {
 
         RequestQueue requestQueue1 = Volley.newRequestQueue(getApplicationContext());
         StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/follow_user",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        Log.v("ResponseLike",s);
+                        Toast.makeText(UserProfileActivity.this, s, Toast.LENGTH_LONG).show();
+                        Log.v("ResponseLike", s);
                         try {
                             JSONObject jsonObject = new JSONObject(s);
                             UserFollowClass userFollowClass = new UserFollowClass(jsonObject);
                             flag = userFollowClass.isReturnType();
                             if (flag == false) {
-                                Log.v("follow",flag+"");
+                                Log.v("follow", flag + "");
                                 followbtn.setText("Follow");
                                 flag = true;
-                            }
-                            else {
-                                Log.v("following",flag+"");
+                            } else {
+                                Log.v("following", flag + "");
                                 followbtn.setText("Following");
                                 flag = false;
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
+
+
 
                     }
                 },
@@ -215,20 +256,21 @@ public class UserProfileActivity extends AppCompatActivity {
                         //Showing toast
 //                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
                     }
-                }){
+                }) {
             @Override
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer "+TokenClass.Token);
+                params.put("Authorization", "Bearer " + TokenClass.Token);
 
                 return params;
             }
+
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
+                Map<String, String> params = new HashMap<>();
 
-                params.put("to_user",user_id+"");
+                params.put("to_user", user_id + "");
                 return params;
             }
         };
@@ -238,11 +280,11 @@ public class UserProfileActivity extends AppCompatActivity {
 
     }
 
-    public void LoadData()
-    {
+    public void LoadData() {
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/corrupted_desires",
+        RequestQueue requestQueue = Volley.newRequestQueue(UserProfileActivity.this);
+        //https://archsqr.in/api/profile/detail/Shivani2292
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/" + profileNameOfUser,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -250,19 +292,15 @@ public class UserProfileActivity extends AppCompatActivity {
                         Toast.makeText(UserProfileActivity.this, response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-//                            if(jsonObject.has("message"))
-//                            {
-//                                if(jsonObject.getString("message").equals("No posts found"));
-//                                return;
-//                            }
                             UserProfileClass userProfileClass = new UserProfileClass(jsonObject);
                             userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
-                            followCnt.setText(userProfileClass.getFollowerscnt());
-                            followingCnt.setText(userProfileClass.getFollowingcnt());
-                            portfolioCnt.setText(userProfileClass.getPortfoliocnt());
-                            bluePrintCnt.setText(userProfileClass.getBluePrintcnt());
-                            userName.setText(userProfileClass.getUser_name());
-                            Glide.with(getApplicationContext()).load("https://archsqr.in/"+userProfileClass.getProfile())
+                            followCnt.setText(jsonObject.getString("followerCnt"));
+                            followingCnt.setText(jsonObject.getString("followingCnt"));
+                            portfolioCnt.setText(jsonObject.getString("portfolioCnt"));
+                            bluePrintCnt.setText(jsonObject.getString("blueprintCnt"));
+                            nextPageUrl=jsonObject.getString("nextPage");
+                            userName.setText(jsonObject.getJSONObject("user").getString("user_name"));
+                            Glide.with(getApplicationContext()).load("https://archsqr.in/" + jsonObject.getJSONObject("user").getString("profile"))
                                     .into(userProfileImage);
 
                             userProfileAdapter.notifyDataSetChanged();
@@ -276,6 +314,21 @@ public class UserProfileActivity extends AppCompatActivity {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        NetworkResponse response = error.networkResponse;
+                        if (error instanceof ServerError && response != null) {
+                            try {
+                                String res = new String(response.data,
+                                        HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                                // Now you can use any deserializer to make sense of data
+                                JSONObject obj = new JSONObject(res);
+                            } catch (UnsupportedEncodingException e1) {
+                                // Couldn't properly decode data to string
+                                e1.printStackTrace();
+                            } catch (JSONException e2) {
+                                // returned data is not JSONObject?
+                                e2.printStackTrace();
+                            }
+                        }
 
                     }
                 }) {
@@ -284,7 +337,7 @@ public class UserProfileActivity extends AppCompatActivity {
             public Map<String, String> getHeaders() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer "+TokenClass.Token);
+                params.put("Authorization", "Bearer " + TokenClass.Token);
                 return params;
             }
 
@@ -292,5 +345,63 @@ public class UserProfileActivity extends AppCompatActivity {
 
         requestQueue.add(myReq);
 
+    }
+
+
+    public  void LoadMoreDataFromServer() {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        StringRequest myReq = new StringRequest(Request.Method.GET, nextPageUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("MorenewsFeedFromServer", response);
+                        //Toast.makeText(, response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            UserProfileClass userProfileClass = new UserProfileClass(jsonObject);
+                            userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
+                            nextPageUrl=jsonObject.getString("nextPage");
+                            userProfileAdapter.notifyDataSetChanged();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        NetworkResponse response = error.networkResponse;
+                        if (error instanceof ServerError && response != null) {
+                            try {
+                                String res = new String(response.data,
+                                        HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                                // Now you can use any deserializer to make sense of data
+                                JSONObject obj = new JSONObject(res);
+                            } catch (UnsupportedEncodingException e1) {
+                                // Couldn't properly decode data to string
+                                e1.printStackTrace();
+                            } catch (JSONException e2) {
+                                // returned data is not JSONObject?
+                                e2.printStackTrace();
+                            }
+                        }
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
     }
 }

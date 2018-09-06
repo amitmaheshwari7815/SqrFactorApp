@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -28,6 +29,7 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
     private Context context;
     private int friendId;
     private String friendProfileUrl,friendName;
+    int count=0;
 
     public ChatWithAFriendActivityAdapter(ArrayList<MessageClass> messageClassArrayList, Context context,int friendId,String friendProfileUrl,String friendName) {
         this.messageClassArrayList = messageClassArrayList;
@@ -50,10 +52,13 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
+
+        //Log.v("osition",position+"");
+        Toast.makeText(context,position+"",Toast.LENGTH_SHORT).show();
         MessageClass messageClass=messageClassArrayList.get(position);
         int fromId=messageClass.getUserFrom();
 
-        String dtc = messageClassArrayList.get(position).getUpdatedAt();
+        String dtc = messageClassArrayList.get(position).getCreatedAt();
         Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
@@ -79,6 +84,8 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
 
         if(fromId==friendId)
         {
+            int x=count++;
+            Log.v("count",x+"");
             holder.freindLayout.setVisibility(View.VISIBLE);
             holder.frndChatMessage.setText(messageClassArrayList.get(position).getChat());
             holder.frndchatTime.setText(days+" Days ago");
@@ -92,8 +99,8 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
             holder.myLayout.setVisibility(View.VISIBLE);
             holder.myMessage.setText(messageClassArrayList.get(position).getChat());
             holder.myChatTime.setText(days+" Days ago");
-            holder.myName.setText(MessagesActivity.userName);
-            Glide.with(context).load("https://archsqr.in/"+MessagesActivity.userProfile)
+            holder.myName.setText(MessageFragment.userName);
+            Glide.with(context).load("https://archsqr.in/"+MessageFragment.userProfile)
                     .into(holder.myProfile);
 
         }
@@ -105,6 +112,14 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
 //       ChatWithAFriendActivity.
 //   }
 
+    }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    @Override
+    public int getItemViewType(int position) {
+        return position;
     }
 
     @Override
@@ -122,9 +137,9 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
         public MyViewHolder(View itemView) {
             super(itemView);
             freindLayout=(RelativeLayout)itemView.findViewById(R.id.frnd);
-            freindLayout.setVisibility(View.GONE);
+//            freindLayout.setVisibility(View.GONE);
             myLayout=(RelativeLayout)itemView.findViewById(R.id.my);
-            myLayout.setVisibility(View.GONE);
+//            myLayout.setVisibility(View.GONE);
             frndProfile =(ImageView)itemView.findViewById(R.id.chat_frnd_profile);
             myProfile=(ImageView)itemView.findViewById(R.id.chat_my_image);
             frndName =(TextView) itemView.findViewById(R.id.chat_frnd_name);

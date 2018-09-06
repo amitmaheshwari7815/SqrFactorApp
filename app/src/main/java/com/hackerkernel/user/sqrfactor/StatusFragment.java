@@ -2,6 +2,7 @@ package com.hackerkernel.user.sqrfactor;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +21,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -51,6 +53,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.baoyz.widget.PullRefreshLayout;
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -68,6 +73,7 @@ import java.util.Hashtable;
 import java.util.Map;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 import static android.media.MediaRecorder.VideoSource.CAMERA;
 
 public class StatusFragment extends Fragment {
@@ -86,6 +92,7 @@ public class StatusFragment extends Fragment {
     int currentItems,totalItems,scrolledItems;
     private ProgressBar progressBar;
     Button btnSubmit;
+    private ImageView newsProfileImage;
     EditText writePost;
     private ProgressDialog pDialog;
     public static String UPLOAD_URL = "https://archsqr.in/api/post";
@@ -96,6 +103,18 @@ public class StatusFragment extends Fragment {
     private NewsFeedAdapter newsFeedAdapter;
     private ProgressDialog dialog = null;
     private JSONObject jsonObject;
+    PullRefreshLayout layout;
+    private Context context;
+    private boolean isLoading=false;
+    private static String nextPageUrl;
+    private String oldUrl;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        context=getActivity();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,17 +132,33 @@ public class StatusFragment extends Fragment {
         newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
         recyclerView.setAdapter(newsFeedAdapter);
         Log.v("status","hello");
+        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
 
+//        newsProfileImage=rootView.findViewById(R.id.newsProfileImage);
+//        Glide.with(getContext()).load("https://archsqr.in/"+userClass.getProfile())
+//                .into(newsProfileImage);
+        LoadNewsFeedDataFromServer();
         camera = rootView.findViewById(R.id.news_camera);
         displayImage = rootView.findViewById(R.id.news_upload_image);
         btnSubmit = rootView.findViewById(R.id.news_postButton);
-        writePost = rootView.findViewById(R.id.news_editPost);
-        writePost.setOnClickListener(new View.OnClickListener() {
+
+        layout = rootView.findViewById(R.id.news_pullToRefresh);
+        layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
-                getActivity().startActivity(intent);
-                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            public void onRefresh() {
+                //LoadNewsFeedDataFromServer();
+                //layout.setRefreshing(false);
+                layout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.setRefreshing(false);
+                        LoadNewsFeedDataFromServer();
+                    }
+                },1000);
+
             }
         });
         dialog = new ProgressDialog(this.getActivity());
@@ -133,6 +168,7 @@ public class StatusFragment extends Fragment {
 //        relativeLayout.setVisibility(View.GONE);
         jsonObject = new JSONObject();
 
+
 //        mRemoveButton = rootView.findViewById(R.id.ib_remove);
 //        displayImage.setVisibility(View.GONE);
 //        mRemoveButton.setVisibility(View.GONE);
@@ -141,160 +177,115 @@ public class StatusFragment extends Fragment {
         token = sharedPreferences.getString("TOKEN", "sqr");
         Log.v("TokenOnStatus", token);
 
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/news-feed",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.v("ReponseFeed", response);
-//                        Toast.makeText(getActivity(),response,Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONObject jsonPost = jsonObject.getJSONObject("posts");
-                            JSONArray jsonArrayData = jsonPost.getJSONArray("data");
-                            for (int i = 0; i < jsonArrayData.length(); i++) {
-                                NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
-                                newsstatus.add(newsFeedStatus1);
-                            }
-
-                           // newsFeedAdapter.notifyDataSetChanged();
-
-
-//                            JSONObject TokenObject= (JSONObject) jsonObject.get("success");
-//                            String Token=(String)TokenObject.get("token");
-
-//                            SharedPreferences sharedPref = getActivity().getSharedPreferences("PREF_NAME" ,MODE_PRIVATE);
-//                            SharedPreferences.Editor editor = sharedPref.edit();
-//                            editor.putString("TOKEN",Token);
-//                            editor.commit();
-//                            Intent i = new Intent(getActivity(), HomeScreen.class);
-//                            startActivity(i);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-//                        Toast.makeText(getActivity().getApplicationContext(), "Token" + response.toString(), Toast.LENGTH_SHORT).show();
-
-                        //interval=parseInterval(response);
-                        // Log.v("Interval",interval+"");
-                        //callback.onSuccess(interval);
-                    }
-                },
-                new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                }) {
-
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer " + TokenClass.Token);
-
-                return params;
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                isLoading=false;
+                //Toast.makeText(context,"moving down",Toast.LENGTH_SHORT).show();
             }
 
-        };
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
 
 
-        requestQueue.add(myReq);
-
-
-//        mRemoveButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                relativeLayout.setVisibility(View.GONE);
-//                displayImage.setImageBitmap(null);
-//                displayImage.setVisibility(View.GONE);
-//                mRemoveButton.setVisibility(View.GONE);
-//
-//
-//            }
-//
-//        });
-//        camera.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                relativeLayout.setVisibility(View.VISIBLE);
-//                displayImage.setVisibility(View.VISIBLE);
-//                mRemoveButton.setVisibility(View.VISIBLE);
-//                showFileChooser();
-//
-//            }
-//        });
-
-
-//        btnSubmit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                uploadImage();
-//            }
-//        });
-//
-//        if (Build.VERSION.SDK_INT >= 23) {
-//            if (checkPermission()) {
-//                // Code for above or equal 23 API Oriented Device
-//                // Your Permission granted already .Do next code
-//            } else {
-//                requestPermission();
-//            }
-//        }
-
-
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-//                super.onScrollStateChanged(recyclerView, newState);
-//                if(newState== AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL)
+                int lastId=layoutManager.findLastVisibleItemPosition();
+//                if(dy>0)
 //                {
-//                    isScrolling=true;
+//                    Toast.makeText(context,"moving up",Toast.LENGTH_SHORT).show();
 //                }
-//            }
-//
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//
-//                currentItems=layoutManager.getChildCount();
-//                totalItems= layoutManager.getItemCount();
-//                scrolledItems=layoutManager.findFirstVisibleItemPosition();
-//                if(isScrolling&&(currentItems+scrolledItems==totalItems))
-//                {
-//                    isScrolling=false;
-//                    fetchDataFromServer();
-//                }
-//            }
-//        });
+                if(dy>0 && lastId + 2 > layoutManager.getItemCount() && !isLoading)
+                {
+                    isLoading=true;
+                    Log.v("rolling",layoutManager.getChildCount()+" "+layoutManager.getItemCount()+" "+layoutManager.findLastVisibleItemPosition()+" "+
+                            layoutManager.findLastVisibleItemPosition());
+                    FetchDataFromServer();
+
+                }
+            }
+        });
+
+
+
+
 
         return rootView;
 
     }
-
-    public void fetchDataFromServer() {
-        progressBar.setVisibility(View.VISIBLE);
-
+    public void LoadNewsFeedDataFromServer()
+    {
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/parse/news-feed",
+        newsstatus.clear();
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/news-feed",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.v("MorenewsFeedFromServer", response);
-                        Toast.makeText(getActivity(), response, Toast.LENGTH_LONG).show();
+                        Log.v("ReponseFeed1", response);
+//                         Toast.makeText(getContext(),response,Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                            nextPageUrl=jsonPost.getString("next_page_url");
                             JSONArray jsonArrayData = jsonPost.getJSONArray("data");
                             for (int i = 0; i < jsonArrayData.length(); i++) {
                                 NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
                                 newsstatus.add(newsFeedStatus1);
                             }
 
-                            //newsFeedAdapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
+                            newsFeedAdapter.notifyDataSetChanged();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity().getApplicationContext(), "Token" + error+"", Toast.LENGTH_SHORT).show();
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + token);
+                return params;
+            }
+
+        };
+
+
+        requestQueue.add(myReq);
+    }
+
+    public void FetchDataFromServer() {
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("MorenewsFeedFromServer", response);
+                        Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                            nextPageUrl=jsonPost.getString("next_page_url");
+                            JSONArray jsonArrayData = jsonPost.getJSONArray("data");
+                            for (int i = 0; i < jsonArrayData.length(); i++) {
+                                NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
+                                newsstatus.add(newsstatus.size(),newsFeedStatus1);
+                            }
+
+                            newsFeedAdapter.notifyDataSetChanged();
+                            //newsFeedAdapter.setLoaded();
+                            // progressBar.setVisibility(View.GONE);
 
 
                         } catch (JSONException e) {
@@ -324,113 +315,6 @@ public class StatusFragment extends Fragment {
 
         requestQueue.add(myReq);
     }
-
-
-    private void requestPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            Toast.makeText(getActivity(), " Please allow this permission in App Settings.", Toast.LENGTH_LONG).show();
-        } else {
-            ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-        }
-    }
-
-    private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (result == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public String getStringImage(Bitmap bitmap){
-        ByteArrayOutputStream ba = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG,100,ba);
-        byte[] imagebyte = ba.toByteArray();
-        String encode = Base64.encodeToString(imagebyte,Base64.DEFAULT);
-        return encode;
-    }
-    private void uploadImage(){
-        //Showing the progress dialog
-        final ProgressDialog loading = ProgressDialog.show(this.getActivity(),"Uploading...","Please wait...",false,false);
-        //Creating a Request Queue
-        RequestQueue requestQueue = Volley.newRequestQueue(this.getActivity().getApplicationContext());
-
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/post",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String s) {
-
-                        //Disimissing the progress dialog
-                        loading.dismiss();
-//                        //Showing toast message of the response
-//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError volleyError) {
-                        //Dismissing the progress dialog
-                        loading.dismiss();
-
-                        //Showing toast
-//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                    }
-                }){
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer " +TokenClass.Token);
-
-            return params;
-            }
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> params = new HashMap<>();
-                String image = getStringImage(bitmap);
-                Log.v("ImageUrl",image);
-
-                //Adding parameters
-                 params.put("image_value",image);
-                 params.put("description",writePost.getText().toString().trim());
-
-                //returning parameters
-                return params;
-            }
-        };
-
-        //Adding request to the queue
-        requestQueue.add(stringRequest);
-    }
-    private void showFileChooser() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
-    }
-
-    private void cameraIntent() {
-        Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePicture, 0);
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == PICK_IMAGE_REQUEST && resultCode== RESULT_OK && data !=null){
-            Uri filepath = data.getData();
-            try {
-                bitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(),filepath);
-                Bitmap bitmap1 = Bitmap.createScaledBitmap(bitmap,(int)(bitmap.getWidth()*0.5),(int)(bitmap.getHeight()*0.5),false );
-                displayImage.setImageBitmap(bitmap1);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-        }
-    }
-
 
 }
 

@@ -1,51 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ProfileActivity">
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <include layout="@layout/activity_toolbar"/>
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
-        <include layout="@layout/activity_toolbar"/>
-
+        android:orientation="vertical"
+        android:layout_marginTop="2dp">
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@color/white">
 
             <ImageView
                 android:id="@+id/user_coverImage"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
-                android:src="@drawable/designimg"
-                android:scaleType="fitStart"
+                android:src="@drawable/home_banner"
+                android:scaleType="centerCrop"
                 android:layout_alignParentLeft="true"
                 android:adjustViewBounds="true"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="25dp"
+                android:text="SqrFactor India Pvt. Ltd"
+                android:fontFamily="@font/roboto_thin"
+                android:textColor="#FFF"
+                android:visibility="gone"/>
 
             <ImageView
                 android:id="@+id/user_image"
-                android:layout_width="60sp"
-                android:layout_height="60sp"
+                android:layout_width="80sp"
+                android:layout_height="80sp"
+                android:padding="3dp"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="81dp"
-                android:src="@drawable/henry" />
+                android:layout_marginTop="100dp"
+                android:background="@color/white"
+                android:src="@drawable/profilepic" />
 
             <TextView
                 android:id="@+id/user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:text="KEANU REEVES"
+                android:text="SqrFactor"
+                android:textAllCaps="false"
+                android:fontFamily="@font/roboto_medium"
                 android:textColor="#000"
-                android:textSize="15sp"
-                android:layout_marginTop="150sp"/>
+                android:textSize="18sp"
+                android:layout_marginTop="190sp"/>
 
         </RelativeLayout>
 
@@ -53,6 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="@color/white"
             android:weightSum="4">
 
             <TextView
@@ -61,6 +79,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="5"
+                android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"
                 android:gravity="center"/>
 
@@ -71,6 +90,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="2"
+                android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"/>
 
             <TextView
@@ -79,6 +99,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="3"
+                android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"
                 android:gravity="center"/>
 
@@ -88,6 +109,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="21"
+                android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"
                 android:gravity="center"/>
 
@@ -109,6 +131,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Blueprint"
+                android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:textColor="@drawable/selector_follow"/>
 
@@ -118,6 +141,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:fontFamily="@font/roboto_medium"
                 android:text="Portfolio"
                 android:textColor="@drawable/selector_follow"/>
 
@@ -127,6 +151,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Followers"
+                android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:textColor="@drawable/selector_follow"/>
 
@@ -136,6 +161,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Following"
+                android:fontFamily="@font/roboto_medium"
                 android:gravity="center"
                 android:textColor="@drawable/selector_follow"/>
 
@@ -191,5 +217,5 @@
         </android.support.v7.widget.RecyclerView>
 
     </LinearLayout>
-
-</ScrollView>
+    </ScrollView>
+</LinearLayout>

@@ -27,6 +27,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -48,6 +49,7 @@ public class Credits extends AppCompatActivity {
     private Button nextPage,prevPage;
     private RecyclerView recyclerView;
     TextView bluePrint,portfolio,followers,following;
+    ImageView userProfile;
     private boolean isScrolling=false;
     int currentItems, totalItems, scrolledItems;
     ArrayList<CreditsClass> creditsClassArrayList = new ArrayList<>();
@@ -58,6 +60,11 @@ public class Credits extends AppCompatActivity {
         setContentView(R.layout.credits);
 
         //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new CreditsFragment()).commit();
+
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView_credit);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(Credits.this);
@@ -87,6 +94,9 @@ public class Credits extends AppCompatActivity {
         creditsAdapter = new CreditsAdapter(this, creditsClassArrayList);
         recyclerView.setAdapter(creditsAdapter);
 
+        userProfile = findViewById(R.id.userProfilePic);
+                Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                        .into(userProfile);
         toolbar = (Toolbar) findViewById(R.id.credits_toolbar);
         toolbar.setTitle("Credits");
         setSupportActionBar(toolbar);
@@ -116,7 +126,8 @@ public class Credits extends AppCompatActivity {
         bluePrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Credits.this, BlueprintActivity.class);
+                Intent i = new Intent(Credits.this, ProfileActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
                 startActivity(i);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();
@@ -129,6 +140,7 @@ public class Credits extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent j = new Intent(Credits.this, PortfolioActivity.class);
+                j.putExtra("UserName",userClass.getUser_name());
                 startActivity(j);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();
@@ -139,6 +151,7 @@ public class Credits extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent k = new Intent(Credits.this, FollowersActivity.class);
+                k.putExtra("UserName",userClass.getUser_name());
                 startActivity(k);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();
@@ -150,6 +163,7 @@ public class Credits extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent l = new Intent(Credits.this, FollowingActivity.class);
+                l.putExtra("UserName",userClass.getUser_name());
                 startActivity(l);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();

@@ -25,6 +25,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.baoyz.widget.PullRefreshLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +45,8 @@ public class RedActivity extends AppCompatActivity {
     private RedAdapter redAdapter;
     private LinearLayoutManager layoutManager;
     private Button btn1,btn2,btn3;
+    private String nextUrl;
+    PullRefreshLayout layout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +82,20 @@ public class RedActivity extends AppCompatActivity {
         btn2 = findViewById(R.id.red_whatsRedbtn);
         btn3 = findViewById(R.id.red_Topbtn);
 
-        final SwipeRefreshLayout pullToRefresh = findViewById(R.id.red_pullToRefresh);
-        pullToRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        layout = findViewById(R.id.red_pullToRefresh);
+        layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                PageRefersh(); // your code
-                pullToRefresh.setRefreshing(false);
+                //LoadNewsFeedDataFromServer();
+                //layout.setRefreshing(false);
+                layout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.setRefreshing(false);
+                        PageRefersh();
+                    }
+                },1000);
+
             }
         });
         progressBar.setVisibility(View.VISIBLE);
@@ -92,11 +103,8 @@ public class RedActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment= new Fragment();
-                FragmentTransaction transaction = getFragmentManager().beginTransaction();
-                transaction.replace(R.id.fragment, fragment); // fragment container id in first parameter is the  container(Main layout id) of Activity
-                transaction.addToBackStack(null);  // this will manage backstack
-                transaction.commit();
+               Intent intent = new Intent(RedActivity.this,HomeScreen.class);
+               startActivity(intent);
             }
         });
         btn2.setOnClickListener(new View.OnClickListener() {
@@ -145,14 +153,16 @@ public class RedActivity extends AppCompatActivity {
     }
     public void PageRefersh(){
         RequestQueue requestQueue = Volley.newRequestQueue(this);
+        newsstatus.clear();
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/whats-red",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
+                            nextUrl = jsonObject.getString("nextPage");
                             JSONObject jsonPost = jsonObject.getJSONObject("posts");
                             JSONArray jsonArrayData = jsonPost.getJSONArray("data");
                             for (int i = 0; i < jsonArrayData.length(); i++) {
@@ -196,53 +206,54 @@ public class RedActivity extends AppCompatActivity {
 
     public void fetchDataFromServer() {
         progressBar.setVisibility(View.VISIBLE);
+        if (nextUrl != null) {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            StringRequest myReq = new StringRequest(Request.Method.POST, nextUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("MoreRedResponse", response);
+//                            Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                nextUrl = jsonObject.getString("nextPage");
+                                JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                                JSONArray jsonArrayData = jsonPost.getJSONArray("data");
+                                for (int i = 0; i < jsonArrayData.length(); i++) {
+                                    NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
+                                    newsstatus.add(newsFeedStatus1);
+                                }
 
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/whats-red",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.v("MoreRedResponse", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONObject jsonPost = jsonObject.getJSONObject("posts");
-                            JSONArray jsonArrayData = jsonPost.getJSONArray("data");
-                            for (int i = 0; i < jsonArrayData.length(); i++) {
-                                NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
-                                newsstatus.add(newsFeedStatus1);
+                                redAdapter.notifyDataSetChanged();
+                                progressBar.setVisibility(View.GONE);
+
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-
-                            redAdapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
 
-                },
-                new Response.ErrorListener() {
+                    },
+                    new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
 
-                    }
-                }) {
+                        }
+                    }) {
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer " + TokenClass.Token);
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    params.put("Authorization", "Bearer " + TokenClass.Token);
 
-                return params;
-            }
+                    return params;
+                }
 
-        };
+            };
 
-        requestQueue.add(myReq);
+            requestQueue.add(myReq);
+        }
     }
-
 }

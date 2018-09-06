@@ -120,9 +120,9 @@
                     android:id="@+id/news_post_image"
                     android:layout_marginTop="5sp"
                     android:layout_width="match_parent"
-                    android:layout_height="150sp"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/build"
-                    android:scaleType="fitCenter"
+                    android:scaleType="fitXY"
                     android:adjustViewBounds="true"/>
             </RelativeLayout>
 

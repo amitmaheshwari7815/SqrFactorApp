@@ -1,267 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".RedFragment">
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/White"
+        android:weightSum="2">
 
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20sp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10sp"
-                android:orientation="horizontal"
-                android:weightSum="4">
-
-                <ImageView
-                    android:layout_width="0sp"
-                    android:layout_height="60sp"
-                    android:src="@drawable/henry"
-                    android:layout_weight="1"
-                    android:layout_marginTop="10sp"
-                    android:layout_marginLeft="10sp"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="3"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10sp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Henry Cavill"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="#000"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="5 minutes ago"
-                        android:textStyle="bold"/>
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="20sp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="right|end"
-                    android:src="@drawable/ellipsis"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10sp"
-                android:paddingLeft="20sp"
-                android:paddingRight="20sp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Check out this new design, by me."
-                    android:textStyle="bold"/>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/designimg"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50sp"
-                android:orientation="horizontal"
-                android:layout_marginTop="10sp"
-                android:paddingLeft="20sp"
-                android:paddingRight="20sp"
-                android:weightSum="3">
-
-                <Button
-                    android:layout_width="0sp"
-                    android:layout_height="50sp"
-                    android:layout_weight="1"
-                    android:text="Like"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-
-                    android:background="@android:color/transparent"/>
-
-                <Button
-                    android:layout_width="0sp"
-                    android:layout_height="50sp"
-                    android:layout_weight="1"
-                    android:text="Comment"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:background="@android:color/transparent"/>
-
-                <Button
-                    android:layout_width="0sp"
-                    android:layout_height="50sp"
-                    android:layout_weight="1"
-                    android:text="Share"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:background="@android:color/transparent"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20sp"
-            android:layout_marginTop="10sp">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="10sp"
-                android:orientation="horizontal"
-                android:weightSum="4">
-
-                <ImageView
-                    android:layout_width="0sp"
-                    android:layout_height="60sp"
-                    android:src="@drawable/henry"
-                    android:layout_weight="1"
-                    android:layout_marginTop="10sp"
-                    android:layout_marginLeft="10sp"/>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_weight="3"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginLeft="10sp">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Henry Cavill"
-                        android:textSize="15sp"
-                        android:textStyle="bold"
-                        android:textColor="#000"/>
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="5 minutes ago"
-                        android:textStyle="bold"/>
-
-                </LinearLayout>
-
-                <ImageView
-                    android:layout_width="20sp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="right|end"
-                    android:src="@drawable/ellipsis"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10sp"
-                android:paddingLeft="20sp"
-                android:paddingRight="20sp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Check out this new design, by me."
-                    android:textStyle="bold"/>
-
-                <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/designimg"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
-        <android.support.v7.widget.CardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="50sp"
-                android:orientation="horizontal"
-                android:layout_marginTop="10sp"
-                android:paddingLeft="20sp"
-                android:paddingRight="20sp"
-                android:weightSum="3">
-
-                <Button
-                    android:layout_width="0sp"
-                    android:layout_height="50sp"
-                    android:layout_weight="1"
-                    android:text="Like"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-
-                    android:background="@android:color/transparent"/>
-
-                <Button
-                    android:layout_width="0sp"
-                    android:layout_height="50sp"
-                    android:layout_weight="1"
-                    android:text="Comment"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:background="@android:color/transparent"/>
-
-                <Button
-                    android:layout_width="0sp"
-                    android:layout_height="50sp"
-                    android:layout_weight="1"
-                    android:text="Share"
-                    android:textAllCaps="false"
-                    android:textStyle="bold"
-                    android:background="@android:color/transparent"/>
-
-            </LinearLayout>
-
-        </android.support.v7.widget.CardView>
-
+        <Button
+            android:id="@+id/red_whatsRedbtn"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="What's Red?"
+            android:textAllCaps="false"
+            android:textColor="#888da8"
+            android:fontFamily="@font/roboto_medium"
+            android:background="@drawable/gray_border"/>
+        <Button
+            android:id="@+id/red_Topbtn"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Top Contributors"
+            android:textAllCaps="false"
+            android:textColor="#888da8"
+            android:fontFamily="@font/roboto_medium"
+            android:background="@drawable/gray_border"/>
     </LinearLayout>
-</ScrollView>
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/red_pullToRefresh"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <android.support.v7.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/red_recycler">
+        </android.support.v7.widget.RecyclerView>
+    </android.support.v4.widget.SwipeRefreshLayout>
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/progress_bar_red"
+        android:layout_gravity="center_horizontal"
+        android:elevation="4dp"
+        android:padding="5dp" />
+
+</LinearLayout>

@@ -7,14 +7,18 @@
     android:orientation="vertical">
 
     <EditText
+        android:id="@+id/user_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/gray_border"
+        android:background="@color/white"
         android:layout_margin="10sp"
         android:hint="@string/search"
+        android:textColorHint="#414040"
+        android:textColor="#414040"
         android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:padding="10sp"
-        android:drawableRight="@drawable/ic_search_black_24dp"/>
+        android:layout_marginStart="5sp"
+        android:drawableLeft="@drawable/ic_search_black_24dp"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"

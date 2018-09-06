@@ -81,14 +81,14 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!--<ImageView-->
-                    <!--android:id="@+id/red_menu"-->
-                    <!--android:layout_width="24sp"-->
-                    <!--android:layout_height="match_parent"-->
-                    <!--android:layout_gravity="end"-->
-                    <!--android:src="@drawable/ellipsis"-->
-                    <!--android:layout_marginRight="10sp"-->
-                    <!--android:layout_marginLeft="10sp"/>-->
+                <ImageView
+                    android:id="@+id/red_menu"
+                    android:layout_width="24sp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_more_verticle"
+                    android:layout_marginRight="10sp"
+                    android:layout_marginLeft="10sp"/>
 
             </LinearLayout>
 
@@ -129,7 +129,7 @@
                     android:id="@+id/red_postImage"
                     android:layout_marginTop="5sp"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:src="@drawable/build"
                     android:scaleType="fitXY"
                     android:adjustViewBounds="true"/>

@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -34,11 +36,20 @@ public class ArchitectureCollegeAdapter extends RecyclerView.Adapter<Architectur
     @Override
     public void onBindViewHolder(@NonNull final MyViewAdapter holder, int position) {
 
-        ArchitectureCollegeClass architectureCollegeClass = architectureCollegeClassArrayList.get(position);
+        final ArchitectureCollegeClass architectureCollegeClass = architectureCollegeClassArrayList.get(position);
         holder.name.setText(architectureCollegeClass.getName());
         Glide.with(context).load("https://archsqr.in/" + architectureCollegeClass.getProfile())
                 .into(holder.profileImage);
 
+        holder.collegeLinear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,UserProfileActivity.class);
+                intent.putExtra("User_id",architectureCollegeClass.getId());
+                intent.putExtra("ProfileUserName",architectureCollegeClass.getUser_name());
+            }
+
+        });
 
     }
 
@@ -50,6 +61,7 @@ public class ArchitectureCollegeAdapter extends RecyclerView.Adapter<Architectur
     public class MyViewAdapter extends RecyclerView.ViewHolder {
         TextView name,college;
         ImageView profileImage;
+        LinearLayout collegeLinear;
 
         public MyViewAdapter(View itemView) {
             super(itemView);
@@ -57,6 +69,8 @@ public class ArchitectureCollegeAdapter extends RecyclerView.Adapter<Architectur
             profileImage=(ImageView) itemView.findViewById(R.id.architectureCollege_image);
             name=(TextView)itemView.findViewById(R.id.architectureCollege_name);
             college =(TextView)itemView.findViewById(R.id.architectureCollege_college);
+            collegeLinear = (LinearLayout)itemView.findViewById(R.id.college_linear);
+
 
         }
     }

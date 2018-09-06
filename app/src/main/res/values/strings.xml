@@ -118,6 +118,49 @@ Week Winners and 3 words for a week will be announced at 11 PM on dates – 10, 
         <item>Blah</item>
         <item>Blah</item>
     </string-array>
+    <string-array name="INR">
+        <item>INR</item>
+        <item>USD</item>
+    </string-array>
+
+    <string-array name="Status">
+        <item>Select Status</item>
+        <item>Idea</item>
+        <item>In Progress</item>
+        <item>Under Construction</item>
+        <item>Complete</item>
+    </string-array>
+
+    <string-array name="Design">
+        <item>Select Design Type</item>
+        <item>Architecture Design</item>
+        <item>Interior Design</item>
+        <item>Landscape Design</item>
+        <item>Product Design</item>
+        <item>Art Installation</item>
+        <item>Decoration</item>
+        <item>Other</item>
+    </string-array>
+
+    <string-array name="Building">
+        <item>Select Building Program</item>
+        <item>Commercial</item>
+        <item>Urbanism</item>
+        <item>Public Space</item>
+        <item>Culture</item>
+        <item>Body Culture</item>
+        <item>Health</item>
+        <item>Education</item>
+        <item>Housing</item>
+        <item>Hotel</item>
+        <item>Corprate</item>
+        <item>Office</item>
+        <item>Startup</item>
+        <item>Residental</item>
+        <item>Leisure-Pub,Cafe's etc.</item>
+        <item>Media</item>
+        <item>Other</item>
+    </string-array>
 
     <string-array name="Company">
         <item>Select Firm/Company</item>

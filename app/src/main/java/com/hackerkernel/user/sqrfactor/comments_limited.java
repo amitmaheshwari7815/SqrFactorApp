@@ -56,8 +56,9 @@ public class comments_limited implements Serializable {
         this.comment_limited_updated_at = comment_limited_updated_at;
     }
 
-    public comments_limited(String commenterFirstName,String commenterLastName,String profileImageOfCommenter,String commenterName,String commentBody,String commmentTime,int likesCount)
+    public comments_limited(int id,String commenterFirstName,String commenterLastName,String profileImageOfCommenter,String commenterName,String commentBody,String commmentTime,int likesCount)
     {
+        this.user_id=id;
         this.body=commentBody;
         this.likeCount=likesCount;
         this.updated_at=commmentTime;
@@ -78,11 +79,14 @@ public class comments_limited implements Serializable {
             this.created_at=comments.getString("created_at");
             this.updated_at=comments.getString("updated_at");
             this.deleted_at=comments.getString("deleted_at");
+
             JSONObject user =comments.getJSONObject("user");
             this.commentUserName=user.getString("user_name");
             this.commentUserPrfile=user.getString("profile");
             this.commenterFirstName=user.getString("first_name");
             this.commenterLastName=user.getString("last_name");
+            this.user_id=user.getInt("id");
+
             JSONArray likesArray=comments.getJSONArray("likes");
             //this.likeCount=likesArray.length();
             if(likesArray!=null)

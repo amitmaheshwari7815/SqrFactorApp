@@ -42,10 +42,7 @@ public class Portfolio extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
 
         PortfolioAdapter portfolioAdapter = new PortfolioAdapter(portfolioArrayList,getActivity());
-//
-        PortfolioClass portfolioClass = new PortfolioClass("url","hello there","Amit","5","4");
-        portfolioArrayList.add(portfolioClass);
-//
+
         recyclerView.setAdapter(portfolioAdapter);
         return view;
 

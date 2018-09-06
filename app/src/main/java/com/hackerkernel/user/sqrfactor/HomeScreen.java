@@ -1,20 +1,43 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.ColorRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
+import android.support.design.internal.BottomNavigationItemView;
+import android.support.design.internal.BottomNavigationMenuView;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -24,12 +47,19 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.Gson;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class HomeScreen extends ToolbarActivity {
@@ -39,44 +69,112 @@ public class HomeScreen extends ToolbarActivity {
     ImageView imageView;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
+    private ImageView profileImage;
+    private boolean notificationVisible = false;
+    private List<Integer> mBadgeCountList = new ArrayList<Integer>();
+    private List<BadgeView> mBadgeViews;
+    private int count = 0;
+    private SearchResultAdapter searchResultAdapter;
+    LinearLayout linearLayout;
+    private EditText searchEditText;
+    private ArrayList<SearchResultClass> searchResultClasses=new ArrayList<>();
+    private RecyclerView recyclerView;
 
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_screen);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar1);
+//        toolbar.setNavigationIcon(R.drawable.profilepic);
         setSupportActionBar(toolbar);
+
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_menu_black_24dp);
+//        actionBar.setLogo(R.drawable.profilepic);
+        actionBar.setDisplayShowTitleEnabled(false);
+
+        actionBar.setHomeAsUpIndicator(R.drawable.profilepic_35x35);
         actionBar.setDisplayHomeAsUpEnabled(true);
+//        profileImage = findViewById(R.id.toolbar_profile);
         drawerLayout = findViewById(R.id.drawer_layout);
 
-        SharedPreferences sharedPreferences = getSharedPreferences("PREF_NAME",MODE_PRIVATE);
-        String token = sharedPreferences.getString("TOKEN","sqr");
-        TokenClass.Token=token;
-        TokenClass tokenClass=new TokenClass(token);
-        Log.v("Token1",token);
+        searchEditText=(EditText)findViewById(R.id.user_search);
+        recyclerView=(RecyclerView)findViewById(R.id.search_recycler);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        linearLayout=(LinearLayout)findViewById(R.id.mainfrag);
+
+        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(layoutManager);
+        searchResultAdapter = new SearchResultAdapter( this,searchResultClasses);
+        recyclerView.setAdapter(searchResultAdapter);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                //Toast.makeText(getApplicationContext(),s+"",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Toast.makeText(getApplicationContext(),s+"",Toast.LENGTH_SHORT).show();
+                recyclerView.setVisibility(View.VISIBLE);
+                linearLayout.setVisibility(View.INVISIBLE);
+                FetchSearchedDataFromServer(s+"");
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length()==0)
+                {
+                    recyclerView.setVisibility(View.GONE);
+                    linearLayout.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
+
+        SharedPreferences sharedPreferences = getSharedPreferences("PREF_NAME", MODE_PRIVATE);
+        String token = sharedPreferences.getString("TOKEN", "sqr");
+        TokenClass.Token = token;
+        TokenClass tokenClass = new TokenClass(token);
+        Log.v("Token1", token);
 
         //getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new TrophyFragment()).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NewsFeedFragment()).commit();
+
+        final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+
 
 
         tabLayout = (TabLayout)findViewById(R.id.tabs);
 
         //tabLayout.setupWithViewPager(pager);
 
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.news_feed2));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.msg));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.notification));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.newsfeeed3color));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.chatmsg));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.notify4));
 //        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_search_black_24dp));
-        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_menu_black_24dp));
+        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.toggle));
 //        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.profilepic));
-
+        Log.w("HomeScreen","NewsFeed3Color: "+mBadgeCountList);
         /*tabLayout.getTabAt(0).setIcon(R.drawable.trophy_filled);
         tabLayout.getTabAt(1).setIcon(R.drawable.msg);
         tabLayout.getTabAt(2).setIcon(R.drawable.notification);
-
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);*/
+        mBadgeCountList.add(6);
+        mBadgeCountList.add(count++);
+        mBadgeCountList.add(166);
+
+        initBadgeViews();
+//        setUpTabBadge();
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -84,22 +182,24 @@ public class HomeScreen extends ToolbarActivity {
                 switch (tab.getPosition()){
 
                     case 0:
+                        getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NewsFeedFragment()).commit();
+                        tab.setIcon(R.drawable.newsfeeed3color);
                         break;
 
                     case 1:
-                        tab.setIcon(R.drawable.envelope_filled);
-                        Intent i1 = new Intent(HomeScreen.this, MessagesActivity.class);
-                        startActivity(i1);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new MessageFragment()).commit();
+                        tab.setIcon(R.drawable.chatmsgcolor);
+
                         break;
 
                     case 2:
-                        tab.setIcon(R.drawable.notification_filled);
-                        Intent i2 = new Intent(HomeScreen.this, NotificationsActivity.class);
-                        startActivity(i2);
+                        tab.setIcon(R.drawable.notifycolor1);
+                        getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NotificationsFragment()).commit();
                         break;
 
 
                     case 3:
+                        tab.setIcon(R.drawable.toggle1color);
                         new ModalSheet().show(getSupportFragmentManager(), "");
                         //Intent i4 = new Intent(HomeScreen.this, MessagesActivity.class);
                         //startActivity(i4);
@@ -115,17 +215,19 @@ public class HomeScreen extends ToolbarActivity {
                 switch (tab.getPosition()){
 
                     case 0:
-
+                        tab.setIcon(R.drawable.newsfeeed4);
                         break;
 
                     case 1:
-                        tab.setIcon(R.drawable.msg);
+                        tab.setIcon(R.drawable.chatmsg);
                         break;
 
                     case 2:
-                        tab.setIcon(R.drawable.notification);
+                        tab.setIcon(R.drawable.notify4);
                         break;
 
+                    case 3:
+                        tab.setIcon(R.drawable.toggle);
 
                 }
 
@@ -137,8 +239,15 @@ public class HomeScreen extends ToolbarActivity {
 
 
             }
-        });
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
+ });
+        navigationView = findViewById(R.id.navigation_view);
+        View headerLayout = navigationView.inflateHeaderView(R.layout.navigation_drawer);
+        ImageView profileImage = (ImageView) headerLayout.findViewById(R.id.profile_image);
+        headerLayout.setVisibility(View.VISIBLE);
+
+        Toast.makeText(this, userClass.getProfile(), Toast.LENGTH_SHORT).show();
+        Glide.with(this).load("https://archsqr.in/" + userClass.getProfile())
+                .into(profileImage);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
@@ -149,22 +258,30 @@ public class HomeScreen extends ToolbarActivity {
                     startActivity(i);
 
                 }
-                if (id == R.id.navigation_credits){
-                    Intent j = new Intent(HomeScreen.this,Credits.class);
+                if (id == R.id.navigation_credits) {
+                    Intent j = new Intent(HomeScreen.this, Credits.class);
                     //j.putExtra("Activity", "2");
                     startActivity(j);
 
                 }
-                if (id == R.id.navigation_settings){
-                    Intent intent = new Intent(HomeScreen.this,Settings.class);
+                if (id == R.id.navigation_settings) {
+                    Intent intent = new Intent(HomeScreen.this, Settings.class);
                     //intent.putExtra("Activity", "3");
                     startActivity(intent);
 
                 }
-                if (id == R.id.navigation_logout){
+                if (id == R.id.navigation_logout) {
 
+//
+//                    //call api here for logout
+//
+                    SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json = mPrefs.getString("MyObject", "");
+                    UserClass userClass = gson.fromJson(json, UserClass.class);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic("pushNotifications" + userClass.getUserId());
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic("chats" + userClass.getUserId());
 
-                    //call api here for logout
                     RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
 
                     StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/logout",
@@ -189,7 +306,7 @@ public class HomeScreen extends ToolbarActivity {
                         public Map<String, String> getHeaders() throws AuthFailureError {
                             Map<String, String> params = new HashMap<String, String>();
                             params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer "+TokenClass.Token);
+                            params.put("Authorization", "Bearer " + TokenClass.Token);
 
                             return params;
                         }
@@ -199,15 +316,11 @@ public class HomeScreen extends ToolbarActivity {
                     requestQueue.add(myReq);
 
 
-                    Intent intent = new Intent(HomeScreen.this,LoginScreen.class);
+                    Intent intent = new Intent(HomeScreen.this, LoginScreen.class);
                     startActivity(intent);
                     finish();
 
                 }
-
-
-
-
 
 
                 menuItem.setChecked(false);
@@ -216,7 +329,32 @@ public class HomeScreen extends ToolbarActivity {
                 return false;
             }
         });
-}
+    }
+
+    private void initBadgeViews() {
+        if (mBadgeViews == null) {
+            mBadgeViews = new ArrayList<BadgeView>();
+            for (int i = 0; i < 4; i++) {
+                BadgeView tmp = new BadgeView(this);
+                tmp.setBadgeMargin(0, 6, 10, 0);
+                tmp.setTextSize(10);
+                mBadgeViews.add(tmp);
+            }
+        }
+    }
+//    private void setUpTabBadge() {
+//
+//        for (int i = 0; i < 4; i++) {
+//            TabLayout.Tab tab = tabLayout.getTabAt(i);
+//
+//
+//        }
+//
+//
+////        tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getCustomView().setSelected(true);
+//    }
+
+
 
     @Override
     public void onBackPressed() {
@@ -224,8 +362,7 @@ public class HomeScreen extends ToolbarActivity {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             //navigationView.getMenu().getItem(0).setCheckable(false);
             drawerLayout.closeDrawer(GravityCompat.START);
-        }
-        else
+        } else
             super.onBackPressed();
         //LinearLayout ll = (LinearLayout)tabLayout.getChildAt(0);
         //ll.getChildAt(tabLayout.getSelectedTabPosition()).setSelected(false);
@@ -233,26 +370,7 @@ public class HomeScreen extends ToolbarActivity {
     }
 
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        MenuItem mSearch = menu.findItem(R.id.action_search);
-        SearchView mSearchView = (SearchView) mSearch.getActionView();
-        mSearchView.setQueryHint("Search");
 
-        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return true;
-            }
-        });
-
-        return super.onCreateOptionsMenu(menu);
-    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -265,10 +383,64 @@ public class HomeScreen extends ToolbarActivity {
             case android.R.id.home:
                 drawerLayout.openDrawer(GravityCompat.START);
                 return true;
-            case R.id.action_search:
-                return true;
+//            case R.id.action_search:
+//                return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+    private void FetchSearchedDataFromServer(final String search) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+        // "https://archsqr.in/api/profile/detail/
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/parse/search",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        searchResultClasses.clear();
+                        //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONObject users=jsonObject.getJSONObject("users");
+                            JSONArray dataArray=users.getJSONArray("data");
+                            for(int i=0;i<dataArray.length();i++)
+                            {
+                                SearchResultClass searchResultClass=new SearchResultClass(dataArray.getJSONObject(i));
+                                searchResultClasses.add(searchResultClass);
+                            }
+                            searchResultAdapter.notifyDataSetChanged();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("search",search);
+                return params;
+            }
+
+        };
+        requestQueue.add(myReq);
+
     }
 }

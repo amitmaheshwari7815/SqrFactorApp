@@ -51,7 +51,7 @@ private EditText oldPassword,newPassword,confirmPassword;
             setSupportActionBar(toolbar);
             toolbar.setNavigationIcon(R.drawable.back_arrow);
 
-            save=(Button)findViewById(R.id.SaveButton);
+            save=(Button)findViewById(R.id.change_password_button);
             oldPassword =(EditText)findViewById(R.id.old_password_text);
             newPassword =(EditText)findViewById(R.id.new_password_text);
             confirmPassword =(EditText)findViewById(R.id.confirm_password_text);

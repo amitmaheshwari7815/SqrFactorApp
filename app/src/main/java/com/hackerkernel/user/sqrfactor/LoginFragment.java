@@ -28,6 +28,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.hackerkernel.user.sqrfactor.HomeScreen;
@@ -53,6 +56,8 @@ public class LoginFragment extends Fragment {
     private CheckBox loginRemberMe;
     private SharedPreferences.Editor editor;
     private SharedPreferences mPrefs;
+    private   FirebaseDatabase database;
+    private   DatabaseReference ref;
 
 
 
@@ -65,6 +70,9 @@ public class LoginFragment extends Fragment {
         editor = sharedPref.edit();
 
         mPrefs = getActivity().getSharedPreferences("User", MODE_PRIVATE);
+        database= FirebaseDatabase.getInstance();
+
+        ref = database.getReference();
 
         login = (Button) rootView.findViewById(R.id.login);
         forgot = (TextView) rootView.findViewById(R.id.forgot);
@@ -104,7 +112,11 @@ public class LoginFragment extends Fragment {
                     loginPrefsEditor.clear();
                     loginPrefsEditor.commit();
                     doSomethingElse();
+
                 }
+
+
+
 
             }
         });
@@ -125,6 +137,8 @@ public class LoginFragment extends Fragment {
     }
 
     public void doSomethingElse() {
+
+
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/login",
                 new Response.Listener<String>() {
@@ -137,7 +151,17 @@ public class LoginFragment extends Fragment {
                             UserClass userClass = new UserClass(jsonObject);
                             // notification listner for like and comment
                             FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications" + userClass.getUserId());
+                            FirebaseMessaging.getInstance().subscribeToTopic("chats"+userClass.getUserId());
+                            //code for user status
+                            HashMap<String,String> status=new HashMap<>();
+                            status.put("isOnline","True");
+                            status.put("time", ServerValue.TIMESTAMP.toString());
+                            ref.child("Status").child(userClass.getUserId()+"").setValue(status);
 
+
+                            DatabaseReference presenceRef = FirebaseDatabase.getInstance().getReference().child("Status").child(userClass.getUserId()+"");
+                            IsOnline isOnline=new IsOnline("False",ServerValue.TIMESTAMP.toString());
+                            presenceRef.onDisconnect().setValue(isOnline);
                             JSONObject TokenObject = jsonObject.getJSONObject("success");
                             String Token = TokenObject.getString("token");
                             Log.v("token", Token);
@@ -152,7 +176,7 @@ public class LoginFragment extends Fragment {
                             prefsEditor.commit();
                             editor.commit();
                             Intent i = new Intent(getActivity(), HomeScreen.class);
-                            startActivity(i);
+                            getActivity().startActivity(i);
                             getActivity().finish();
 
                         } catch (JSONException e) {
@@ -185,6 +209,34 @@ public class LoginFragment extends Fragment {
         };
         requestQueue.add(myReq);
     }
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        Log.v("OnStart","OnstartCllaed");
+//        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
+//        Gson gson = new Gson();
+//        String json = mPrefs.getString("MyObject", "");
+//        UserClass userClass = gson.fromJson(json, UserClass.class);
+//        HashMap<String,String> status=new HashMap<>();
+//        status.put("isOnline","True");
+//        status.put("time", ServerValue.TIMESTAMP.toString());
+//        ref.child("Status").child(userClass.getUserId()+"").setValue(status);
+//    }
+
+
+
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
+//        Gson gson = new Gson();
+//        String json = mPrefs.getString("MyObject", "");
+//        UserClass userClass = gson.fromJson(json, UserClass.class);
+//        HashMap<String,String> status=new HashMap<>();
+//        status.put("isOnline","False");
+//        status.put("time", ServerValue.TIMESTAMP.toString());
+//        ref.child("Status").child(userClass.getUserId()+"").setValue(status);
+//    }
+
 }
-
-

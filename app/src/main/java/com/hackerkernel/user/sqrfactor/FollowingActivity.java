@@ -73,18 +73,24 @@ public class FollowingActivity extends AppCompatActivity {
 
     public void LoadData()
     {
-        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
+//        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+//        Gson gson = new Gson();
+//        String json = mPrefs.getString("MyObject", "");
+//        UserClass userClass = gson.fromJson(json, UserClass.class);
+        String userName=null;
+        Intent intent=getIntent();
+        if(intent!=null)
+        {
+            userName=intent.getStringExtra("UserName");
+        }
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/"+userClass.getUser_name()+"?action=following",
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/follow/"+userName+"?action=following",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("MorenewsFeedFromServer", response);
-                        Toast.makeText(FollowingActivity.this, response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(FollowingActivity.this, response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray follow=jsonObject.getJSONArray("follows");

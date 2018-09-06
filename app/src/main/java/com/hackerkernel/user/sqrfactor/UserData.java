@@ -157,13 +157,14 @@ public class UserData {
             this.created_at = jsonObject.getString("created_at");
             this.updated_at = jsonObject.getString("updated_at");
             this.deleted_at = jsonObject.getString("deleted_at");
+            this.emails=null;
 
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-        public int getId() {
+    public int getId() {
         return id;
     }
 

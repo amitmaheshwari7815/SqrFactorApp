@@ -9,14 +9,59 @@ import java.io.Serializable;
 public class UserClass implements Serializable{
 
     private JSONObject jsonObject;
+    private String blueprintCount,portfolioCount,followerCount,followingCount;
     private String user_name;
     private String first_name;
+    private String name;
     private String last_name;
     private String profile;
     private int userId;
     private String email;
     private String mobile;
     private String userType;
+
+    public JSONObject getJsonObject() {
+        return jsonObject;
+    }
+
+    public void setJsonObject(JSONObject jsonObject) {
+        this.jsonObject = jsonObject;
+    }
+
+    public String getBlueprintCount() {
+        return blueprintCount;
+    }
+
+    public void setBlueprintCount(String blueprintCount) {
+        this.blueprintCount = blueprintCount;
+    }
+
+    public String getPortfolioCount() {
+        return portfolioCount;
+    }
+
+    public void setPortfolioCount(String portfolioCount) {
+        this.portfolioCount = portfolioCount;
+    }
+
+    public String getFollowerCount() {
+        return followerCount;
+    }
+
+    public void setFollowerCount(String followerCount) {
+        this.followerCount = followerCount;
+    }
+
+    public String getFollowingCount() {
+        return followingCount;
+    }
+
+    public void setFollowingCount(String followingCount) {
+        this.followingCount = followingCount;
+    }
+
+
+
 
     public int getUserId() {
         return userId;
@@ -97,34 +142,42 @@ public class UserClass implements Serializable{
         this.profile = profile;
     }
 
-    public JSONObject getJsonObject() {
-        return jsonObject;
+    public String getName() {
+        return name;
     }
 
-    public void setJsonObject(JSONObject jsonObject) {
-        this.jsonObject = jsonObject;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public UserClass(String user_name, String first_name, String last_name, String profile) {
         this.user_name = user_name;
         this.first_name = first_name;
 
+
         this.last_name = last_name;
         this.profile = profile;
     }
+
 
     public UserClass(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
 
         try {
-            JSONObject user = jsonObject.getJSONObject("user");
-            this.userId = user.getInt("id");
-            this.user_name = user.getString("user_name");
-            this.first_name=user.getString("first_name");
-            this.last_name=user.getString("last_name");
-            this.profile=user.getString("profile");
-            this.email=user.getString("email");
-            this.mobile=user.getString("mobile_number");
+//            JSONObject user = jsonObject.getJSONObject("user");
+            this.followerCount=jsonObject.getString("followerCount");
+            this.followingCount=jsonObject.getString("followingCount");
+            this.portfolioCount=jsonObject.getString("portfolioCount");
+            this.blueprintCount=jsonObject.getString("blueprintCount");
+            this.userId = jsonObject.getInt("user_id");
+            this.name=jsonObject.getString("user_name");
+            this.user_name = jsonObject.getString("user_username");
+            this.first_name=jsonObject.getString("user_firstname");
+            this.last_name=jsonObject.getString("user_lastname");
+            this.profile=jsonObject.getString("user_profile");
+            this.email=jsonObject.getString("user_email");
+            this.mobile=jsonObject.getString("user_mobile");
+            this.userType=jsonObject.getString("user_usertype");
 
         } catch (JSONException e) {
             e.printStackTrace();

@@ -1,6 +1,8 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -8,32 +10,54 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimitedAdapter.MyViewHolder> {
 
     private ArrayList<comments_limited> comments_limitedArrayList=new ArrayList<>();
     private Context context;
-    private int flag=0;
+    private int flag=0,user_id,commentable_id,postId;
+    private String isShared;
 
-    public CommentsLimitedAdapter(ArrayList<comments_limited> comments_limitedArrayList, Context context) {
+    public CommentsLimitedAdapter(ArrayList<comments_limited> comments_limitedArrayList, Context context,int user_id,int commentable_id,int postId,String isShared) {
 
         this.comments_limitedArrayList = comments_limitedArrayList;
         this.context = context;
+        this.isShared=isShared;
+        this.commentable_id=commentable_id;
+        this.postId=postId;
+        this.user_id=user_id;
     }
 
 
@@ -48,9 +72,17 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
 
+        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+        if(userClass.getUserId()==user_id)
+        {
+            holder.comment_menu.setVisibility(View.VISIBLE);
+        }
+
 
         holder.commentBody.setText(comments_limitedArrayList.get(position).getBody());
-
         holder.buttonLike.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
@@ -77,8 +109,18 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
                 load("https://archsqr.in/"+comments_limitedArrayList.get(position).getCommentUserPrfile())
                 .centerCrop().into(holder.commenterProfile);
 
-       holder.commenterUserName.setText(comments_limitedArrayList.get(position).getCommentUserName());
-       holder.numberOfLikes.setText(comments_limitedArrayList.get(position).getLikeCount()+"");
+        holder.commenterUserName.setText(comments_limitedArrayList.get(position).getCommentUserName());
+        holder.commenterUserName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,UserProfileActivity.class);
+                //Log.v("Data",newsFeedStatus.getUserId()+" "+userName+" "+newsFeedStatus.getPostId());
+                intent.putExtra("User_id",comments_limitedArrayList.get(position).getUser_id());
+                intent.putExtra("ProfileUserName",comments_limitedArrayList.get(position).getCommentUserName());
+                context.startActivity(intent);
+            }
+        });
+        holder.numberOfLikes.setText(comments_limitedArrayList.get(position).getLikeCount()+"");
         String dtc = comments_limitedArrayList.get(position).getUpdated_at();
         Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
@@ -104,10 +146,45 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
         long days = diff/(24*60*60*1000);
         holder.timeAgo.setText(days+" Days ago");
 
-
-
-
     }
+    public void DeletePost(final int id, int comment_id)
+    {
+        RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/delete_post",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.v("ResponseLike",s);
+                        Toast.makeText(context, s , Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+//                params.put("id",id);
+//                params.put("is_shared",is_shared+"");
+//
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
 
     @Override
     public int getItemCount() {
@@ -117,7 +194,7 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView commentBody,commenterUserName,timeAgo,numberOfLikes;
-        ImageView commenterProfile;
+        ImageView commenterProfile,comment_menu;
         Button buttonLike;
 
         public MyViewHolder(View itemView) {
@@ -125,9 +202,35 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
             commentBody=(TextView)itemView.findViewById(R.id.commentBody);
             commenterUserName=(TextView)itemView.findViewById(R.id.commenterUserName);
             timeAgo=(TextView)itemView.findViewById(R.id.timeAgo);
+            comment_menu=(ImageView)itemView.findViewById(R.id.comment_menu);
             commenterProfile=(ImageView)itemView.findViewById(R.id.commenterProfileImage);
             buttonLike=(Button)itemView.findViewById(R.id.commentLike);
             numberOfLikes=(TextView)itemView.findViewById(R.id.numberOfLike);
+            comment_menu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu pop = new PopupMenu(context, v);
+                    pop.getMenuInflater().inflate(R.menu.comment_delete, pop.getMenu());
+                    pop.show();
+
+                    pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            switch (item.getItemId()){
+
+                                case R.id.deleteComment:
+                                    comments_limitedArrayList.remove(getAdapterPosition());
+                                    notifyItemRemoved(getAdapterPosition());
+                                    // DeletePost(newsFeedStatus.getPostId()+"",newsFeedStatus.getSharedId()+"",newsFeedStatus.getIs_Shared());
+                                    return true;
+
+                            }
+                            return true;
+                        }
+                    });
+                }
+            });
         }
     }
 }

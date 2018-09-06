@@ -27,6 +27,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,9 +46,11 @@ public class EducationDetailsActivity extends AppCompatActivity {
     ArrayList<String> collegeArray=new ArrayList<>();
     ArrayList<String> admissionYearArray=new ArrayList<>();
     ArrayList<String> graduationYearArray=new ArrayList<>();
+    ArrayList<AllEducationDetailsClass> allEducationDetailsClassArrayList=new ArrayList<>();
     //ArrayList<String> course=new ArrayList<>();
 
     private boolean edDate=false;
+
     private EditText courseText,collegeText,admissionText,graduationText,courseText1,collegeText1,admissionText1,graduationText1;
 
     private Boolean isClicked= false;
@@ -151,7 +154,88 @@ public class EducationDetailsActivity extends AppCompatActivity {
             }
         });
 
+        GetDataFromServerAndBindToView();
+
     }
+    public void GetDataFromServerAndBindToView()
+    {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/edit/education-details",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        // Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray allEducationDetails=jsonObject.getJSONArray("allEducationDetails");
+//                            Toast.makeText(getApplicationContext(),allEducationDetails.length(),Toast.LENGTH_LONG).show();
+                            for(int i=0;i<allEducationDetails.length();i++)
+                            {
+                                AllEducationDetailsClass allEducationDetailsClass=new AllEducationDetailsClass(allEducationDetails.getJSONObject(i));
+                                allEducationDetailsClassArrayList.add(allEducationDetailsClass);
+
+                            }
+
+                            BindDataToView(allEducationDetailsClassArrayList);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+
+        requestQueue.add(myReq);
+    }
+
+    public void BindDataToView(ArrayList<AllEducationDetailsClass> allEducationDetailsClassArray)
+    {
+
+        for(int i=0;i<allEducationDetailsClassArray.size();i++)
+        {
+            if(i==0)
+            {
+                courseText.setText(allEducationDetailsClassArray.get(i).getCourse());
+                collegeText.setText(allEducationDetailsClassArray.get(i).getCollege_university());
+                admissionText.setText(allEducationDetailsClassArray.get(i).getYear_of_admission());
+                graduationText.setText(allEducationDetailsClassArray.get(i).getYear_of_graduation());
+            }
+            if(i==1 && !isClicked)
+            {
+
+                newForm.setVisibility(View.VISIBLE);
+                isClicked=true;
+                courseText1.setText(allEducationDetailsClassArray.get(i).getCourse());
+                collegeText1.setText(allEducationDetailsClassArray.get(i).getCollege_university());
+                admissionText1.setText(allEducationDetailsClassArray.get(i).getYear_of_admission());
+                graduationText1.setText(allEducationDetailsClassArray.get(i).getYear_of_graduation());
+            }
+
+        }
+    }
+
+
+
     private void updateLabel(Calendar myCalendar) {
         String myFormat = "dd/MM/yy"; //In which you need put here
         SimpleDateFormat sdf = new SimpleDateFormat(myFormat, Locale.US);

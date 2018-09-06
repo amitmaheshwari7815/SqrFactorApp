@@ -13,12 +13,12 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 public class NotificationClass implements Serializable {
-    public String type, time, name, profile, body,postType,title,description,shortDescription;
+    public String type, time, user_name,name, profile, body,postType,title,description,shortDescription,slug;
     public int postId, userId, commentID, commentType;
     public JSONObject jsonObject;
 
 
-    public NotificationClass(String type, String time, String name, String profile,String description,String shortDescription, String body,String postType,String title, int userId, int postId, int commentID, int commentType) {
+    public NotificationClass(String user_name,String type,String time, String name, String profile,String description,String shortDescription, String body,String postType,String title, int userId, int postId, int commentID, int commentType,String slug) {
         this.type = type;
         this.time = time;
         this.name = name;
@@ -32,6 +32,8 @@ public class NotificationClass implements Serializable {
         this.title = title;
         this.description = description;
         this.shortDescription = shortDescription;
+        this.slug = slug;
+        this.user_name = user_name;
     }
 
     public NotificationClass(JSONObject jsonObject) {
@@ -45,12 +47,15 @@ public class NotificationClass implements Serializable {
 
             JSONObject userfrom = jsonObject.getJSONObject("user_from");
             this.name = userfrom.getString("name");
+            this.user_name = userfrom.getString("user_name");
             this.profile = userfrom.getString("profile");
+
 
             JSONArray post = jsonObject.getJSONArray("post");
             for (int j = 0; j < post.length(); j++){
                 JSONObject postObject = post.getJSONObject(j);
                 this.postType = postObject.getString("type");
+                this.slug = postObject.getString("slug");
                 this.title = postObject.getString("title");
                 this.postId = postObject.getInt("id");
                 this.userId = postObject.getInt("user_id");
@@ -119,6 +124,14 @@ public class NotificationClass implements Serializable {
         this.userId = userId;
     }
 
+    public String getUser_name() {
+        return user_name;
+    }
+
+    public void setUser_name(String user_name) {
+        this.user_name = user_name;
+    }
+
     public int getCommentID() {
         return commentID;
     }
@@ -165,6 +178,14 @@ public class NotificationClass implements Serializable {
 
     public void setShortDescription(String shortDescription) {
         this.shortDescription = shortDescription;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
     }
 
     public JSONObject getJsonObject() {

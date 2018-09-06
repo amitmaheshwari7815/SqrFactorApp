@@ -26,6 +26,7 @@
                 android:layout_height="60sp"
                 android:src="@drawable/profilepic"
                 android:layout_weight="1"
+                android:id="@+id/article_profile"
                 android:layout_marginTop="10sp"/>
 
             <TextView
@@ -33,6 +34,7 @@
                 android:layout_height="60sp"
                 android:layout_weight="4"
                 android:layout_marginTop="10sp"
+                android:id="@+id/article_userName"
                 android:gravity="center_vertical"
                 android:text="Keanu Reeves"
                 android:textColor="#000"
@@ -116,7 +118,27 @@
                 android:src="@drawable/ic_insert_link"
                 />
 
+
         </LinearLayout>
+<FrameLayout
+    android:layout_width="match_parent"
+    android:id="@+id/videoFrameLayout"
+    android:visibility="gone"
+    android:layout_height="wrap_content">
+
+    <Button
+        android:id="@+id/video_post_close"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_margin="10dp"
+        android:layout_gravity="right"
+        android:background="@drawable/ic_close"/>
+    <WebView
+        android:layout_width="match_parent"
+        android:id="@+id/articleVideoView"
+        android:layout_height="300dp"
+        tools:ignore="WebViewLayout" />
+</FrameLayout>
 
         <ScrollView
             android:layout_width="match_parent"
@@ -125,6 +147,8 @@
                 android:layout_width="match_parent"
                 android:id="@+id/editor"
                 app:render_type="Editor"
+                android:focusable="false"
+                android:focusableInTouchMode="true"
                 app:placeholder="Type your text, add pictures and videos link here..."
                 android:paddingTop="10dp"
                 android:paddingLeft="10dp"
@@ -160,10 +184,13 @@
         </android.support.design.widget.TextInputLayout>
 
         <ImageView
+            android:id="@+id/cropFinalImage"
             android:layout_width="match_parent"
             android:layout_height="150sp"
             android:layout_margin="10sp"
-            android:id="@+id/cropFinalImage"/>
+            android:scaleType="fitXY"
+            android:visibility="gone"
+            android:src="@drawable/profilepic" />
 
 
         <LinearLayout
@@ -172,7 +199,8 @@
             android:layout_height="60sp"
             android:background="@drawable/gray_border"
             android:layout_margin="10sp"
-            android:padding="10sp">
+            android:padding="10sp"
+           >
 
             <TextView
                 android:id="@+id/articleSelectBaneerImage"
@@ -185,9 +213,15 @@
                 android:inputType="text"
                 android:textSize="18dp" />
             <ImageView
+                android:layout_width="24dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/profilepic"
+                android:layout_weight="1"
+                android:id="@+id/banner_attachment_image"/>
+            <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_gravity="end"
+                android:layout_gravity=""
                 android:src="@drawable/ic_attach_file_black_24dp"
                 android:id="@+id/selectBanerImageIcon"/>
 

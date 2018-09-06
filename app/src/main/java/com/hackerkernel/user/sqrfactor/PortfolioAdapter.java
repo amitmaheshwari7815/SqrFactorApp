@@ -1,6 +1,8 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,6 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 
@@ -30,13 +34,25 @@ public class PortfolioAdapter extends RecyclerView.Adapter<PortfolioAdapter.MyVi
         return new MyViewHolder(itemView);
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
-       PortfolioClass portfolioClass=portfolioClassArrayList.get(position);
-        holder.articleName.setText(portfolioClass.getArticleName());
-        holder.articleWriter.setText(portfolioClass.articleWirterName);
-        holder.likes.setText(portfolioClass.getLikes());
-        holder.comment.setText(portfolioClass.getComments());
+        final PortfolioClass portfolioClass=portfolioClassArrayList.get(position);
+        holder.articleName.setText(portfolioClass.getTitle());
+        holder.shortDescrip.setText(portfolioClass.getShort_description());
+        Glide.with(context).load("https://archsqr.in/"+portfolioClass.getArticleImageUrl())
+                .into(holder.articleImage);
+        holder.articleImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,FullPostActivity.class);
+                intent.putExtra("Post_Slug_ID",portfolioClass.getSlug());
+                context.startActivity(intent);
+            }
+        });
+
+        holder.likes.setText(portfolioClass.getLikeCount());
+        holder.comment.setText(portfolioClass.getCommentcount());
         holder.menuButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,14 +88,14 @@ public class PortfolioAdapter extends RecyclerView.Adapter<PortfolioAdapter.MyVi
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView articleName,articleWriter,likes,comment;
+        TextView articleName,shortDescrip,likes,comment;
         ImageView articleImage;
         ImageView menuButton;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             articleName=(TextView)itemView.findViewById(R.id.articleTitle_portfolio);
-            articleWriter=(TextView)itemView.findViewById(R.id.articleWriter_portfolio);
+            shortDescrip=(TextView)itemView.findViewById(R.id.short_descrip_portfolio);
             likes=(TextView)itemView.findViewById(R.id.like_portfolio);
             comment=(TextView)itemView.findViewById(R.id.Comments_portfolio);
             articleImage=(ImageView)itemView.findViewById(R.id.imageProfile);

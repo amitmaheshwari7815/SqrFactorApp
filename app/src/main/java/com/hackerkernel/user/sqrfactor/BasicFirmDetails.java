@@ -57,6 +57,8 @@ public class BasicFirmDetails extends AppCompatActivity {
     private boolean email3 = false;
     private int count = 0;
     Spinner spin;
+    UserClass userClass;
+    UserData userData;
     Spinner countrySpinner, companySpinner, citySpinner, stateSpinner;
     ArrayList<String> countries = new ArrayList<String>();
     ArrayList<String> company = new ArrayList<String>();
@@ -66,6 +68,16 @@ public class BasicFirmDetails extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_basic_firm_details);
+
+        final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        userClass = gson.fromJson(json, UserClass.class);
+
+        SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
+        Gson gson1 = new Gson();
+        String json1 = sharedPreferences.getString("UserData", "");
+        userData= gson1.fromJson(json1, UserData.class);
 
         toolbar = (Toolbar) findViewById(R.id.basic_firm_toolbar);
         toolbar.setTitle("Profile");
@@ -150,8 +162,12 @@ public class BasicFirmDetails extends AppCompatActivity {
                 if (countryName.size() > 0) {
                     //country_val = countryName.get(position);
                     country_val=position+"";
+//                    if(!userData.getCountry_id().equals("null"))
+//                        countrySpinner.setSelection(Integer.parseInt(userData.getCountry_id()));
                     LoadStateFromServer(countryClassArrayList.get(position).getId());
                     countryId = countryClassArrayList.get(position).getId();
+
+
                 }
 
                 //Toast.makeText(getApplicationContext(),countryClassArrayList.get(position).getId()+" ",Toast.LENGTH_LONG).show();
@@ -176,6 +192,11 @@ public class BasicFirmDetails extends AppCompatActivity {
                 if (statesName.size() > 0) {
                     //state_val = statesName.get(position);
                     state_val=position+"";
+
+//                    if(!userData.getState_id().equals("null"))
+//                        stateSpinner.setSelection(Integer.parseInt(userData.getState_id()));
+
+
                     LoadCitiesFromServer(statesClassArrayList.get(position).getId(), countryId);
                 }
                 // Toast.makeText(getApplicationContext(),statesClassArrayList.get(position).getId()+" "+countryId,Toast.LENGTH_LONG).show();
@@ -199,6 +220,8 @@ public class BasicFirmDetails extends AppCompatActivity {
                 if (citiesName.size() > 0)
                     // city_val = citiesName.get(position);
                     city_val=position+"";
+//                if(!userData.getCity_id().equals("null"))
+//                    citySpinner.setSelection(Integer.parseInt(userData.getCity_id()));
                 // Toast.makeText(getApplicationContext(),city_val,Toast.LENGTH_LONG).show();
 
             }
@@ -648,35 +671,15 @@ public class BasicFirmDetails extends AppCompatActivity {
 
     private void BindDataTOviews() {
 
-        final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("userData", MODE_PRIVATE);
-        Gson gson1 = new Gson();
-        String json1 = sharedPreferences.getString("UserData", "");
-        UserData userData = gson1.fromJson(json1, UserData.class);
-
-//
-//        if(!userData.getCountry_id().equals("null"))
-//        countrySpinner.setSelection(Integer.parseInt(userData.getCountry_id()));
-//
-//        if(!userData.getState_id().equals("null"))
-//        stateSpinner.setSelection(Integer.parseInt(userData.getState_id()));
-//
-//        if(!userData.getCity_id().equals("null"))
-//        citySpinner.setSelection(Integer.parseInt(userData.getCity_id()));
-
-        if (!userData.getName_of_the_company().equals("null")) {
-            nameOfCompany.setText(userData.getName_of_the_company());
+        if (!userClass.getUser_name().equals("null")) {
+            nameOfCompany.setText(userClass.getUser_name());
         }
-        if (!userData.getPhone_number().equals("null")) {
-            mobileNumber.setText(userData.getPhone_number());
+        if (!userClass.getMobile().equals("null")) {
+            mobileNumber.setText(userClass.getMobile());
         }
-//        if (!userData.getEmails().equals("null")) {
-//            email.setText(userData.getEmails());
-//        }
+        if (!userClass.getEmail().equals("null")) {
+            email.setText(userClass.getEmail());
+        }
         if (!userData.getShot_bio().equals("null")) {
             shortBio.setText(userData.getShot_bio());
         }

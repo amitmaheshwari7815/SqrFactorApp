@@ -10,9 +10,11 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +63,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     private FirebaseDatabase database;
     private DatabaseReference ref;
     private String userName;
+    int result;
 
 
     public NewsFeedAdapter(ArrayList<NewsFeedStatus> newsFeedStatuses, Context context) {
@@ -80,17 +84,18 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
         final NewsFeedStatus newsFeedStatus=newsFeedStatuses.get(position);
 
 
-       // holder.time.setText(newsFeedStatus.getTime());
-        //Log.v("status",newsFeedStatus.getType());
-//
+        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+        result = Integer.parseInt(newsFeedStatus.getComments());
 
-//        holder.time.setText(newsFeedStatus.getTime());
-//        Log.v("status",newsFeedStatus.getType());
         if(newsFeedStatus.getType().equals("status"))
         {
             Log.v("status1",newsFeedStatus.getType());
             //holder.postTitle.setText(newsFeedStatus.getPostTitle());
             holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            userName=newsFeedStatus.getUser_name_of_post();
             holder.shortDescription.setText(newsFeedStatus.getFullDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
                     .into(holder.postImage);
@@ -103,6 +108,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             Log.v("status2",newsFeedStatus.getType());
             //holder.postTitle.setText(newsFeedStatus.getPostTitle());
             holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            userName=newsFeedStatus.getUser_name_of_post();
             holder.postTitle.setText(newsFeedStatus.getPostTitle());
             holder.shortDescription.setText(newsFeedStatus.getShortDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
@@ -116,6 +122,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             Log.v("status2",newsFeedStatus.getType());
             holder.authName.setText(newsFeedStatus.getUser_name_of_post());
             holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            userName=newsFeedStatus.getUser_name_of_post();
             holder.shortDescription.setText(newsFeedStatus.getShortDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
                     .into(holder.postImage);
@@ -132,6 +139,16 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                 intent.putExtra("ProfileUserName",userName);
                 context.startActivity(intent);
 
+            }
+        });
+        Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
+                .into( holder.news_user_imageProfile);
+        holder.postImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,FullPostActivity.class);
+                intent.putExtra("Post_Slug_ID",newsFeedStatus.getSlug());
+                context.startActivity(intent);
             }
         });
         String dtc = newsFeedStatus.getTime();
@@ -171,14 +188,6 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
                 if(flag1 == 0) {
                     holder.comments.setTextColor(context.getColor(R.color.sqr));
                     flag1 = 1;
-                    database= FirebaseDatabase.getInstance();
-                    ref = database.getReference();
-                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
-                    Gson gson = new Gson();
-                    String json = mPrefs.getString("MyObject", "");
-                    UserClass userClass = gson.fromJson(json, UserClass.class);
-                    PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatus.getPostId(),newsFeedStatus.getPostTitle(),newsFeedStatus.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
-                    ref.child("Notifications").child(newsFeedStatus.getUserId()+"").setValue(notificationClass);
 
                 }
                 else {
@@ -188,6 +197,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
                 //context.startActivity(new Intent(context,CommentsPage.class));
                 Intent intent = new Intent(context, CommentsPage.class);
+                intent.putExtra("Activity","From_News_Adapter");
                 intent.putExtra("PostDataClass",newsFeedStatuses.get(position)); //second param is Serializable
                 context.startActivity(intent);
 
@@ -196,15 +206,156 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
             }
         });
+        if(userClass.getUserId()==newsFeedStatus.getUserId())
+        {
+            holder.news_post_menu.setVisibility(View.VISIBLE);
+        }
+        holder.news_post_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu pop = new PopupMenu(context, v);
+                pop.getMenuInflater().inflate(R.menu.delete_news_post_menu, pop.getMenu());
+                pop.show();
 
-//        holder.share.setText(newsFeedStatus.getShare());
-//        holder.commentUserName.setText(newsFeedStatus.getCommentUserName());
-//        holder.commentTime.setText(newsFeedStatus.getCommentTime());
-//        holder.commentDescription.setText(newsFeedStatus.getCommentDescription());
-//        holder.commentLike.setText(newsFeedStatus.getCommentLike());
-//        holder.postId.setText(newsFeedStatus.getPostId());
-  //      holder.userId.setText(newsFeedStatus.getUserId());
+                pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        switch (item.getItemId()){
+
+                            case R.id.fullView:
+                                Intent intent=new Intent(context,FullPostActivity.class);
+                                intent.putExtra("Post_Slug_ID",newsFeedStatus.getSlug());
+                                context.startActivity(intent);
+                                break;
+                            case R.id.editPost:
+                                if(newsFeedStatus.getType().equals("design"))
+                                {
+                                    context.startActivity(new Intent(context,DesignActivity.class));
+                                }
+                                else if(newsFeedStatus.getType().equals("article"))
+                                {
+                                    context.startActivity(new Intent(context,ArticleActivity.class));
+                                }
+                                else if(newsFeedStatus.getType().equals("status"))
+                                {
+                                    context.startActivity(new Intent(context,ArticleActivity.class));
+                                }
+                                break;
+                            case R.id.deletePost:
+                                newsFeedStatuses.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeRemoved(position, 1);
+                                DeletePost(newsFeedStatus.getPostId()+"",newsFeedStatus.getSharedId()+"",newsFeedStatus.getIs_Shared());
+                                break;
+                            case R.id.selectAsFeaturedPost:
+                                return true;
+
+                        }
+                        return true;
+                    }
+                });
+            }
+        });
+        holder.commentPostbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
+
+                                holder.commentTime.setText("0 minutes ago");
+                                holder.commentDescription.setText(holder.writeComment.getText().toString());
+                                Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
+                                        .into(holder.commentProfileImageUrl);
+                                holder.commentUserName.setText(userClass.getUser_name());
+                                holder.news_comment_card.setVisibility(View.VISIBLE);
+                                database= FirebaseDatabase.getInstance();
+                                ref = database.getReference();
+                                SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+                                Gson gson = new Gson();
+                                String json = mPrefs.getString("MyObject", "");
+                                UserClass userClass = gson.fromJson(json, UserClass.class);
+                                PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatus.getPostId(),newsFeedStatus.getPostTitle(),newsFeedStatus.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
+                                ref.child("Notifications").child(newsFeedStatus.getUserId()+"").setValue(notificationClass);
+                                holder.writeComment.setText("");
+                                result=result+1;
+                                holder.comments.setText(result+" Comment");
+
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("commentable_id",newsFeedStatus.getSharedId()+"");
+                        params.put("comment_text",holder.writeComment.getText().toString());
+
+                        //returning parameters
+                        return params;
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            }
+        });
     }
+    public void DeletePost(final String  user_post_id, final String  id, final String is_shared) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/delete_post",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.v("ResponseLike",s);
+                        Toast.makeText(context, s , Toast.LENGTH_LONG).show();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("users_post_id",user_post_id+"");
+                params.put("id",id+"");
+                params.put("is_shared",is_shared+"");
+//
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
+    }
+
 
     @Override
     public int getItemCount() {
@@ -212,23 +363,32 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-         ImageView userImageUrl,authImageUrl,postImage,commentProfileImageUrl;
+         ImageView userImageUrl,authImageUrl,postImage,commentProfileImageUrl,news_user_imageProfile,news_post_menu;;
          TextView authName,time,postTitle,shortDescription,fullDescription,comments,share,commentPostbtn,
                  commentUserName,commentTime,commentDescription;
          ImageButton commentLike;
          TextView likelist;
          CheckBox like;
          EditText writeComment;
-
-
+         View view;
+         CardView news_comment_card;
          TextView postId,userId;
 
         public MyViewHolder(View itemView) {
             super(itemView);
-
+            view=itemView;
+            SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+            Gson gson = new Gson();
+            String json = mPrefs.getString("MyObject", "");
+            final UserClass userClass = gson.fromJson(json, UserClass.class);
+            news_user_imageProfile=(ImageView)itemView.findViewById(R.id.news_user_imageProfile);
             userImageUrl=(ImageView)itemView.findViewById(R.id.newsProfileImage);
             authImageUrl=(ImageView)itemView.findViewById(R.id.news_auth_image);
             postImage=(ImageView)itemView.findViewById(R.id.news_post_image);
+            news_post_menu =(ImageView)itemView.findViewById(R.id.news_post_menu);
+
+            news_comment_card=(CardView)itemView.findViewById(R.id.news_comment_card);
+
             commentProfileImageUrl=(ImageView)itemView.findViewById(R.id.news_comment_image);
             authName=(TextView)itemView.findViewById(R.id.news_auth_name);
             time=(TextView)itemView.findViewById(R.id.news_post_time);
@@ -245,59 +405,14 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
             likelist =(TextView) itemView.findViewById(R.id.news_post_likeList);
             writeComment =(EditText)itemView.findViewById(R.id.news_user_commnentEdit);
             commentPostbtn = (TextView) itemView.findViewById(R.id.news_comment_post);
-            commentPostbtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String s) {
-                                    Log.v("ResponseLike",s);
-                                    writeComment.setText("");
 
-//                        //Showing toast message of the response
-//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-
-                                    //Showing toast
-//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                                }
-                            }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer " +TokenClass.Token);
-
-                            return params;
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String,String> params = new HashMap<>();
-
-                            params.put("commentable_id",newsFeedStatuses.get(getAdapterPosition()).getSharedId()+"");
-//
-                            params.put("comment_text",writeComment.getText().toString());
-
-                            //returning parameters
-                            return params;
-                        }
-                    };
-
-                    //Adding request to the queue
-                    requestQueue.add(stringRequest);
-                }
-            });
             likelist.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
 
-                    showPopup();
+                    Intent intent = new Intent(context,LikeListActivity.class);
+                    intent.putExtra("id",newsFeedStatuses.get(getAdapterPosition()).getPostId());
+                    context.startActivity(intent);
                 }
 
             });
@@ -409,6 +524,14 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
         }
     }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+    @Override
+    public int getItemViewType(int position) {
+        return position;
+    }
     private void shareIt() {
     //sharing implementation here
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
@@ -419,19 +542,5 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.MyView
 
 
     }
-    public void showPopup(){
-        LayoutInflater li = LayoutInflater.from(context);
-        final View promptsView = li.inflate(R.layout.post_likes_popup, null);
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
-
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(promptsView);
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        RecyclerView recyclerView = promptsView.findViewById(R.id.like_recycler);
-        // show it
-        alertDialog.show();
-
-    }
 }

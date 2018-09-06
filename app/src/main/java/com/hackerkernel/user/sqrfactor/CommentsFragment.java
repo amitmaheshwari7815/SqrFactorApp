@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,9 +18,10 @@ import java.util.ArrayList;
 
 public class CommentsFragment extends Fragment {
 
-    public static ArrayList<comments_limited> arrayList=new ArrayList<>();
-    CommentsLimitedAdapter commentsLimitedAdapter;
-    RecyclerView recyclerView;
+    private ArrayList<comments_limited> arrayList=new ArrayList<>();
+    private CommentsLimitedAdapter commentsLimitedAdapter;
+    private RecyclerView recyclerView;
+    private NewsFeedStatus newsFeedStatus;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -27,9 +29,10 @@ public class CommentsFragment extends Fragment {
         View view= inflater.inflate(R.layout.fragment_comments, container, false);
         CommentsPage activity = (CommentsPage) getActivity();
         NewsFeedStatus newsFeedStatus = activity.getMyData();
+        //NewsFeedStatus newsFeedStatus=(NewsFeedStatus)getArguments().getSerializable("DataCommentsLimited");
 
 
-        Log.v("postDatOncommentfrag",newsFeedStatus.toString());
+
 
 
         recyclerView = view.findViewById(R.id.comments_recycler);
@@ -37,13 +40,10 @@ public class CommentsFragment extends Fragment {
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-
-
-
         arrayList=newsFeedStatus.getCommentsLimitedArrayList();
-        Log.v("autname",newsFeedStatus.getAuthName());
+        Log.v("autname",arrayList.get(0).getUserClass().getEmail());
         //Log.v("length",arrayList.size()+"");
-        commentsLimitedAdapter=new CommentsLimitedAdapter(arrayList,this.getActivity());
+        // commentsLimitedAdapter=new CommentsLimitedAdapter(arrayList,this.getActivity());
         recyclerView.setAdapter(commentsLimitedAdapter);
         commentsLimitedAdapter.notifyDataSetChanged();
 
@@ -58,5 +58,19 @@ public class CommentsFragment extends Fragment {
 //        }
 
 
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        Bundle bundle = this.getArguments();
+//        CommentsPage activity = (CommentsPage) getActivity();
+//        NewsFeedStatus newsFeedStatus = activity.getMyData();
+//        if (bundle != null) {
+//            newsFeedStatus = (NewsFeedStatus) bundle.getSerializable("DataCommentsLimited");
+//        }
+        //newsFeedStatus=(NewsFeedStatus) savedInstanceState.getSerializable("DataCommentsLimited");
+        //newsFeedStatus=(NewsFeedStatus)getArguments().getSerializable("DataCommentsLimited");
+        // Log.v("postDatOncommentfrag",newsFeedStatus.getCommentDescription());
     }
 }

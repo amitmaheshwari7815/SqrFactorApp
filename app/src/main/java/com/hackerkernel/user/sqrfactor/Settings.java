@@ -39,6 +39,7 @@ public class Settings extends AppCompatActivity {
     private Toolbar toolbar;
     private ImageView menu,profilePic;
     private TextView text1,text2,text3,text4,text5,profileUserName;
+    private TextView bluePrint1,portfolio1,followers1,following1;
     private TextView bluePrint,portfolio,followers,following;
     private ArrayList<UserData> userDataArrayList = new ArrayList<>();
     private SharedPreferences.Editor editor;
@@ -50,17 +51,23 @@ public class Settings extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         profilePic=(ImageView)findViewById(R.id.userProfilePic);
+
+        profileUserName=(TextView)findViewById(R.id.userProfileName);
+        bluePrint =(TextView)findViewById(R.id.blueprint);
+        portfolio =(TextView)findViewById(R.id.portfolio);
+        followers =(TextView)findViewById(R.id.followers);
+        following =(TextView)findViewById(R.id.following);
         //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new SettingsFragment()).commit();
 
         SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
 
-//        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
-//                .into(profilePic);
-        // Log.v("image",userClass.getProfile());
-//        profileUserName.setText(userClass.getFirst_name()+" "+userClass.getLast_name());
+        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                .into(profilePic);
+       // Log.v("image",userClass.getProfile());
+        profileUserName.setText(userClass.getUser_name());
         toolbar = (Toolbar) findViewById(R.id.settings_toolbar);
         toolbar.setTitle("Settings");
         setSupportActionBar(toolbar);
@@ -87,12 +94,24 @@ public class Settings extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-        bluePrint = (TextView)findViewById(R.id.blueprint1);
-        bluePrint.setText(intent.getStringExtra("bluePrintCount"));
+
+        bluePrint1 = (TextView)findViewById(R.id.blueprint1);
+
+        if(intent.getStringExtra("bluePrintCount")!=null)
+        {
+            bluePrint1.setText(intent.getStringExtra("bluePrintCount"));
+        }
+        else
+        {
+            Toast.makeText(getApplicationContext(),userClass.getBlueprintCount(),Toast.LENGTH_LONG).show();
+            bluePrint1.setText(userClass.getBlueprintCount());
+        }
+
         bluePrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(Settings.this, BlueprintActivity.class);
+                Intent i = new Intent(Settings.this, ProfileActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
                 startActivity(i);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();
@@ -100,35 +119,66 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        portfolio = (TextView)findViewById(R.id.portfolio1);
-        portfolio.setText(intent.getStringExtra("portFolioCount"));
+        portfolio1 = (TextView)findViewById(R.id.portfolio1);
+
+        if(intent.getStringExtra("portFolioCount")!=null)
+        {
+            portfolio1.setText(intent.getStringExtra("portFolioCount"));
+        }
+        else
+        {
+            portfolio1.setText(userClass.getPortfolioCount());
+        }
+
         portfolio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent j = new Intent(Settings.this, PortfolioActivity.class);
+                j.putExtra("UserName",userClass.getUser_name());
                 startActivity(j);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();
             }
         });
-        followers = (TextView)findViewById(R.id.followers1);
-        followers.setText(intent.getStringExtra("followersCount"));
+
+        followers1 = (TextView)findViewById(R.id.followers1);
+
+        if(intent.getStringExtra("followersCount")!=null)
+        {
+            followers1.setText(intent.getStringExtra("followersCount"));
+        }
+        else
+        {
+            followers1.setText(userClass.getFollowerCount());
+        }
+
         followers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent k = new Intent(Settings.this, FollowersActivity.class);
+                k.putExtra("UserName",userClass.getUser_name());
                 startActivity(k);
                 //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
                 //.addToBackStack(null).commit();
 
             }
         });
-        following = (TextView)findViewById(R.id.following1);
-        following.setText(intent.getStringExtra("followingCount"));
+        following1 = (TextView)findViewById(R.id.following1);
+
+        if(intent.getStringExtra("followingCount")!=null)
+        {
+            following1.setText(intent.getStringExtra("followingCount"));
+        }
+        else
+        {
+            following1.setText(userClass.getFollowingCount());
+        }
+
         following.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent l = new Intent(Settings.this, FollowingActivity.class);
+                l.putExtra("UserName",userClass.getUser_name());
                 startActivity(l);
 
             }
@@ -278,7 +328,7 @@ public class Settings extends AppCompatActivity {
             });
 
         }
-    }
+        }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -322,7 +372,7 @@ public class Settings extends AppCompatActivity {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray jsonArray = jsonObject.getJSONArray("User Data");
                             UserData  userData = new UserData(jsonArray.getJSONObject(0));
-                            // userDataArrayList.add(userData);
+                           // userDataArrayList.add(userData);
                             Toast.makeText(getApplicationContext(), userData.getId()+userData.getName_of_the_company()+userData.getAddress(), Toast.LENGTH_LONG).show();
 
                             mPrefs = getSharedPreferences("userData", MODE_PRIVATE);

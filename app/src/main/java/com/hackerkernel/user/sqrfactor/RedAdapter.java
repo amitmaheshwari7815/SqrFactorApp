@@ -13,6 +13,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -75,6 +77,15 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
 
         final NewsFeedStatus newsFeedStatus=whatsRed.get(position);
+        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+
+        if(userClass.getUserId()==newsFeedStatus.getUserId())
+        {
+            holder.red_menu.setVisibility(View.VISIBLE);
+        }
         holder.authName.setText(newsFeedStatus.getAuthName());
         //holder.postTime.setText(newsFeedStatus.getTime());
         holder.postTitle.setText(newsFeedStatus.getPostTitle());
@@ -92,6 +103,55 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
                 context.startActivity(intent);
             }
         });
+        holder.red_menu.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu pop = new PopupMenu(context, v);
+                pop.getMenuInflater().inflate(R.menu.delete_news_post_menu, pop.getMenu());
+                pop.show();
+
+                pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+
+                        switch (item.getItemId()){
+
+                            case R.id.fullView:
+                                Intent intent=new Intent(context,FullPostActivity.class);
+                                intent.putExtra("Post_Slug_ID",newsFeedStatus.getSlug());
+                                context.startActivity(intent);
+                                break;
+                            case R.id.editPost:
+                                if(newsFeedStatus.getType().equals("design"))
+                                {
+                                    context.startActivity(new Intent(context,DesignActivity.class));
+                                }
+                                else if(newsFeedStatus.getType().equals("article"))
+                                {
+                                    context.startActivity(new Intent(context,ArticleActivity.class));
+                                }
+                                else if(newsFeedStatus.getType().equals("status"))
+                                {
+                                    context.startActivity(new Intent(context,ArticleActivity.class));
+                                }
+                                break;
+                            case R.id.deletePost:
+                                whatsRed.remove(position);
+                                notifyItemRemoved(position);
+                                notifyItemRangeRemoved(position, 1);
+                                // DeletePost(newsFeedStatus.getPostId()+"",newsFeedStatus.getSharedId()+"",newsFeedStatus.getIs_Shared());
+                                break;
+                            case R.id.selectAsFeaturedPost:
+                                return true;
+
+                        }
+                        return true;
+                    }
+                });
+            }
+        });
+
+
 
         String dtc = newsFeedStatus.getTime();
         Log.v("dtc",dtc);
@@ -240,7 +300,7 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         CheckBox buttonLike;
         CardView commentCardView;
         TextView commentUserName,commentTime,commentMessage;
-        ImageView commentProfile;
+        ImageView commentProfile,red_menu;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -257,20 +317,17 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
             buttonComment=(Button)itemView.findViewById(R.id.red_comment);
             buttonShare=(Button)itemView.findViewById(R.id.red_share);
             userComment = (EditText)itemView.findViewById(R.id.red_userComment);
-//            commentCardView=(CardView)itemView.findViewById(R.id.red_commentListCard);
-//            commentCardView.setVisibility(View.GONE);
-//            commentUserName=(TextView)itemView.findViewById(R.id.Red_commentUserName);
-//            commentTime=(TextView)itemView.findViewById(R.id.red_commentTime);
-//            commentMessage=(TextView)itemView.findViewById(R.id.red_commentMsg);
-//            commentProfile=(ImageView) itemView.findViewById(R.id.red_commenterProfile);
-//            commentLike =(Button) itemView.findViewById(R.id.red_commenterlike);
+            red_menu=(ImageView)itemView.findViewById(R.id.red_menu);
+//
             commentpost=(TextView)itemView.findViewById(R.id.red_commentPostbtn);
 //
             buttonLikeList.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    Intent intent = new Intent(context, LikeListActivity.class);
+                    intent.putExtra("id",whatsRed.get(getAdapterPosition()).getPostId());
+                    context.startActivity(intent);
 
-                    showPopup();
                 }
 
             });
@@ -389,17 +446,17 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
     }
         public void showPopup() {
         LayoutInflater li = LayoutInflater.from(context);
-        final View promptsView = li.inflate(R.layout.post_likes_popup, null);
-
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
-
-        // set prompts.xml to alertdialog builder
-        alertDialogBuilder.setView(promptsView);
-        AlertDialog alertDialog = alertDialogBuilder.create();
-        RecyclerView recyclerView = promptsView.findViewById(R.id.like_recycler);
+//        final View promptsView = li.inflate(R.layout.post_likes_popup, null);
+//
+//        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+//                context);
+//
+//        // set prompts.xml to alertdialog builder
+////        alertDialogBuilder.setView(promptsView);
+//        AlertDialog alertDialog = alertDialogBuilder.create();
+//        RecyclerView recyclerView = promptsView.findViewById(R.id.like_recycler);
         // show it
-        alertDialog.show();
+//        alertDialog.show();
     }
     }
 

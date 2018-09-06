@@ -1,5 +1,6 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -38,6 +39,10 @@ public class NotificationsActivity extends ToolbarActivity {
     private ArrayList<NotificationClass> notificationsClassArrayList = new ArrayList<>();
     private NotificationsAdapter notificationsAdapter;
     private Button send;
+    private boolean isLoading = false;
+    private Context context;
+    private  String nextPageUrl;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,13 +82,93 @@ public class NotificationsActivity extends ToolbarActivity {
         DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), linearLayoutManager.getOrientation());
         recycler.addItemDecoration(decoration);
 
+        recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                isLoading=false;
+                //Toast.makeText(context,"moving down",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+
+                int lastId=linearLayoutManager.findLastVisibleItemPosition();
+//                if(dy>0)
+//                {
+//                    Toast.makeText(context,"moving up",Toast.LENGTH_SHORT).show();
+//                }
+                if(dy>0 && lastId + 3 > linearLayoutManager.getItemCount() && !isLoading)
+                {
+                    isLoading=true;
+                    Log.v("rolling",linearLayoutManager.getChildCount()+" "+linearLayoutManager.getItemCount()+" "+linearLayoutManager.findLastVisibleItemPosition()+" "+
+                            linearLayoutManager.findLastVisibleItemPosition());
+                    LoadMoreNotification();
+
+                }
+            }
+        });
+
+
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            nextPageUrl=jsonObject.getString("nextpage");
+                            JSONArray jsonArrayData = jsonObject.getJSONArray("notifications");
+                            for (int i = 0; i < jsonArrayData.length(); i++) {
+                                Log.v("Response",response);
+                                NotificationClass notificationsClass = new NotificationClass(jsonArrayData.getJSONObject(i));
+                                notificationsClassArrayList.add(notificationsClass);
+                            }
+                            notificationsAdapter.notifyDataSetChanged();
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
+
+    }
+
+    public void LoadMoreNotification(){
+        if(nextPageUrl!= null){
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray jsonArrayData = jsonObject.getJSONArray("notifications");
@@ -122,6 +207,7 @@ public class NotificationsActivity extends ToolbarActivity {
 
         requestQueue.add(myReq);
 
+    }
     }
 
 }

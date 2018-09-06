@@ -44,7 +44,7 @@
             android:fontFamily="@font/roboto_medium"
             android:background="@drawable/gray_border"/>
     </LinearLayout>
-    <android.support.v4.widget.SwipeRefreshLayout
+    <com.baoyz.widget.PullRefreshLayout
         android:id="@+id/red_pullToRefresh"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -53,14 +53,13 @@
         android:layout_height="wrap_content"
         android:id="@+id/red_recycler">
     </android.support.v7.widget.RecyclerView>
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </com.baoyz.widget.PullRefreshLayout>
     <ProgressBar
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/progress_bar_red"
         android:layout_gravity="center_horizontal"
         android:elevation="4dp"
-        android:padding="5dp"
-        />
+        android:padding="5dp" />
 
 </LinearLayout>

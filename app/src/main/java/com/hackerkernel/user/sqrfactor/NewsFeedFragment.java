@@ -14,7 +14,14 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class NewsFeedFragment extends Fragment {
     FloatingActionButton fabView, fabStatus, fabDesign, fabArticle;
@@ -23,9 +30,12 @@ public class NewsFeedFragment extends Fragment {
     private LinearLayout layoutFabDesign;
     private LinearLayout layoutFabArticle;
 
+    private EditText writePost;
+    private ImageView profileImage;
+
     Animation rotate_forward, rotate_Backward, fab_open, fab_close;
     Button button1,button2;
-    public static int flag=0;
+    public int flag=0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,6 +48,23 @@ public class NewsFeedFragment extends Fragment {
 //        String token = sharedPreferences.getString("TOKEN","sqr");
 //        Log.v("Token2",token);
         getChildFragmentManager().beginTransaction().replace(R.id.fragment, new StatusFragment()).addToBackStack(null).commit();
+
+        SharedPreferences mPrefs = getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+        profileImage =view.findViewById(R.id.newsProfileImage);
+        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                .into(profileImage);
+        writePost = view.findViewById(R.id.news_editPost);
+        writePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
+                getActivity().startActivity(intent);
+                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            }
+        });
 
         fabView = view.findViewById(R.id.fab_view);
         fabStatus = view.findViewById(R.id.fab_status);
@@ -64,6 +91,14 @@ public class NewsFeedFragment extends Fragment {
             }
         });
         closeSubMenusFab();
+
+        fabStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), StatusPostActivity.class);
+                getActivity().startActivity(intent);
+            }
+        });
         fabDesign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

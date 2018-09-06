@@ -2,7 +2,7 @@
 <android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardElevation="5dp"
+    app:cardElevation="3dp"
     android:layout_margin="5dp"
     android:layout_height="wrap_content">
 
@@ -21,9 +21,10 @@
             <ImageView
                 android:id="@+id/imageProfile"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
+                android:layout_height="150dp"
                 android:gravity="center_horizontal"
                 android:scaleType="centerCrop"
+                android:adjustViewBounds="true"
                 android:src="@drawable/designimg2" />
 
         </LinearLayout>
@@ -62,88 +63,129 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:gravity="center_horizontal"
-            android:layout_marginTop="10dp"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="What does radical..."
-                android:fontFamily="@font/roboto_medium"
-                android:textSize="18sp"
-                android:id="@+id/articleTitle_portfolio"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Sameer Shekhar"
-                android:fontFamily="@font/roboto_medium"
-                android:textColor="@color/sqr"
-                android:textSize="15sp"
-                android:id="@+id/articleWriter_portfolio"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:layout_marginTop="40sp"
+            android:orientation="vertical">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:gravity="center">
-
+                android:paddingLeft="10sp"
+                android:paddingRight="10sp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
                 <TextView
-                    android:id="@+id/like_portfolio"
+                    android:id="@+id/articleTitle_portfolio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/roboto_medium" />
-
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/roboto_medium"
+                    android:maxLines="2"
+                    android:maxLength="30"
+                    android:text="What does radical"
+                    android:ellipsize="end"
+                    android:textSize="18sp" />
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Likes"
+                    android:textSize="18sp"
+                    android:text="..."/>
+            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/short_descrip_portfolio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="5dp"
                     android:fontFamily="@font/roboto"
+                    android:maxLines="2"
+                    android:maxLength="30"
+                    android:text="Sameer Shekhar"
+                    android:ellipsize="end"
+                    android:textColor="@color/sqr"
                     android:textSize="15sp" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:layout_marginTop="5dp"
+                        android:text="..."
+                        android:layout_gravity="center"
+                        android:fontFamily="@font/roboto"
+                        android:textColor="@color/sqr"/>
+                </LinearLayout>
             </LinearLayout>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:orientation="vertical"
-                android:gravity="center"
-                android:layout_marginLeft="10dp">
+                android:layout_gravity="center"
+                android:layout_marginBottom="30dp"
+                android:layout_marginTop="50dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/Comments_portfolio"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0"
-                    android:textSize="15sp"
-                    android:fontFamily="@font/roboto_medium" />
+                    android:gravity="center"
+                    android:orientation="vertical">
 
-                <TextView
+                    <TextView
+                        android:id="@+id/like_portfolio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="0"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto"
+                        android:text="Likes"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Comments"
-                    android:fontFamily="@font/roboto"
-                    android:textSize="15sp" />
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/Comments_portfolio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_medium"
+                        android:text="0"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto"
+                        android:text="Comments"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
 
             </LinearLayout>
-
         </LinearLayout>
 
     </LinearLayout>
