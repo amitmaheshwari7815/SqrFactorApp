@@ -56,6 +56,7 @@ import com.android.volley.toolbox.Volley;
 import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
+import com.roger.gifloadinglibrary.GifLoadingView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -108,6 +109,7 @@ public class StatusFragment extends Fragment {
     private boolean isLoading=false;
     private static String nextPageUrl;
     private String oldUrl;
+    private GifLoadingView gifLoadingView;
 
     @Override
     public void onStart() {
@@ -125,7 +127,7 @@ public class StatusFragment extends Fragment {
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fregment_status, container, false);
 
         recyclerView = rootView.findViewById(R.id.news_recycler);
-        progressBar = rootView.findViewById(R.id.progress_bar_status);
+        gifLoadingView = new GifLoadingView();
         layoutManager = new LinearLayoutManager(this.getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);

@@ -149,6 +149,13 @@ public class DesignActivity extends ToolbarActivity {
                 finish();
             }
         });
+
+        Intent intent=getIntent();
+        if(!intent.hasExtra("Fab"))
+        {
+            toolbar.setVisibility(View.GONE);
+        }
+
         editor = (Editor) findViewById(R.id.design_editor);
         findViewById(R.id.design_insert_image).setOnClickListener(new View.OnClickListener() {
             @Override

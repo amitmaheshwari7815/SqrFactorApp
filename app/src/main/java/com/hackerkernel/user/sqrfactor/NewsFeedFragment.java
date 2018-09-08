@@ -38,7 +38,7 @@ public class NewsFeedFragment extends Fragment {
     public int flag=0;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = (View)inflater.inflate(R.layout.fragment_news_feed, container, false);
@@ -95,21 +95,27 @@ public class NewsFeedFragment extends Fragment {
         fabStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), StatusPostActivity.class);
+                intent.putExtra("Fab",1);
                 getActivity().startActivity(intent);
             }
         });
         fabDesign.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), DesignActivity.class);
+                intent.putExtra("Fab",1);
                 getActivity().startActivity(intent);
             }
         });
         fabArticle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent intent = new Intent(getActivity().getApplicationContext(), ArticleActivity.class);
+                intent.putExtra("Fab",1);
                 getActivity().startActivity(intent);
             }
         });

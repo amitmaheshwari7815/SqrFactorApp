@@ -185,6 +185,12 @@ public class ArticleActivity extends ToolbarActivity {
             }
         });
 
+        Intent intent=getIntent();
+        if(!intent.hasExtra("Fab"))
+        {
+            toolbar.setVisibility(View.GONE);
+        }
+
         articleSelectBannerImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -655,6 +661,7 @@ public class ArticleActivity extends ToolbarActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+                Log.v("data",articleTitle.getText().toString()+articleTag.getText().toString()+articleShortDescription.getText().toString()+finalHtml);
                 params.put("post_type","article");
                 params.put("title",articleTitle.getText().toString());
                 params.put("tags",articleTag.getText().toString());

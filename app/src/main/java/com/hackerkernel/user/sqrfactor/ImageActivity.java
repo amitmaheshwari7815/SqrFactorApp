@@ -1,75 +1,338 @@
 package com.hackerkernel.user.sqrfactor;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
 import android.net.Uri;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
-import android.support.v7.widget.Toolbar;
 
-import com.soundcloud.android.crop.Crop;
+import com.naver.android.helloyako.imagecrop.util.BitmapLoadUtils;
 
-import java.io.File;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
-public class ImageActivity extends AppCompatActivity{
+public class ImageActivity extends Activity {
 
+        public static final String TAG = "MainActivity";
 
-    private ImageView resultView;
-    private Toolbar toolbar;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image);
-        toolbar = (Toolbar) findViewById(R.id.image_toolbar);
-        toolbar.setTitle("Profile");
-        setSupportActionBar(toolbar);
-        toolbar.setNavigationIcon(R.drawable.back_arrow);
+        private static final int MAIN_ACTIVITY_REQUEST_STORAGE = RESULT_FIRST_USER;
+        private static final int ACTION_REQUEST_GALLERY = 99;
 
-        resultView = (ImageView) findViewById(R.id.result_image);
-    }
+        Button mGalleryButton;
+        Button mEditButton;
+        ImageView mImage;
+        View mImageContainer;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.crop_menu, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
+        Uri mImageUri;
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.action_select) {
-            resultView.setImageDrawable(null);
-            Crop.pickImage(this);
+        int imageWidth, imageHeight;
+
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_image);
+
+            imageWidth = 1000;
+            imageHeight = 1000;
+
+            mGalleryButton = (Button) findViewById(R.id.button1);
+            mEditButton = (Button) findViewById(R.id.button2);
+            mImage = ((ImageView) findViewById(R.id.image));
+            mImageContainer = findViewById(R.id.image_container);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (getPackageManager().checkPermission(WRITE_EXTERNAL_STORAGE, getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+                    initClickListener();
+                }
+                requestPermissions(new String[]{WRITE_EXTERNAL_STORAGE}, MAIN_ACTIVITY_REQUEST_STORAGE);
+            } else {
+                initClickListener();
+            }
+        }
+
+        @Override
+        public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            switch (requestCode) {
+                case MAIN_ACTIVITY_REQUEST_STORAGE:
+                    if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        initClickListener();
+                    }
+                    break;
+            }
+        }
+
+        private void initClickListener() {
+
+            mGalleryButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    pickFromGallery();
+                }
+            });
+
+            mEditButton.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    if (mImageUri != null) {
+                        startCrop(mImageUri);
+                    }
+                }
+            });
+
+            mImageContainer.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View v) {
+                    findViewById(R.id.touch_me).setVisibility(View.GONE);
+                    Uri uri = pickRandomImage();
+                    if (uri != null) {
+                        Log.d(TAG, "image uri: " + uri);
+                        loadAsync(uri);
+                    }
+                }
+            });
+        }
+
+        @Override
+        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+            if (resultCode == RESULT_OK) {
+                switch (requestCode) {
+                    case ACTION_REQUEST_GALLERY:
+                        String filePath = "";
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            filePath = getRealPathFromURI_API19(this, data.getData());
+                        }else if (Build.VERSION.SDK_INT > Build.VERSION_CODES.HONEYCOMB && Build.VERSION.SDK_INT <= Build.VERSION_CODES.JELLY_BEAN) {
+                            filePath = getRealPathFromURI_API11to18(this, data.getData());
+                        }else {
+                            filePath = getRealPathFromURI_BelowAPI11(this, data.getData());
+                        }
+
+                        Uri filePathUri = Uri.parse(filePath);
+                        loadAsync(filePathUri);
+                        break;
+                }
+            }
+        }
+
+        private void pickFromGallery() {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+
+            Intent chooser = Intent.createChooser(intent, "Choose a Picture");
+            startActivityForResult(chooser, ACTION_REQUEST_GALLERY);
+        }
+
+        private void startCrop(Uri imageUri) {
+            Intent intent = new Intent(this, CropActivity.class);
+            intent.setData(imageUri);
+            startActivity(intent);
+        }
+
+        private boolean setImageURI(final Uri uri, final Bitmap bitmap) {
+
+            Log.d(TAG, "image size: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+            mImage.setImageBitmap(bitmap);
+            mImage.setBackgroundDrawable(null);
+
+            mEditButton.setEnabled(true);
+            mImageUri = uri;
+
             return true;
         }
-        return super.onOptionsItemSelected(item);
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent result) {
-        if (requestCode == Crop.REQUEST_PICK && resultCode == RESULT_OK) {
-            beginCrop(result.getData());
-        } else if (requestCode == Crop.REQUEST_CROP) {
-            handleCrop(resultCode, result);
+        private Uri pickRandomImage() {
+            Cursor c = getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Images.ImageColumns._ID, MediaStore.Images.ImageColumns.DATA},
+                    MediaStore.Images.ImageColumns.SIZE + ">?", new String[]{"90000"}, null);
+            Uri uri = null;
+
+            if (c != null) {
+                int total = c.getCount();
+                int position = (int) (Math.random() * total);
+                Log.d(TAG, "pickRandomImage. total images: " + total + ", position: " + position);
+                if (total > 0) {
+                    if (c.moveToPosition(position)) {
+                        String data = c.getString(c.getColumnIndex(MediaStore.Images.ImageColumns.DATA));
+                        uri = Uri.parse(data);
+                        Log.d(TAG, uri.toString());
+                    }
+                }
+                c.close();
+            }
+            return uri;
+        }
+
+        private void loadAsync(final Uri uri) {
+            Log.i(TAG, "loadAsync: " + uri);
+
+            Drawable toRecycle = mImage.getDrawable();
+            if (toRecycle != null && toRecycle instanceof BitmapDrawable) {
+                if (((BitmapDrawable) mImage.getDrawable()).getBitmap() != null)
+                    ((BitmapDrawable) mImage.getDrawable()).getBitmap().recycle();
+            }
+            mImage.setImageDrawable(null);
+            mImageUri = null;
+
+            DownloadAsync task = new DownloadAsync();
+            task.execute(uri);
+        }
+
+        class DownloadAsync extends AsyncTask<Uri, Void, Bitmap> implements DialogInterface.OnCancelListener {
+
+            ProgressDialog mProgress;
+            private Uri mUri;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+
+                mProgress = new ProgressDialog(ImageActivity.this);
+                mProgress.setIndeterminate(true);
+                mProgress.setCancelable(true);
+                mProgress.setMessage("Loading image...");
+                mProgress.setOnCancelListener(this);
+                mProgress.show();
+            }
+
+            @Override
+            protected Bitmap doInBackground(Uri... params) {
+                mUri = params[0];
+
+                Bitmap bitmap = null;
+
+//            while (mImageContainer.getWidth() < 1) {
+//                try {
+//                    Thread.sleep(1);
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            final int w = mImageContainer.getWidth();
+//            Log.d(TAG, "width: " + w);
+                bitmap = BitmapLoadUtils.decode(mUri.toString(), imageWidth, imageHeight, true);
+                return bitmap;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap result) {
+                super.onPostExecute(result);
+
+                if (mProgress.getWindow() != null) {
+                    mProgress.dismiss();
+                }
+
+                if (result != null) {
+                    setImageURI(mUri, result);
+                } else {
+                    Toast.makeText(getApplicationContext(), "Failed to load image " + mUri, Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                Log.i(TAG, "onProgressCancel");
+                this.cancel(true);
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                Log.i(TAG, "onCancelled");
+            }
+
+        }
+
+        private String getPathFromUri(Uri uri) {
+            if (uri == null) {
+                return null;
+            }
+            Cursor cursor = null;
+            try {
+                String[] proj = {MediaStore.Images.Media.DATA};
+                cursor = this.getContentResolver().query(uri, proj, null, null, null);
+                if (cursor == null) {
+                    return null;
+                }
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                return cursor.getString(column_index);
+            } finally {
+                if (cursor != null) {
+                    cursor.close();
+                }
+            }
+        }
+
+        @TargetApi(Build.VERSION_CODES.KITKAT)
+        public static String getRealPathFromURI_API19(ImageActivity context, Uri uri) {
+            String filePath = "";
+            String wholeID = DocumentsContract.getDocumentId(uri);
+
+            // Split at colon, use second item in the array
+            String id = wholeID.split(":")[1];
+
+            String[] column = { MediaStore.Images.Media.DATA };
+
+            // where id is equal to
+            String sel = MediaStore.Images.Media._ID + "=?";
+
+            Cursor cursor = context.getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    column, sel, new String[]{ id }, null);
+
+            int columnIndex = cursor.getColumnIndex(column[0]);
+
+            if (cursor.moveToFirst()) {
+                filePath = cursor.getString(columnIndex);
+            }
+            cursor.close();
+            return filePath;
+        }
+
+        public static String getRealPathFromURI_API11to18(ImageActivity context, Uri contentUri) {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            String result = null;
+
+            CursorLoader cursorLoader = new CursorLoader(
+                    context,
+                    contentUri, proj, null, null, null);
+            Cursor cursor = cursorLoader.loadInBackground();
+
+            if(cursor != null) {
+                int columnIndex =
+                        cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                cursor.moveToFirst();
+                result = cursor.getString(columnIndex);
+            }
+            return result;
+        }
+
+        public static String getRealPathFromURI_BelowAPI11(ImageActivity context, Uri contentUri) {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            Cursor cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            int columnIndex
+                    = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(columnIndex);
         }
     }
-
-    private void beginCrop(Uri source) {
-        Uri destination = Uri.fromFile(new File(getCacheDir(), "cropped"));
-        Crop.of(source, destination).asSquare().start(this);
-    }
-
-    private void handleCrop(int resultCode, Intent result) {
-        if (resultCode == RESULT_OK) {
-            resultView.setImageURI(Crop.getOutput(result));
-        } else if (resultCode == Crop.RESULT_ERROR) {
-            Toast.makeText(this, Crop.getError(result).getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
-
-}

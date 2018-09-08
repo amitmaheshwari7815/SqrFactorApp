@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 
@@ -47,6 +48,7 @@ public class ArchitectureCollegeAdapter extends RecyclerView.Adapter<Architectur
                 Intent intent = new Intent(context,UserProfileActivity.class);
                 intent.putExtra("User_id",architectureCollegeClass.getId());
                 intent.putExtra("ProfileUserName",architectureCollegeClass.getUser_name());
+                context.startActivity(intent);
             }
 
         });

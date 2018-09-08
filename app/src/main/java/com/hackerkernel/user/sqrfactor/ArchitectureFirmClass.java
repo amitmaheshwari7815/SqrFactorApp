@@ -27,6 +27,7 @@ public class ArchitectureFirmClass {
                 this.id = jsonObject.getInt("id");
                 this.profile = jsonObject.getString("profile");
                 this.name = jsonObject.getString("name");
+                this.user_name = jsonObject.getString("user_name");
             } catch (JSONException e) {
                 e.printStackTrace();
             }

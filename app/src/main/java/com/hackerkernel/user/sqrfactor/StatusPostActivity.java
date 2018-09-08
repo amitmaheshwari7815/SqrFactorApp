@@ -96,6 +96,13 @@ public class StatusPostActivity extends AppCompatActivity {
             }
         });
 
+
+        Intent intent=getIntent();
+        if(!intent.hasExtra("Fab"))
+        {
+            toolbar.setVisibility(View.GONE);
+        }
+
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
         dialog.setCancelable(false);

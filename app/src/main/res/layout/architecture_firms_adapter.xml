@@ -9,6 +9,7 @@
         android:layout_height="wrap_content"
         android:background="#ffffff"
         android:padding="10sp"
+        android:id="@+id/linear_firm"
         android:orientation="horizontal">
 
         <ImageView

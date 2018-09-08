@@ -58,6 +58,8 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
     private FirebaseDatabase database;
     private DatabaseReference ref;
     private ArrayList<NewsFeedStatus> whatsRed;
+    int result;
+    private String userName;
     public RedAdapter(Context context,ArrayList<NewsFeedStatus> whatsRed) {
 
         this.context = context;
@@ -81,12 +83,62 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
         final UserClass userClass = gson.fromJson(json, UserClass.class);
+        result = Integer.parseInt(newsFeedStatus.getComments());
+
+        if(newsFeedStatus.getType().equals("status"))
+        {
+            Log.v("status1",newsFeedStatus.getType());
+            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            userName=newsFeedStatus.getUser_name_of_post();
+            holder.postDescription.setText(newsFeedStatus.getShortDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
+                    .into(holder.postBannerImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authProfile);
+        }
+        else if(newsFeedStatus.getType().equals("design"))
+        {
+            Log.v("status2",newsFeedStatus.getType());
+            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            userName=newsFeedStatus.getUser_name_of_post();
+            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.postDescription.setText(newsFeedStatus.getShortDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+                    .into(holder.postBannerImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authProfile);
+        }
+        else if(newsFeedStatus.getType().equals("article"))
+        {
+            Log.v("status2",newsFeedStatus.getType());
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            userName=newsFeedStatus.getUser_name_of_post();
+            holder.postDescription.setText(newsFeedStatus.getShortDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+                    .into(holder.postBannerImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authProfile);
+        }
 
         if(userClass.getUserId()==newsFeedStatus.getUserId())
         {
             holder.red_menu.setVisibility(View.VISIBLE);
         }
         holder.authName.setText(newsFeedStatus.getAuthName());
+        holder.authName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context,UserProfileActivity.class);
+                intent.putExtra("User_id",newsFeedStatus.getUserId());
+                intent.putExtra("ProfileUserName",userName);
+                context.startActivity(intent);
+            }
+        });
+
+
         //holder.postTime.setText(newsFeedStatus.getTime());
         holder.postTitle.setText(newsFeedStatus.getPostTitle());
         holder.postDescription.setText(newsFeedStatus.getShortDescription());
@@ -98,8 +150,8 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         holder.postBannerImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, CommentsPage.class);
-                intent.putExtra("PostDataClass",whatsRed.get(position)); //second param is Serializable
+                Intent intent=new Intent(context,FullPostActivity.class);
+                intent.putExtra("Post_Slug_ID",newsFeedStatus.getSlug());
                 context.startActivity(intent);
             }
         });

@@ -283,6 +283,7 @@ public class UserProfileActivity extends AppCompatActivity {
     public void LoadData() {
 
         RequestQueue requestQueue = Volley.newRequestQueue(UserProfileActivity.this);
+       // userProfileClassArrayList.clear();
         //https://archsqr.in/api/profile/detail/Shivani2292
         StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/" + profileNameOfUser,
                 new Response.Listener<String>() {
