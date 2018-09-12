@@ -135,16 +135,7 @@ public class ProfileActivity extends ToolbarActivity {
             }
         });
 
-        btn = (ImageView)findViewById(R.id.profile_morebtn);
 
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu pop = new PopupMenu(getApplicationContext(), v);
-                pop.getMenuInflater().inflate(R.menu.home_menu, pop.getMenu());
-                pop.show();
-            }
-        });
 
         morebtn = (ImageView)findViewById(R.id.profile_about_morebtn);
         morebtn.setOnClickListener(new View.OnClickListener() {
@@ -269,6 +260,7 @@ public class ProfileActivity extends ToolbarActivity {
                         Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
+//                            nextPageUrl = jsonObject.getString("nextPage");
                             followCnt.setText(jsonObject.getString("followerCnt"));
                             followingCnt.setText(jsonObject.getString("followingCnt"));
                             bluePrintCnt.setText(jsonObject.getString("blueprintCnt"));

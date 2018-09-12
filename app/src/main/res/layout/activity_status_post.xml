@@ -5,6 +5,7 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
 <include layout="@layout/activity_toolbar"/>
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -43,7 +44,7 @@
         <LinearLayout
             android:id="@+id/linear_status"
             android:layout_width="match_parent"
-            android:layout_height="142dp"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_below="@+id/profile_details"
@@ -61,14 +62,14 @@
         <FrameLayout
             android:id="@+id/rl"
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="wrap_content"
             android:layout_above="@+id/post_buttons"
             android:layout_marginTop="1dp">
 
             <ImageView
                 android:id="@+id/news_upload_image"
                 android:layout_width="match_parent"
-                android:layout_height="300dp"
+                android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:scaleType="fitXY" />
 
@@ -121,4 +122,5 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
 </LinearLayout>

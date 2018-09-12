@@ -4,7 +4,7 @@
     android:id="@+id/comment_drag_to_close"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sqr"
+    android:background="@color/white"
     android:paddingEnd="12dp"
     android:paddingStart="12dp"
     drag:draggableContainer="@+id/comment_card"
@@ -41,7 +41,6 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_alignParentStart="true"
-            android:background="@drawable/gray_line"
             android:orientation="horizontal"
             android:padding="10sp">
 

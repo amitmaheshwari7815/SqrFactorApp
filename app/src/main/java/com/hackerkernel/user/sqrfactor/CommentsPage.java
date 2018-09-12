@@ -239,10 +239,9 @@ public class CommentsPage extends ToolbarActivity {
 
         Glide.with(this)
                 .load("https://archsqr.in/" + newsFeedStatus.getPostImage())
-                .centerCrop()
                 .into(postImage);
 
-        Glide.with(this).load("https://archsqr.in/" + newsFeedStatus.getAuthImageUrl()).centerCrop().into(authImageUrl);
+        Glide.with(this).load("https://archsqr.in/" + newsFeedStatus.getAuthImageUrl()).into(authImageUrl);
 
         userName = findViewById(R.id.commentPage_post_userName);
         userName.setText(newsFeedStatus.getUser_name_of_post());

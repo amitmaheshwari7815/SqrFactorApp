@@ -146,13 +146,9 @@
         <activity android:name=".Design2Activity" />
         <activity android:name=".FullPostActivity" />
         <activity android:name=".LikeListActivity" />
-        <activity android:name=".StatusPostActivity">
-        </activity>
-<activity android:name=".ImageActivity"/>
-
-        <activity android:name=".CropActivity"/>
-
-
+        <activity android:name=".StatusPostActivity"></activity>
+        <activity android:name=".ImageActivity" />
+        <activity android:name=".CropActivity" />
     </application>
 
 </manifest>

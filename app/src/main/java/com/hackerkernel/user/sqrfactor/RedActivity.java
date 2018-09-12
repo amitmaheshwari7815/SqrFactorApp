@@ -11,10 +11,14 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -26,6 +30,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.baoyz.widget.PullRefreshLayout;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.SkeletonScreen;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,16 +43,20 @@ import java.util.Map;
 
 public class RedActivity extends AppCompatActivity {
     Toolbar toolbar;
-    private ProgressBar progressBar;
     private ArrayList<NewsFeedStatus> newsstatus = new ArrayList<>();
     private RecyclerView recyclerView;
+    private RecyclerView recyclerView1;
     private boolean isScrolling=false;
     int currentItems, totalItems, scrolledItems;
     private RedAdapter redAdapter;
-    private LinearLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager,layoutManager1;
     private Button btn1,btn2,btn3;
     private String nextUrl;
     PullRefreshLayout layout;
+    LinearLayout linearLayout;
+    private EditText searchEditText;
+    private SearchResultAdapter searchResultAdapter;
+    private ArrayList<SearchResultClass> searchResultClasses=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +67,6 @@ public class RedActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         recyclerView = findViewById(R.id.red_recycler);
-        progressBar = findViewById(R.id.progress_bar_red);
-        progressBar.setVisibility(View.GONE);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -69,14 +77,71 @@ public class RedActivity extends AppCompatActivity {
         redAdapter = new RedAdapter(this, newsstatus);
         recyclerView.setAdapter(redAdapter);
 
+        final SkeletonScreen skeletonScreen = Skeleton.bind(recyclerView)
+                .adapter(redAdapter)
+                .shimmer(true)
+                .angle(20)
+                .frozen(false)
+                .duration(1200)
+                .count(10)
+                .load(R.layout.item_skeleton_news)
+                .show(); //default count is 10
+        recyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                skeletonScreen.hide();
+            }
+        }, 3000);
+
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 finish();
+                overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
             }
         });
+        linearLayout = findViewById(R.id.linear_red);
+        searchEditText=(EditText)findViewById(R.id.user_search);
+        recyclerView1=(RecyclerView)findViewById(R.id.search_recycler1);
+        LinearLayoutManager layoutManager1 = new LinearLayoutManager(this);
+
+
+
+        layoutManager1.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView1.setLayoutManager(layoutManager1);
+        searchResultAdapter = new SearchResultAdapter( this,searchResultClasses);
+        recyclerView1.setAdapter(searchResultAdapter);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                //Toast.makeText(getApplicationContext(),s+"",Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Toast.makeText(getApplicationContext(),s+"",Toast.LENGTH_SHORT).show();
+                recyclerView1.setVisibility(View.VISIBLE);
+                linearLayout.setVisibility(View.INVISIBLE);
+                FetchSearchedDataFromServer(s+"");
+
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if(s.length()==0)
+                {
+                    recyclerView1.setVisibility(View.GONE);
+                    linearLayout.setVisibility(View.VISIBLE);
+
+                }
+            }
+        });
+
 
         btn1 = findViewById(R.id.red_newsFeedbtn);
         btn2 = findViewById(R.id.red_whatsRedbtn);
@@ -98,13 +163,15 @@ public class RedActivity extends AppCompatActivity {
 
             }
         });
-        progressBar.setVisibility(View.VISIBLE);
+
 
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                Intent intent = new Intent(RedActivity.this,HomeScreen.class);
                startActivity(intent);
+                overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
+
             }
         });
         btn2.setOnClickListener(new View.OnClickListener() {
@@ -119,6 +186,7 @@ public class RedActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(RedActivity.this,TopContributors.class);
                 startActivity(intent);
+                overridePendingTransition(R.anim.enter, R.anim.exit);
             }
         });
 
@@ -171,7 +239,7 @@ public class RedActivity extends AppCompatActivity {
                                 newsstatus.add(newsFeedStatus1);
                             }
                             redAdapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
+
 
 
                         } catch (JSONException e) {
@@ -205,7 +273,6 @@ public class RedActivity extends AppCompatActivity {
 
 
     public void fetchDataFromServer() {
-        progressBar.setVisibility(View.VISIBLE);
         if (nextUrl != null) {
             RequestQueue requestQueue = Volley.newRequestQueue(this);
             StringRequest myReq = new StringRequest(Request.Method.POST, nextUrl,
@@ -225,7 +292,7 @@ public class RedActivity extends AppCompatActivity {
                                 }
 
                                 redAdapter.notifyDataSetChanged();
-                                progressBar.setVisibility(View.GONE);
+
 
 
                             } catch (JSONException e) {
@@ -255,5 +322,64 @@ public class RedActivity extends AppCompatActivity {
 
             requestQueue.add(myReq);
         }
+    }
+    private void FetchSearchedDataFromServer(final String search) {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        // "https://archsqr.in/api/profile/detail/
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/parse/search",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        searchResultClasses.clear();
+                        //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONObject users=jsonObject.getJSONObject("users");
+                            JSONArray dataArray=users.getJSONArray("data");
+                            for(int i=0;i<dataArray.length();i++)
+                            {
+                                SearchResultClass searchResultClass=new SearchResultClass(dataArray.getJSONObject(i));
+                                searchResultClasses.add(searchResultClass);
+                            }
+                            searchResultAdapter.notifyDataSetChanged();
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("search",search);
+                return params;
+            }
+
+        };
+        requestQueue.add(myReq);
+
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
     }
 }

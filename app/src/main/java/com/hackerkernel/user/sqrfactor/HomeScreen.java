@@ -4,7 +4,10 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +21,7 @@ import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTabHost;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
@@ -36,8 +40,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -50,6 +57,7 @@ import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 
 import org.json.JSONArray;
@@ -79,7 +87,11 @@ public class HomeScreen extends ToolbarActivity {
     private EditText searchEditText;
     private ArrayList<SearchResultClass> searchResultClasses=new ArrayList<>();
     private RecyclerView recyclerView;
+    BadgeView badge7;
+    private FragmentTabHost mTabHost;
+    int count1;
 
+    @SuppressLint("ResourceType")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -95,15 +107,23 @@ public class HomeScreen extends ToolbarActivity {
 //        actionBar.setLogo(R.drawable.profilepic);
         actionBar.setDisplayShowTitleEnabled(false);
 
-        actionBar.setHomeAsUpIndicator(R.drawable.profilepic_35x35);
+        final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+
+
+        actionBar.setHomeAsUpIndicator(R.drawable.user_menu);
         actionBar.setDisplayHomeAsUpEnabled(true);
 //        profileImage = findViewById(R.id.toolbar_profile);
         drawerLayout = findViewById(R.id.drawer_layout);
 
+        linearLayout=(LinearLayout)findViewById(R.id.mainfrag);
         searchEditText=(EditText)findViewById(R.id.user_search);
         recyclerView=(RecyclerView)findViewById(R.id.search_recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        linearLayout=(LinearLayout)findViewById(R.id.mainfrag);
+
+
 
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
@@ -144,14 +164,7 @@ public class HomeScreen extends ToolbarActivity {
         TokenClass tokenClass = new TokenClass(token);
         Log.v("Token1", token);
 
-        //getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new TrophyFragment()).commit();
         getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NewsFeedFragment()).commit();
-
-        final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
-
 
 
         tabLayout = (TabLayout)findViewById(R.id.tabs);
@@ -161,20 +174,10 @@ public class HomeScreen extends ToolbarActivity {
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.newsfeeed3color));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.chatmsg));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.notify4));
-//        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.ic_search_black_24dp));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.toggle));
-//        tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.profilepic));
-        Log.w("HomeScreen","NewsFeed3Color: "+mBadgeCountList);
-        /*tabLayout.getTabAt(0).setIcon(R.drawable.trophy_filled);
-        tabLayout.getTabAt(1).setIcon(R.drawable.msg);
-        tabLayout.getTabAt(2).setIcon(R.drawable.notification);
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);*/
-        mBadgeCountList.add(6);
-        mBadgeCountList.add(count++);
-        mBadgeCountList.add(166);
+        getnotificationCount();
 
-        initBadgeViews();
-//        setUpTabBadge();
+
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -194,6 +197,10 @@ public class HomeScreen extends ToolbarActivity {
 
                     case 2:
                         tab.setIcon(R.drawable.notifycolor1);
+                        View v = tab.getCustomView().findViewById(R.id.badgeCotainer);
+                        if(v != null) {
+                            v.setVisibility(View.GONE);
+                        }
                         getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NotificationsFragment()).commit();
                         break;
 
@@ -331,28 +338,6 @@ public class HomeScreen extends ToolbarActivity {
         });
     }
 
-    private void initBadgeViews() {
-        if (mBadgeViews == null) {
-            mBadgeViews = new ArrayList<BadgeView>();
-            for (int i = 0; i < 4; i++) {
-                BadgeView tmp = new BadgeView(this);
-                tmp.setBadgeMargin(0, 6, 10, 0);
-                tmp.setTextSize(10);
-                mBadgeViews.add(tmp);
-            }
-        }
-    }
-//    private void setUpTabBadge() {
-//
-//        for (int i = 0; i < 4; i++) {
-//            TabLayout.Tab tab = tabLayout.getTabAt(i);
-//
-//
-//        }
-//
-//
-////        tabLayout.getTabAt(tabLayout.getSelectedTabPosition()).getCustomView().setSelected(true);
-//    }
 
 
 
@@ -442,5 +427,105 @@ public class HomeScreen extends ToolbarActivity {
         };
         requestQueue.add(myReq);
 
+    }
+
+    public void getnotificationCount(){
+        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/notificationcount",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            count1 =jsonObject.getInt("count");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        TabLayout.Tab tab1 = tabLayout.getTabAt(2);
+                        tab1.setCustomView(R.layout.badged);
+                        if(tab1 != null && tab1.getCustomView() != null) {
+                            TextView b = (TextView) tab1.getCustomView().findViewById(R.id.badge);
+                            if(b != null) {
+                                b.setText(count1+"");
+                            }
+                            View v = tab1.getCustomView().findViewById(R.id.badgeCotainer);
+                            if(v != null) {
+                                v.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
+    }
+
+    public void getUnReadMsgCount(){
+        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/notificationcount",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("ReponseFeed", response);
+                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        TabLayout.Tab tab = tabLayout.getTabAt(1);
+                        tab.setCustomView(R.layout.badged);
+                        if(tab != null && tab.getCustomView() != null) {
+                            TextView b = (TextView) tab.getCustomView().findViewById(R.id.badge);
+                            if(b != null) {
+                                b.setText("3");
+                            }
+                            View v = tab.getCustomView().findViewById(R.id.badgeCotainer);
+                            if(v != null) {
+                                v.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
     }
 }

@@ -53,18 +53,18 @@ public class NewsFeedFragment extends Fragment {
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
         UserClass userClass = gson.fromJson(json, UserClass.class);
-        profileImage =view.findViewById(R.id.newsProfileImage);
-        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
-                .into(profileImage);
-        writePost = view.findViewById(R.id.news_editPost);
-        writePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
-                getActivity().startActivity(intent);
-                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-            }
-        });
+//        profileImage =view.findViewById(R.id.newsProfileImage);
+//        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+//                .into(profileImage);
+//        writePost = view.findViewById(R.id.news_editPost);
+//        writePost.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
+//                getActivity().startActivity(intent);
+//                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+//            }
+//        });
 
         fabView = view.findViewById(R.id.fab_view);
         fabStatus = view.findViewById(R.id.fab_status);
@@ -134,6 +134,7 @@ public class NewsFeedFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity().getApplicationContext(), RedActivity.class);
                 getActivity().startActivity(intent);
+                getActivity().overridePendingTransition(R.anim.enter, R.anim.exit);
             }
         });
         return view;

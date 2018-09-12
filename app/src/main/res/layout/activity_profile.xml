@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <include layout="@layout/activity_toolbar"/>
+    <include layout="@layout/activity_toolbar" />
 <ScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -76,7 +76,7 @@
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="5"
+                android:text=""
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"
                 android:gravity="center"/>
@@ -87,7 +87,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="2"
+                android:text=""
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"/>
 
@@ -96,7 +96,7 @@
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="3"
+                android:text=""
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"
                 android:gravity="center"/>
@@ -106,7 +106,7 @@
                 android:layout_width="0sp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="21"
+                android:text=""
                 android:fontFamily="@font/roboto_medium"
                 android:textColor="@color/sqr"
                 android:gravity="center"/>
@@ -121,6 +121,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:background="@color/white"
             android:weightSum="4">
 
             <TextView
@@ -170,7 +171,12 @@
                 android:src="@drawable/ellipsis"/>
 
         </LinearLayout>
-
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@color/white"
+    android:gravity="center">
         <Button
             android:id="@+id/profile_editprofile"
             android:layout_width="wrap_content"
@@ -187,18 +193,19 @@
             android:paddingStart="10sp"
             android:paddingRight="10sp"
             android:paddingEnd="10sp"/>
-
-        <ImageView
-                android:id="@+id/profile_morebtn"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_more"
-                android:layout_gravity="center"
-                android:elevation="@dimen/cardview_default_elevation"/>
+</LinearLayout>
+        <!--<ImageView-->
+                <!--android:id="@+id/profile_morebtn"-->
+                <!--android:layout_width="24dp"-->
+                <!--android:layout_height="24dp"-->
+                <!--android:src="@drawable/ic_more"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:elevation="@dimen/cardview_default_elevation"/>-->
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="65sp"
+                android:layout_marginTop="5sp"
                 android:orientation="vertical"
                 android:background="@color/white">
                 <LinearLayout

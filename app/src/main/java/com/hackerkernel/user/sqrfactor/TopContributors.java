@@ -37,6 +37,7 @@ public class TopContributors extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 finish();
+                overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
             }
         });
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -83,5 +84,10 @@ public class TopContributors extends AppCompatActivity {
         public CharSequence getPageTitle(int position) {
             return mFragmentTitleList.get(position);
         }
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
     }
 }

@@ -55,8 +55,10 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
+import com.ethanhua.skeleton.Skeleton;
+import com.ethanhua.skeleton.SkeletonScreen;
 import com.google.gson.Gson;
-import com.roger.gifloadinglibrary.GifLoadingView;
+
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -87,7 +89,7 @@ public class StatusFragment extends Fragment {
     Button like, comment, share, like2;
     String token;
     SharedPreferences sharedPreferences;
-    ImageView user_profile_photo;
+    ImageView profile_photo;
     String message, encodedImage;
     private boolean isScrolling;
     int currentItems,totalItems,scrolledItems;
@@ -109,7 +111,7 @@ public class StatusFragment extends Fragment {
     private boolean isLoading=false;
     private static String nextPageUrl;
     private String oldUrl;
-    private GifLoadingView gifLoadingView;
+
 
     @Override
     public void onStart() {
@@ -127,12 +129,28 @@ public class StatusFragment extends Fragment {
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fregment_status, container, false);
 
         recyclerView = rootView.findViewById(R.id.news_recycler);
-        gifLoadingView = new GifLoadingView();
         layoutManager = new LinearLayoutManager(this.getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
         recyclerView.setAdapter(newsFeedAdapter);
+
+        final SkeletonScreen skeletonScreen = Skeleton.bind(recyclerView)
+                .adapter(newsFeedAdapter)
+                .shimmer(true)
+                .angle(20)
+                .frozen(false)
+                .duration(1200)
+                .count(10)
+                .load(R.layout.item_skeleton_news)
+                .show(); //default count is 10
+        recyclerView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                skeletonScreen.hide();
+            }
+        }, 2000);
+
         Log.v("status","hello");
         SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
@@ -146,6 +164,19 @@ public class StatusFragment extends Fragment {
         camera = rootView.findViewById(R.id.news_camera);
         displayImage = rootView.findViewById(R.id.news_upload_image);
         btnSubmit = rootView.findViewById(R.id.news_postButton);
+        newsProfileImage =rootView.findViewById(R.id.newsProfileImage);
+        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                .into(newsProfileImage);
+
+        writePost = rootView.findViewById(R.id.news_editPost);
+        writePost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
+                getActivity().startActivity(intent);
+                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+            }
+        });
 
         layout = rootView.findViewById(R.id.news_pullToRefresh);
         layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {

@@ -5,7 +5,7 @@
     android:id="@+id/drag_to_close"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/sqr"
+    android:background="@color/white"
     android:paddingEnd="12dp"
     android:paddingStart="12dp"
     drag:draggableContainer="@+id/card"

@@ -107,7 +107,7 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
 
         Glide.with(context).
                 load("https://archsqr.in/"+comments_limitedArrayList.get(position).getCommentUserPrfile())
-                .centerCrop().into(holder.commenterProfile);
+                .into(holder.commenterProfile);
 
         holder.commenterUserName.setText(comments_limitedArrayList.get(position).getCommentUserName());
         holder.commenterUserName.setOnClickListener(new View.OnClickListener() {

@@ -36,12 +36,10 @@
                     android:id="@+id/toolbar1"
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
-                    android:background="@color/sqr"
+                    android:background="@drawable/gradient"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-                    <include layout="@layout/fragment_search_page">
-
-                    </include>
+                    <include layout="@layout/fragment_search_page"></include>
 
 
                 </android.support.v7.widget.Toolbar>

@@ -39,6 +39,8 @@ public class FollowingActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private RecyclerView recyclerView1;
     private ArrayList<FollowingClass> followerClassArrayList = new ArrayList<>();
+    boolean isLoading = false;
+    private static String nextPageUrl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,37 @@ public class FollowingActivity extends AppCompatActivity {
 
         LoadData();
 
+
+        recyclerView1.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                isLoading=false;
+                //Toast.makeText(context,"moving down",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+
+                int lastId=layoutManager.findLastVisibleItemPosition();
+//                if(dy>0)
+//                {
+//                    Toast.makeText(context,"moving up",Toast.LENGTH_SHORT).show();
+//                }
+                if(dy>0 && lastId + 2 > layoutManager.getItemCount() && !isLoading)
+                {
+                    isLoading=true;
+                    Log.v("rolling",layoutManager.getChildCount()+" "+layoutManager.getItemCount()+" "+layoutManager.findLastVisibleItemPosition()+" "+
+                            layoutManager.findLastVisibleItemPosition());
+                    loadmoreData();
+
+                }
+            }
+        });
+
+
     }
 
     public void LoadData()
@@ -93,6 +126,7 @@ public class FollowingActivity extends AppCompatActivity {
 //                        Toast.makeText(FollowingActivity.this, response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
+                            nextPageUrl = jsonObject.getString("nextPage");
                             JSONArray follow=jsonObject.getJSONArray("follows");
                             for(int i=0;i<follow.length();i++)
                             {
@@ -130,6 +164,53 @@ public class FollowingActivity extends AppCompatActivity {
 
     }
 
+    public void loadmoreData(){
+        if(nextPageUrl!=null) {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            StringRequest myReq = new StringRequest(Request.Method.GET, nextPageUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("MorenewsFeedFromServer", response);
+//                        Toast.makeText(FollowingActivity.this, response, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                nextPageUrl = jsonObject.getString("nextPage");
+                                JSONArray follow = jsonObject.getJSONArray("follows");
+                                for (int i = 0; i < follow.length(); i++) {
+                                    FollowingClass followingClass = new FollowingClass(follow.getJSONObject(i));
+                                    followerClassArrayList.add(followingClass);
+                                }
+
+                                followingAdapter.notifyDataSetChanged();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    },
+                    new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                    return params;
+                }
+
+            };
+
+            requestQueue.add(myReq);
+        }
+    }
 
 
     @Override
