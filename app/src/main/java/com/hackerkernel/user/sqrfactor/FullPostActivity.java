@@ -20,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,14 +62,16 @@ public class FullPostActivity extends AppCompatActivity {
     private Editor editor;
     private WebView webView;
     private CheckBox like;
+    private LinearLayout web;
     private EditText written_comment_body;
     private FirebaseDatabase database;
     private DatabaseReference ref;
     private String slug;
-    private int flag = 0;
+    private int flag = 0,sharedId;
+    UserClass userClass;
     private CardView news_comment_card;
-    private TextView commentTime,commentDescription,commentUserName,htmlContent;
-    private int flag1 = 0;
+    private TextView commentTime,commentDescription,commentUserName,fullPostDescription;
+    private int flag1 = 0,isAlreadyLiked=0;
     private Toolbar toolbar;
 
     @Override
@@ -82,6 +85,11 @@ public class FullPostActivity extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        userClass = gson.fromJson(json, UserClass.class);
+
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -90,6 +98,8 @@ public class FullPostActivity extends AppCompatActivity {
             }
         });
 
+        fullPostDescription=(TextView)findViewById(R.id.fullPostDescription);
+        web=(LinearLayout)findViewById(R.id.webView);
         postTitle = findViewById(R.id.full_postTitle);
         postDescription = findViewById(R.id.full_postDescription);
         postTag = findViewById(R.id.full_postTag);
@@ -114,7 +124,7 @@ public class FullPostActivity extends AppCompatActivity {
         news_comment_card=findViewById(R.id.news_comment_card_fullPost);
         // htmlContent=(TextView)findViewById(R.id.htmlContent);
         //editor=findViewById(R.id.editor1);
-        webView=(WebView)findViewById(R.id.webview);
+        //webView=(WebView)findViewById(R.id.webview);
         //editor=(Editor)findViewById(R.id.full_post_editor);
 
         // htmlTextView = (HtmlTextView)findViewById(R.id.html_text);
@@ -126,16 +136,17 @@ public class FullPostActivity extends AppCompatActivity {
         if(getIntent().getStringExtra("Post_Slug_ID")!=null)
             slug = getIntent().getStringExtra("Post_Slug_ID");
         Toast.makeText(this,slug,Toast.LENGTH_LONG).show();
+        LoadFullPostDataFromServer();
 
-
-        //FetchFullDeatailsFromServer(slug);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        LoadFullPostDataFromServer();
+
+
     }
+
 
     public void LoadFullPostDataFromServer()
     {
@@ -150,7 +161,8 @@ public class FullPostActivity extends AppCompatActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONObject jsonObjectFullPost = jsonObject.getJSONObject("post");
-                            FullPost fullPost = new FullPost(jsonObjectFullPost);
+                            final FullPost fullPost = new FullPost(jsonObjectFullPost);
+                            sharedId=fullPost.getShared_id();
                             if(!fullPost.getTitle().equals("null"))
                             {
                                 postTitle.setText(fullPost.getTitle());
@@ -174,7 +186,8 @@ public class FullPostActivity extends AppCompatActivity {
                             Glide.with(getApplicationContext()).load("https://archsqr.in/" + fullPost.getAuthImageUrl())
                                     .into(red_authImage);
 
-                            String finalHtml="   <html>\n" +
+
+                            final String finalHtml="   <html>\n" +
                                     "  <head>\n" +
                                     "    <title>Combined</title>\n" +
                                     "  </head>\n" +
@@ -184,34 +197,47 @@ public class FullPostActivity extends AppCompatActivity {
                                     "    </div>\n" +
                                     "  </body>\n" +
                                     "</html>";
-                            WebSettings settings = webView.getSettings();
-                            settings.setMinimumFontSize(30);
-                            settings.setJavaScriptEnabled(true);
-                            settings.setTextSize(WebSettings.TextSize.LARGEST);
-                            settings.setLoadWithOverviewMode(true);
-                            settings.setUseWideViewPort(true);
-                            webView.setWebChromeClient(new WebChromeClient());
-                            webView.getSettings().setJavaScriptEnabled(true);
 
-                            Matcher matcher = Pattern.compile("src=\"([^\"]+)\"").matcher(fullPost.getDescription());
+                            Log.v("des0",fullPost.getDescription());
 
-                            if (matcher.find())
-                            {
-                                String src = matcher.group(1);
-                                String[] stringId=src.split("/");
-                                String id=stringId[stringId.length-1];
-                                String src1="src="+'"'+"https://www.youtube.com/embed/"+id+'"';
-                                String html="<iframe width=\"100%\" height=\"400\" "+src1+"frameborder=\"0\" allowfullscreen=\"\"></iframe>";
-                                webView.loadDataWithBaseURL("https://www.youtube.com/embed/"+id+'"',finalHtml, "text/html", "UTF-8", "");
-                            }
-                            else
-                            {
-                                webView.loadDataWithBaseURL("", finalHtml,"text/html", "UTF-8", "");
+                            Thread thread = new Thread() {
+                                @Override
+                                public void run() {
+                                    try { Thread.sleep(300); }
+                                    catch (InterruptedException e) {}
 
-                            }
+                                    runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            PostContentHandler postContentHandler=new PostContentHandler(getApplicationContext(),finalHtml,web,fullPostDescription);
+                                            postContentHandler.setContentToView();
+                                        }
+                                    });
+                                }
+                            };
+                            thread.start();
+
 
                             likeList.setText(fullPost.getLike()+" Likes");
                             red_comment.setText(fullPost.getComments_count()+" comments");
+                            for(int i=0;i<fullPost.getAllLikesId().size();i++)
+                            {
+                                if(userClass.getUserId()==fullPost.AllLikesId.get(i))
+                                {
+                                    likeList.setTextColor(getResources().getColor(R.color.red));
+                                    isAlreadyLiked=1;
+                                    like.setChecked(true);
+                                }
+                            }
+
+                            for(int i=0;i<fullPost.getAllCommentId().size();i++)
+                            {
+                                if(userClass.getUserId()==fullPost.AllCommentId.get(i))
+                                {
+                                    red_comment.setTextColor(getResources().getColor(R.color.sqr));
+                                }
+                            }
+
 
                             LikeAndCommentFunction(fullPost);
 //                            red_postTime.setText(fullPost.getTitle());
@@ -242,12 +268,9 @@ public class FullPostActivity extends AppCompatActivity {
             }
 
         };
-
-
-
-
         requestQueue.add(myReq);
     }
+
 
     private void LikeAndCommentFunction(final FullPost fullPost) {
         SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
@@ -259,99 +282,128 @@ public class FullPostActivity extends AppCompatActivity {
                 .into(userImage);
 
 
-        like.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-                                            @Override
-                                            public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-                                                if (isChecked) {
-                                                    int i = Integer.parseInt(fullPost.getLike()) + 1;
-                                                    likeList.setText(i + " Likes");
-
-                                                    database = FirebaseDatabase.getInstance();
-                                                    ref = database.getReference();
-
-                                                    Log.v("daattataatat", userClass.getUserId() + " " + userClass.getProfile() + " ");
-
-                                                    //PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),newsFeedStatuses.get(getAdapterPosition()).getFullDescription(),"Like",userClass.getUser_name()+" liked your post");
-//                        ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
-
-
-                                                } else {
-                                                    likeList.setText(fullPost.getLike() + " Likes");
-                                                }
-                                                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-                                                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
-                                                        new Response.Listener<String>() {
-                                                            @Override
-                                                            public void onResponse(String s) {
-                                                                Log.v("ResponseLike", s);
-                                                                Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
-                                                            }
-                                                        },
-                                                        new Response.ErrorListener() {
-                                                            @Override
-                                                            public void onErrorResponse(VolleyError volleyError) {
-                                                            }
-                                                        }) {
-                                                    @Override
-                                                    public Map<String, String> getHeaders() throws AuthFailureError {
-                                                        Map<String, String> params = new HashMap<String, String>();
-                                                        params.put("Accept", "application/json");
-                                                        params.put("Authorization", "Bearer " + TokenClass.Token);
-
-                                                        return params;
-                                                    }
-
-                                                    @Override
-                                                    protected Map<String, String> getParams() throws AuthFailureError {
-                                                        Map<String, String> params = new HashMap<>();
-                                                        params.put("likeable_id", fullPost.getShared_id() + "");
-                                                        params.put("likeable_type", "users_post_share");
-//
-                                                        return params;
-                                                    }
-                                                };
-
-                                                //Adding request to the queue
-                                                requestQueue.add(stringRequest);
-
-
-                                            }
-                                        }
-        );
 
         likeList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(getApplicationContext(),LikeListActivity.class);
+                intent.putExtra("id",fullPost.getId());
+                startActivity(intent);
             }
         });
         red_comment.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
-                if(flag1 == 0) {
-                    red_comment.setTextColor(getApplicationContext().getColor(R.color.sqr));
-                    flag1 = 1;
-
-
-                }
-                else {
-                    red_comment.setTextColor(getApplicationContext().getColor(R.color.gray));
-                    flag1 = 0;
-                }
-
-                //context.startActivity(new Intent(context,CommentsPage.class));
                 Intent intent = new Intent(getApplicationContext(), CommentsPage.class);
-                intent.putExtra("Activity","From_Full_PostActivity");
-                intent.putExtra("PostDataClass",fullPost); //second param is Serializable
+                intent.putExtra("PostSharedId",fullPost.getShared_id()); //second param is Serializable
                 startActivity(intent);
 
 
             }
         });
 
+        like.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
+                if (isChecked) {
+//                    Toast.makeText(context, "checked", Toast.LENGTH_SHORT).show();
+                    int likeCount=Integer.parseInt(fullPost.getLike());
+//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
+                    likeList.setTextColor(getColor(R.color.sqr));
+                    if(isAlreadyLiked==1)
+                        likeList.setText(likeCount+" Like");
+                    else
+                    {
+                        likeCount=likeCount+1;
+                        likeList.setText(likeCount+" Like");
+                    }
+
+                    database= FirebaseDatabase.getInstance();
+                    ref = database.getReference();
+                    SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json = mPrefs.getString("MyObject", "");
+                    UserClass userClass = gson.fromJson(json, UserClass.class);
+
+                    Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
+                    if(fullPost.getType().equals("status"))
+                    {
+//                        PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),Integer.parseInt(fullPost.getUser_post_id()),fullPost.getDescription(),fullPost.getDescription(),"Like",userClass.getUser_name()+" liked your post");
+//                        ref.child("Notifications").child(fullPost.getUser_id()+"").setValue(pushNotificationClass);
+
+                    }
+                    else
+                    {
+//                        PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),Integer.parseInt(fullPost.getUser_post_id()),fullPost.getTitle(),fullPost.getDescription(),"Like",userClass.getUser_name()+" liked your post");
+//                        ref.child("Notifications").child(fullPost.getUser_id()+"").setValue(pushNotificationClass);
+
+                    }
+                }
+                else {
+
+                    if(isAlreadyLiked==1)
+                    {
+                        Log.v("isAlreadyLiked1",isAlreadyLiked+" ");
+                        likeList.setTextColor(getColor(R.color.gray));
+                        int likeCount1=Integer.parseInt(fullPost.getLike());
+                        //Toast.makeText(context, "Unchecked1", Toast.LENGTH_SHORT).show();
+                        likeCount1=likeCount1-1;
+                        likeList.setText(likeCount1+" Like");
+                    }
+                    else
+                    {
+                        Log.v("isAlreadyLiked2",isAlreadyLiked+" ");
+                        //Toast.makeText(context, "Unchecked2", Toast.LENGTH_SHORT).show();
+                        likeList.setTextColor(getColor(R.color.gray));
+                        likeList.setText(fullPost.getLike()+" Like");
+                    }
+
+
+                }
+                RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
+
+
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("likeable_id",fullPost.getShared_id()+"");
+                        params.put("likeable_type","users_post_share");
+//
+                        return params;
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            }
+
+
+        });
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -413,7 +465,7 @@ public class FullPostActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 PopupMenu pop = new PopupMenu(getApplicationContext(), v);
-                pop.getMenuInflater().inflate(R.menu.delete_news_post_menu, pop.getMenu());
+                pop.getMenuInflater().inflate(R.menu.delete_fullpost_menu, pop.getMenu());
                 pop.show();
 
                 pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -422,9 +474,7 @@ public class FullPostActivity extends AppCompatActivity {
 
                         switch (item.getItemId()){
 
-                            case R.id.fullView:
-                                LoadFullPostDataFromServer();
-                                break;
+
                             case R.id.editPost:
                                 if(fullPost.getType().equals("design"))
                                 {
@@ -442,11 +492,8 @@ public class FullPostActivity extends AppCompatActivity {
 //                                Intent i = new Intent(context, FullPostActivity.class);
 //                                context.startActivity(i);
                             case R.id.deletePost:
-                                DeletePost();
+                                DeletePost(fullPost.getUser_post_id()+"",fullPost.getShared_id()+"",fullPost.getIs_shared());
                                 break;
-                            case R.id.selectAsFeaturedPost:
-                                return true;
-
                         }
                         return true;
                     }
@@ -456,9 +503,44 @@ public class FullPostActivity extends AppCompatActivity {
 
     }
 
-    private void DeletePost()
-    {
+    public void DeletePost(final String  user_post_id, final String  id, final String is_shared) {
 
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/delete_post",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.v("ResponseLike",s);
+                        Toast.makeText(getApplicationContext(), s , Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                    }
+                }){
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> params = new HashMap<>();
+                params.put("users_post_id",user_post_id+"");
+                params.put("id",id+"");
+                params.put("is_shared",is_shared+"");
+//
+                return params;
+            }
+        };
+
+        //Adding request to the queue
+        requestQueue.add(stringRequest);
     }
 
     public void FetchFullDeatailsFromServer(String slug) {

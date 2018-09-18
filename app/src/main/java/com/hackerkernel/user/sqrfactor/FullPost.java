@@ -13,6 +13,8 @@ public class FullPost implements Serializable {
     String slug,type,title,image,banner_image,short_description,description,credits_earned,week_views,credits_redeemed,credits_paid,paid_at,created_at
             ,updated_at,deleted_at,user_post_id,is_shared,like;
     public ArrayList<comments_limited>  commentsLimitedArrayList=new ArrayList<>();
+    public ArrayList<Integer> AllLikesId=new ArrayList<>();
+    public ArrayList<Integer> AllCommentId=new ArrayList<>();
     public transient JSONObject jsonObject;
     public int getId() {
         return id;
@@ -238,6 +240,22 @@ public class FullPost implements Serializable {
         this.jsonObject = jsonObject;
     }
 
+    public ArrayList<Integer> getAllLikesId() {
+        return AllLikesId;
+    }
+
+    public void setAllLikesId(ArrayList<Integer> allLikesId) {
+        AllLikesId = allLikesId;
+    }
+
+    public ArrayList<Integer> getAllCommentId() {
+        return AllCommentId;
+    }
+
+    public void setAllCommentId(ArrayList<Integer> allCommentId) {
+        AllCommentId = allCommentId;
+    }
+
     public FullPost(JSONObject jsonObject)
     {
         this.jsonObject = jsonObject;
@@ -245,6 +263,7 @@ public class FullPost implements Serializable {
         try {
             this.id = jsonObject.getInt("id");
             this.slug = jsonObject.getString("slug");
+            this.user_id=jsonObject.getInt("user_id");
             this.type = jsonObject.getString("type");
             this.title = jsonObject.getString("title");
             this.image= jsonObject.getString("image");
@@ -262,7 +281,7 @@ public class FullPost implements Serializable {
             this.deleted_at = jsonObject.getString("deleted_at");
             this.user_post_id = jsonObject.getString("user_post_id");
             this.is_shared = jsonObject.getString("is_shared");
-            this.comments_count = jsonObject.getInt("comments_count");
+            // this.comments_count = jsonObject.getInt("comments_count");
 
             JSONObject user = jsonObject.getJSONObject("user");
 
@@ -272,22 +291,24 @@ public class FullPost implements Serializable {
             this.user_name_of_post = user.getString("user_name");
 
             JSONArray likes = jsonObject.getJSONArray("likes");
+
+            for(int i=0;i<likes.length();i++)
+            {
+                this.AllLikesId.add(i,likes.getJSONObject(i).getInt("user_id"));
+            }
+
             this.like = likes.length() + "";
 
             JSONArray commentsLimited = jsonObject.getJSONArray("comments_limited");
 
+            this.comments_count = commentsLimited.length();
+
             for (int i = 0; i < commentsLimited.length(); i++) {
                 try {
+
                     JSONObject jsonObject1 = commentsLimited.getJSONObject(i);
-                    this.commentId = jsonObject1.getInt("id");
-                    comments_limited limited=new comments_limited(jsonObject1);
-
-//                    comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
-//                            jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
-//                            jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
-//                            jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
-                    this.commentsLimitedArrayList.add(limited);
-
+                    JSONObject user1 =jsonObject1.getJSONObject("user");
+                    this.AllCommentId.add(i,user1.getInt("id"));
 
                 } catch (JSONException e) {
                     e.printStackTrace();

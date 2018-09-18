@@ -18,12 +18,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -78,7 +80,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+        int isAlreadyLiked=0;
 
         if(profileClass.getType().equals("status"))
         {
@@ -142,6 +145,29 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
                 .into( holder.usercommentProfile);
 
+        for(int i=0;i<profileClass.getAllLikesId().size();i++)
+        {
+            if(userClass.getUserId()==profileClass.AllLikesId.get(i))
+            {
+                holder.buttonLikeList.setTextColor(context.getResources().getColor(R.color.sqr));
+                isAlreadyLiked=1;
+                holder.buttonLike.setChecked(true);
+                ///flag=1;
+            }
+        }
+        final int isAlreadyLikedFinal=isAlreadyLiked;
+
+        for(int i=0;i<profileClass.AllCommentId.size();i++)
+        {
+            if(userClass.getUserId()==profileClass.AllCommentId.get(i))
+            {
+//                holder.c.setTextColor(context.getResources().getColor(R.color.sqr));
+//                holder.commentCheckBox.setChecked(true);
+                //holder.co.setChecked(true);
+            }
+        }
+
+
         String dtc = profileClass.getTime();
         // Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
@@ -169,6 +195,16 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         holder.postTime.setText(days+ " Days ago");
         //holder.fullDescription.setText(profileClass.);
         holder.buttonLikeList.setText(profileClass.getLike()+" Like");
+        holder.buttonLikeList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context,LikeListActivity.class);
+                intent.putExtra("id",profileClass.getPostId());
+                context.startActivity(intent);
+            }
+
+        });
 
         holder.buttonComment.setText(profileClass.getComments()+" Comment");
         holder.buttonComment.setOnClickListener(new View.OnClickListener() {
@@ -178,14 +214,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
                 if(flag1 == 0) {
                     holder.buttonComment.setTextColor(context.getColor(R.color.sqr));
                     flag1 = 1;
-                    database= FirebaseDatabase.getInstance();
-                    ref = database.getReference();
-                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
-                    Gson gson = new Gson();
-                    String json = mPrefs.getString("MyObject", "");
-                    UserClass userClass = gson.fromJson(json, UserClass.class);
-                    PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),profileClass.getPostId(),profileClass.getPostTitle(),profileClass.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
-                    ref.child("Notifications").child(profileClass.getUserId()+"").setValue(notificationClass);
 
                 }
                 else {
@@ -193,10 +221,9 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
                     flag1 = 0;
                 }
 
-                //context.startActivity(new Intent(context,CommentsPage.class));
+
                 Intent intent = new Intent(context, CommentsPage.class);
-                intent.putExtra("Activity","From_Profile_Adapter");
-                intent.putExtra("PostDataClass",profileClass); //second param is Serializable
+                intent.putExtra("PostSharedId",profileClass.getSharedId()); //second param is Serializable
                 context.startActivity(intent);
 
             }
@@ -206,6 +233,90 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
             holder.user_post_menu.setVisibility(View.VISIBLE);
         }
 
+        holder.buttonLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+                    Toast.makeText(context, "checked", Toast.LENGTH_SHORT).show();
+                    int likeCount=Integer.parseInt(profileClass.getLike());
+//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
+                    holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                    if(isAlreadyLikedFinal==1)
+                        holder.buttonLikeList.setText(likeCount+" Like");
+                    else
+                    {
+                        likeCount=likeCount+1;
+                        holder.buttonLikeList.setText(likeCount+" Like");
+                    }
+
+                    database= FirebaseDatabase.getInstance();
+                    ref = database.getReference();
+
+                    Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
+                }
+                else {
+
+                    if(isAlreadyLikedFinal==1)
+                    {
+                        Log.v("isAlreadyLiked1",isAlreadyLikedFinal+" ");
+                        holder.buttonLikeList.setTextColor(context.getColor(R.color.gray));
+                        int likeCount1=Integer.parseInt(profileClass.getLike());
+                        Toast.makeText(context, "Unchecked1", Toast.LENGTH_SHORT).show();
+                        likeCount1=likeCount1-1;
+                        holder.buttonLikeList.setText(likeCount1+" Like");
+                    }
+                    else
+                    {
+                        Log.v("isAlreadyLiked2",isAlreadyLikedFinal+" ");
+                        Toast.makeText(context, "Unchecked2", Toast.LENGTH_SHORT).show();
+                        holder.buttonLikeList.setTextColor(context.getColor(R.color.gray));
+                        holder.buttonLikeList.setText(profileClass.getLike()+" Like");
+                    }
+
+
+                }
+                RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
+
+
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("likeable_id",profileClass.getSharedId()+"");
+                        params.put("likeable_type","users_post_share");
+//
+                        return params;
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            }
+
+
+        });
         holder.user_post_menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -254,13 +365,59 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
             }
         });
 
-//        holder.share.setText(profileClass.getShare());
-//        holder.commentUserName.setText(profileClass.getCommentUserName());
-//        holder.commentTime.setText(profileClass.getCommentTime());
-//        holder.commentDescription.setText(profileClass.getCommentDescription());
-//        holder.commentLike.setText(profileClass.getCommentLike());
-//        holder.postId.setText(profileClass.getPostId());
-        //      holder.userId.setText(profileClass.getUserId());
+
+        holder.commentpost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
+
+                                holder.user_comment_time.setText("0 minutes ago");
+                                holder.user_post_likeListcomment.setText("0 Likes");
+                                holder.user_comment.setText(holder.user_write_comment.getText().toString());
+                                Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
+                                        .into(holder.user_comment_image);
+                                holder.user_comment_name.setText(userClass.getUser_name());
+                                holder.commentCardView.setVisibility(View.VISIBLE);
+                                holder.user_write_comment.setText("");
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("commentable_id",profileClass.getSharedId()+"");
+//
+                        params.put("comment_text",holder.user_write_comment.getText().toString());
+
+                        //returning parameters
+                        return params;
+                    }
+                };
+
+                //Adding request to the queue
+                requestQueue.add(stringRequest);
+            }
+        });
     }
 
     @Override
@@ -278,10 +435,6 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
 
         public MyViewHolder(View itemView) {
             super(itemView);
-            SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
-            Gson gson = new Gson();
-            String json = mPrefs.getString("MyObject", "");
-            final UserClass userClass = gson.fromJson(json, UserClass.class);
             postTitle=(TextView)itemView.findViewById(R.id.user_post_title);
             postBannerImage = (ImageView) itemView.findViewById(R.id.user_post_image);
             userName = (TextView) itemView.findViewById(R.id.userprofle_name);
@@ -307,59 +460,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
             user_comment=(TextView)itemView.findViewById(R.id.user_comment);
             userComment = (EditText) itemView.findViewById(R.id.user_write_comment);
             commentpost = (TextView) itemView.findViewById(R.id.user_post_button);
-            commentpost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                    RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String s) {
-                                    Log.v("ResponseLike",s);
-
-                                    user_comment_time.setText("0 minutes ago");
-                                    user_post_likeListcomment.setText("0 Likes");
-                                    user_comment.setText(user_write_comment.getText().toString());
-                                    Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
-                                            .into(user_comment_image);
-                                    user_comment_name.setText(userClass.getUser_name());
-                                    commentCardView.setVisibility(View.VISIBLE);
-                                    user_write_comment.setText("");
-
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-
-                                }
-                            }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer " +TokenClass.Token);
-
-                            return params;
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String,String> params = new HashMap<>();
-
-                            params.put("commentable_id",profileClassArrayList.get(getAdapterPosition()).getSharedId()+"");
-//
-                            params.put("comment_text",user_write_comment.getText().toString());
-
-                            //returning parameters
-                            return params;
-                        }
-                    };
-
-                    //Adding request to the queue
-                    requestQueue.add(stringRequest);
-                }
-            });
         }
     }
 }

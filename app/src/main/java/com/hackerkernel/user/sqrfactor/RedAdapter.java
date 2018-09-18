@@ -58,8 +58,7 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
     private FirebaseDatabase database;
     private DatabaseReference ref;
     private ArrayList<NewsFeedStatus> whatsRed;
-    int result;
-    private String userName;
+    private int result=0;
     public RedAdapter(Context context,ArrayList<NewsFeedStatus> whatsRed) {
 
         this.context = context;
@@ -75,9 +74,11 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
 
+        int isAlreadyLiked=0;
         final NewsFeedStatus newsFeedStatus=whatsRed.get(position);
         SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
@@ -85,37 +86,26 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         final UserClass userClass = gson.fromJson(json, UserClass.class);
         result = Integer.parseInt(newsFeedStatus.getComments());
 
+        if(userClass.getUserId()==newsFeedStatus.getUserId())
+        {
+            holder.red_menu.setVisibility(View.VISIBLE);
+        }
         if(newsFeedStatus.getType().equals("status"))
         {
-            Log.v("status1",newsFeedStatus.getType());
-            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+
             holder.authName.setText(newsFeedStatus.getUser_name_of_post());
-            userName=newsFeedStatus.getUser_name_of_post();
-            holder.postDescription.setText(newsFeedStatus.getShortDescription());
+            holder.postDescription.setText(newsFeedStatus.getFullDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
                     .into(holder.postBannerImage);
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
                     .into(holder.authProfile);
         }
+
         else if(newsFeedStatus.getType().equals("design"))
         {
-            Log.v("status2",newsFeedStatus.getType());
-            //holder.postTitle.setText(newsFeedStatus.getPostTitle());
-            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
-            userName=newsFeedStatus.getUser_name_of_post();
-            holder.postTitle.setText(newsFeedStatus.getPostTitle());
-            holder.postDescription.setText(newsFeedStatus.getShortDescription());
-            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
-                    .into(holder.postBannerImage);
-            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
-                    .into(holder.authProfile);
-        }
-        else if(newsFeedStatus.getType().equals("article"))
-        {
-            Log.v("status2",newsFeedStatus.getType());
+
             holder.authName.setText(newsFeedStatus.getUser_name_of_post());
             holder.postTitle.setText(newsFeedStatus.getPostTitle());
-            userName=newsFeedStatus.getUser_name_of_post();
             holder.postDescription.setText(newsFeedStatus.getShortDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
                     .into(holder.postBannerImage);
@@ -123,30 +113,29 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
                     .into(holder.authProfile);
         }
 
-        if(userClass.getUserId()==newsFeedStatus.getUserId())
+        else if(newsFeedStatus.getType().equals("article"))
         {
-            holder.red_menu.setVisibility(View.VISIBLE);
+
+            holder.authName.setText(newsFeedStatus.getUser_name_of_post());
+            holder.postTitle.setText(newsFeedStatus.getPostTitle());
+            holder.postDescription.setText(newsFeedStatus.getShortDescription());
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
+                    .into(holder.postBannerImage);
+            Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
+                    .into(holder.authProfile);
+
         }
-        holder.authName.setText(newsFeedStatus.getAuthName());
         holder.authName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context,UserProfileActivity.class);
                 intent.putExtra("User_id",newsFeedStatus.getUserId());
-                intent.putExtra("ProfileUserName",userName);
+                intent.putExtra("ProfileUserName",newsFeedStatus.getUser_name_of_post());
                 context.startActivity(intent);
+
             }
         });
 
-
-        //holder.postTime.setText(newsFeedStatus.getTime());
-        holder.postTitle.setText(newsFeedStatus.getPostTitle());
-        holder.postDescription.setText(newsFeedStatus.getShortDescription());
-       // holder.shortDescription.setText(newsFeedStatus.getShortDescription());
-        Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getAuthImageUrl())
-                .into(holder.authProfile);
-        Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
-                .into(holder.postBannerImage);
         holder.postBannerImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -232,104 +221,236 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         holder.postTime.setText(days+ " Days ago");
         holder.postViews.setText(newsFeedStatus.getWeek_views());
         holder.buttonLikeList.setText(newsFeedStatus.getLike()+" Like");
-//        holder.buttonComment.setText(newsFeedStatus.getComments()+" Comment");
         holder.buttonComment.setText(newsFeedStatus.getComments()+" Comment");
+
+        holder.buttonLikeList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(context, LikeListActivity.class);
+                intent.putExtra("id",newsFeedStatus.getPostId());
+                context.startActivity(intent);
+
+            }
+
+        });
+
         holder.buttonComment.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
-                Toast.makeText(context,"comment button",Toast.LENGTH_LONG).show();
-                if(flag1 == 0) {
-                    holder.buttonComment.setTextColor(context.getColor(R.color.sqr));
-                    flag1 = 1;
+
+                Intent intent = new Intent(context, CommentsPage.class);
+                intent.putExtra("PostSharedId",newsFeedStatus.getSharedId()); //second param is Serializable
+                context.startActivity(intent);
+            }
+        });
+        for(int i=0;i<newsFeedStatus.AllLikesId.size();i++)
+        {
+            if(userClass.getUserId()==newsFeedStatus.AllLikesId.get(i))
+            {
+                holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                isAlreadyLiked=1;
+                holder.buttonLike.setChecked(true);
+            }
+        }
+        final int isAlreadyLikedFinal=isAlreadyLiked;
+
+        for(int i=0;i<newsFeedStatus.AllCommentId.size();i++)
+        {
+            if(userClass.getUserId()==newsFeedStatus.AllCommentId.get(i))
+            {
+                holder.buttonComment.setTextColor(context.getColor(R.color.sqr));
+            }
+        }
+
+        holder.commentpost.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                Date date = new Date();
+                                SharedPreferences sharedPreferences = context.getSharedPreferences("User",MODE_PRIVATE);
+                                Gson gson = new Gson();
+                                String json = sharedPreferences.getString("MyObject","");
+                                UserClass userClass = gson.fromJson(json,UserClass.class);
+                                PostCommentClass postCommentClass=new PostCommentClass(userClass.getProfile(),userClass.getUser_name()
+                                        ,formatter.format(date),holder.userComment.getText().toString(),"4");
+                                holder.commentCardView.setVisibility(View.VISIBLE);
+                                holder.commentUserName.setText(postCommentClass.getProfileName());
+                                holder.commentMessage.setText(postCommentClass.getCommentMsg());
+                                holder.commentTime.setText(postCommentClass.getCommentTime());
+                                Glide.with(context).load("https://archsqr.in/"+postCommentClass.getProfileImage())
+                                        .into(holder.commentProfile);
+                                database= FirebaseDatabase.getInstance();
+                                ref = database.getReference();
+//                                    PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatus.getPostId(),newsFeedStatus.getPostTitle(),newsFeedStatus.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
+//                                    ref.child("Notifications").child(newsFeedStatus.getUserId()+"").setValue(notificationClass);
+                                holder.userComment.setText("");
+                                result=result+1;
+                                holder.buttonComment.setText(result+" Comment");
+
+
+//                        //Showing toast message of the response
+//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                                //Showing toast
+//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("commentable_id",newsFeedStatus.getSharedId()+"");
+//
+                        params.put("comment_text",holder.userComment.getText().toString());
+
+                        //returning parameters
+                        return params;
+                    }
+                };
+
+                //Adding request to the queue
+                requestQueue.add(stringRequest);
+            }
+        });
+        holder.buttonLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @RequiresApi(api = Build.VERSION_CODES.M)
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+                    holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                    int likeCount=Integer.parseInt(newsFeedStatus.getLike());
+//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
+                    holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                    if(isAlreadyLikedFinal==1)
+                        holder.buttonLikeList.setText(likeCount+" Like");
+                    else
+                    {
+                        likeCount=likeCount+1;
+                        holder.buttonLikeList.setText(likeCount+" Like");
+                    }
+
+                    //  buttonLikeList.setText(result+" Like");
                     database= FirebaseDatabase.getInstance();
                     ref = database.getReference();
                     SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
                     Gson gson = new Gson();
                     String json = mPrefs.getString("MyObject", "");
                     UserClass userClass = gson.fromJson(json, UserClass.class);
-                    PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatus.getPostId(),newsFeedStatus.getPostTitle(),newsFeedStatus.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
-                    ref.child("Notifications").child(newsFeedStatus.getUserId()+"").setValue(notificationClass);
 
+                    Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
+                    if(newsFeedStatus.getType().equals("status"))
+                    {
+                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
+                        post post1=new post(newsFeedStatus.getFullDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
+                        PushNotificationClass pushNotificationClass=new PushNotificationClass("commented on your&nbsparticle",new Date().getTime(),fromUser,post1,"like_post");
+
+                        String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+
+
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("unread").child(key).setValue(unred);
+                    }
+                    else
+                    {
+                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
+                        post post1=new post(newsFeedStatus.getShortDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
+                        PushNotificationClass pushNotificationClass=new PushNotificationClass("commented on your&nbsparticle",new Date().getTime(),fromUser,post1,"like_post");
+
+                        String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+
+
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("unread").child(key).setValue(unred);
+
+                    }
+
+                    flag = 1;
                 }
                 else {
-                    holder.buttonComment.setTextColor(context.getColor(R.color.gray));
-                    flag1 = 0;
+                    if(isAlreadyLikedFinal==1)
+                    {
+                        Log.v("isAlreadyLiked1",isAlreadyLikedFinal+" ");
+                        holder.buttonLikeList.setTextColor(context.getColor(R.color.gray));
+                        int likeCount1=Integer.parseInt(newsFeedStatus.getLike());
+                        Toast.makeText(context, "Unchecked1", Toast.LENGTH_SHORT).show();
+                        likeCount1=likeCount1-1;
+                        holder.buttonLikeList.setText(likeCount1+" Like");
+                    }
+                    else
+                    {
+                        Log.v("isAlreadyLiked2",isAlreadyLikedFinal+" ");
+                        Toast.makeText(context, "Unchecked2", Toast.LENGTH_SHORT).show();
+                        holder.buttonLikeList.setTextColor(context.getColor(R.color.gray));
+                        holder.buttonLikeList.setText(newsFeedStatus.getLike()+" Like");
+                    }
                 }
+                RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
 
-                //context.startActivity(new Intent(context,CommentsPage.class));
-                Intent intent = new Intent(context, CommentsPage.class);
-                intent.putExtra("PostDataClass",whatsRed.get(position)); //second param is Serializable
-                context.startActivity(intent);
-
-
-
-
-            }
-        });
-        holder.commentpost.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String s) {
-                                    Log.v("ResponseLike",s);
-                                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                    Date date = new Date();
-                                    SharedPreferences sharedPreferences = context.getSharedPreferences("User",MODE_PRIVATE);
-                                    Gson gson = new Gson();
-                                    String json = sharedPreferences.getString("MyObject","");
-                                    UserClass userClass = gson.fromJson(json,UserClass.class);
-                                    PostCommentClass postCommentClass=new PostCommentClass(userClass.getProfile(),userClass.getUser_name()
-                                            ,formatter.format(date),holder.userComment.getText().toString(),"4");
-                                    holder.commentCardView.setVisibility(View.VISIBLE);
-                                    holder.commentUserName.setText(postCommentClass.getProfileName());
-                                    holder.commentMessage.setText(postCommentClass.getCommentMsg());
-                                    holder.commentTime.setText(postCommentClass.getCommentTime());
-                                    Glide.with(context).load("https://archsqr.in/"+postCommentClass.getProfileImage())
-                                            .into(holder.commentProfile);
-                                    holder.userComment.setText("");
-
-
-//                        //Showing toast message of the response
-//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-
-                                    //Showing toast
-//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                                }
-                            }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer " +TokenClass.Token);
-
-                            return params;
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String,String> params = new HashMap<>();
-
-                            params.put("commentable_id",newsFeedStatus.getSharedId()+"");
 //
-                            params.put("comment_text",holder.userComment.getText().toString());
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
 
-                            //returning parameters
-                            return params;
-                        }
-                    };
+                                //Showing toast
+//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
 
-                    //Adding request to the queue
-                    requestQueue.add(stringRequest);
-                }
-            });
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("likeable_id",newsFeedStatus.getSharedId()+"");
+                        params.put("likeable_type","users_post_share");
+                        return params;
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            }
+
+
+        });
 
 //        holder.share.setText(newsFeedStatus.getShare());
 //        holder.commentUserName.setText(newsFeedStatus.getCommentUserName());
@@ -362,112 +483,19 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
             postTitle =(TextView)itemView.findViewById(R.id.red_postTitle);
             postDescription=(TextView)itemView.findViewById(R.id.red_postDescription);
             authProfile=(ImageView)itemView.findViewById(R.id.red_authImage);
-//            userProfile = (ImageView) itemView.findViewById(R.id.red_userProfile);
             postViews = (TextView) itemView.findViewById(R.id.red_postViews);
             buttonLike=(CheckBox) itemView.findViewById(R.id.red_like);
+            commentCardView=(CardView)itemView.findViewById(R.id.red_commentListCard);
             buttonLikeList=(TextView) itemView.findViewById(R.id.red_likeList);
             buttonComment=(Button)itemView.findViewById(R.id.red_comment);
             buttonShare=(Button)itemView.findViewById(R.id.red_share);
             userComment = (EditText)itemView.findViewById(R.id.red_userComment);
             red_menu=(ImageView)itemView.findViewById(R.id.red_menu);
-//
+            commentProfile=(ImageView)itemView.findViewById(R.id.red_commenterProfile);
+            commentMessage=itemView.findViewById(R.id.red_commentMsg);
+            commentTime=itemView.findViewById(R.id.red_commentTime);
+            commentUserName=itemView.findViewById(R.id.red_commentUserName);
             commentpost=(TextView)itemView.findViewById(R.id.red_commentPostbtn);
-//
-            buttonLikeList.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(context, LikeListActivity.class);
-                    intent.putExtra("id",whatsRed.get(getAdapterPosition()).getPostId());
-                    context.startActivity(intent);
-
-                }
-
-            });
-
-            buttonLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-
-                    if (flag == 0) {
-                        buttonLikeList.setTextColor(context.getColor(R.color.sqr));
-                        int result = Integer.parseInt(whatsRed.get(getAdapterPosition()).getLike())+1;
-                        buttonLikeList.setText(result+" Like");
-                        database= FirebaseDatabase.getInstance();
-                        ref = database.getReference();
-                        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
-                        Gson gson = new Gson();
-                        String json = mPrefs.getString("MyObject", "");
-                        UserClass userClass = gson.fromJson(json, UserClass.class);
-
-                        Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
-                        if(whatsRed.get(getAdapterPosition()).getType().equals("status"))
-                        {
-                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),whatsRed.get(getAdapterPosition()).getPostId(),whatsRed.get(getAdapterPosition()).getFullDescription(),whatsRed.get(getAdapterPosition()).getFullDescription(),"Like",userClass.getUser_name());
-                            ref.child("Notifications").child(whatsRed.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
-
-                        }
-                        else
-                        {
-                            PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),whatsRed.get(getAdapterPosition()).getPostId(),whatsRed.get(getAdapterPosition()).getPostTitle(),whatsRed.get(getAdapterPosition()).getShortDescription(),"Like",userClass.getUser_name());
-                            ref.child("Notifications").child(whatsRed.get(getAdapterPosition()).getUserId()+"").setValue(pushNotificationClass);
-
-                        }
-
-                        flag = 1;
-                    }
-                    else {
-                        buttonLikeList.setTextColor(context.getColor(R.color.gray));
-                        int result = Integer.parseInt(whatsRed.get(getAdapterPosition()).getLike());
-                        buttonLikeList.setText(result+" Like");
-                        flag = 0;
-                    }
-                    RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String s) {
-                                    Log.v("ResponseLike",s);
-
-//                        //Showing toast message of the response
-//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-
-                                    //Showing toast
-//                        Toast.makeText(getActivity(), volleyError.getMessage().toString(), Toast.LENGTH_LONG).show();
-                                }
-                            }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer " +TokenClass.Token);
-
-                            return params;
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String,String> params = new HashMap<>();
-                            //Adding parameters
-//                 params.put("image_value",image);
-                            params.put("likeable_id",whatsRed.get(getAdapterPosition()).getSharedId()+"");
-                            params.put("likeable_type","users_post_share");
-//                            params.put("user_id",newsFeedStatuses.get(getAdapterPosition()).getUserId()+"");
-                            //returning parameters
-                            return params;
-                        }
-                    };
-
-                    //Adding request to the queue
-                    requestQueue.add(stringRequest);
-                }
-
-
-            });
             buttonShare.setOnClickListener(new View.OnClickListener() {
 
                 int flag = 0;
@@ -496,7 +524,7 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         sharingIntent.putExtra(Intent.EXTRA_TEXT, "professional network for the architecture community visit https://sqrfactor.com");
         context.startActivity(Intent.createChooser(sharingIntent, "Share via"));
     }
-        public void showPopup() {
+    public void showPopup() {
         LayoutInflater li = LayoutInflater.from(context);
 //        final View promptsView = li.inflate(R.layout.post_likes_popup, null);
 //
@@ -510,6 +538,5 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         // show it
 //        alertDialog.show();
     }
-    }
-
+}
 

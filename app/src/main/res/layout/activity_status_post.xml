@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android">
+
 <include layout="@layout/activity_toolbar"/>
 
     <RelativeLayout
@@ -31,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="20sp"
                 android:layout_marginRight="20sp"
-                android:layout_marginTop="10sp"
+                android:layout_marginTop="20sp"
                 android:layout_weight="3"
                 android:background="@android:color/transparent"
                 android:gravity="top"
@@ -59,32 +60,38 @@
                 android:hint="Share what you are thinking here..." />
         </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/rl"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/post_buttons"
-            android:layout_marginTop="1dp">
+            android:layout_below="@id/linear_status"
+            android:layout_alignParentStart="true">
 
-            <ImageView
-                android:id="@+id/news_upload_image"
+            <FrameLayout
+                android:id="@+id/rl"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:scaleType="fitXY" />
+                android:layout_above="@+id/post_buttons"
+                android:layout_marginTop="1dp">
 
-            <ImageButton
-                android:id="@+id/ib_remove"
-                android:layout_width="34dp"
-                android:layout_height="34dp"
-                android:layout_gravity="right"
-                android:background="@android:color/transparent"
-                android:clickable="true"
-                android:src="@drawable/ic_close" />
+                <ImageView
+                    android:id="@+id/news_upload_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:scaleType="fitXY" />
+
+                <ImageButton
+                    android:id="@+id/ib_remove"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
+                    android:layout_gravity="right"
+                    android:background="@android:color/transparent"
+                    android:clickable="true"
+                    android:src="@drawable/ic_close" />
 
 
-        </FrameLayout>
-
+            </FrameLayout>
+        </LinearLayout>
         <RelativeLayout
             android:id="@+id/post_buttons"
             android:layout_width="match_parent"
@@ -122,5 +129,4 @@
         </RelativeLayout>
 
     </RelativeLayout>
-
 </LinearLayout>

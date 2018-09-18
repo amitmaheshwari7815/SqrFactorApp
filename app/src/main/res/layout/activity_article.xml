@@ -199,8 +199,7 @@
             android:layout_height="60sp"
             android:background="@drawable/gray_border"
             android:layout_margin="10sp"
-            android:padding="10sp"
-           >
+            android:padding="10sp">
 
             <TextView
                 android:id="@+id/articleSelectBaneerImage"

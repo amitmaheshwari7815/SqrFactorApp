@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 
+import android.annotation.SuppressLint;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +12,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.TabHost;
 
+import static com.hackerkernel.user.sqrfactor.R.color.white;
+import static com.hackerkernel.user.sqrfactor.R.color.yellow;
+
 
 public class PostActivity extends TabActivity {
     private Toolbar toolbar;
@@ -20,6 +24,7 @@ public class PostActivity extends TabActivity {
 
 
 
+    @SuppressLint("ResourceAsColor")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,6 +32,8 @@ public class PostActivity extends TabActivity {
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
+        toolbar.setTitle("Post");
+        toolbar.setTitleTextColor(R.color.White);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override

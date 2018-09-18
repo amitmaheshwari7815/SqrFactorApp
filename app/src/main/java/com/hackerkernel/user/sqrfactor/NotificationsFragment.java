@@ -1,7 +1,9 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,6 +22,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.baoyz.widget.PullRefreshLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +37,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class NotificationsFragment extends Fragment {
 
@@ -39,7 +50,10 @@ public class NotificationsFragment extends Fragment {
     private Button send;
     private boolean isLoading = false;
     private Context context;
+    public static DatabaseReference ref;
+    public static FirebaseDatabase database;
     private String nextPageUrl;
+    private PullRefreshLayout layout;
 
 
     @Override
@@ -49,10 +63,22 @@ public class NotificationsFragment extends Fragment {
 
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_notifications, container, false);
 
-        String s = getContext().getResources().getString(R.string.noti_string);
-        //text.setText(Html.fromHtml(s));
-        //text2.setText(Html.fromHtml(s));
+        layout = view.findViewById(R.id.notification_pullRefresh);
+        layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //LoadNewsFeedDataFromServer();
+                //layout.setRefreshing(false);
+                layout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.setRefreshing(false);
+                        NotificationData();
+                    }
+                },1000);
 
+            }
+        });
         recycler = (RecyclerView) view.findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -61,6 +87,8 @@ public class NotificationsFragment extends Fragment {
 
         notificationsAdapter = new NotificationsAdapter(notificationsClassArrayList, getActivity());
         recycler.setAdapter(notificationsAdapter);
+
+        NotificationData();
 
         DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), linearLayoutManager.getOrientation());
         recycler.addItemDecoration(decoration);
@@ -92,8 +120,12 @@ public class NotificationsFragment extends Fragment {
                 }
             }
         });
+        return view;
 
+    }
 
+    public void NotificationData(){
+        notificationsClassArrayList.clear();
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
                 new Response.Listener<String>() {
@@ -140,15 +172,30 @@ public class NotificationsFragment extends Fragment {
 
         requestQueue.add(myReq);
 
+        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+        database= FirebaseDatabase.getInstance();
+        ref = database.getReference();
+        ref.child("notification").child(userClass.getUserId()+"").child("all").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-        return view;
+                HomeScreen.getnotificationCount();
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
-
     public void LoadMoreNotification() {
         if (nextPageUrl != null) {
             RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
+            StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -156,6 +203,7 @@ public class NotificationsFragment extends Fragment {
 //                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
+                                nextPageUrl = jsonObject.getString("nextpage");
                                 JSONArray jsonArrayData = jsonObject.getJSONArray("notifications");
                                 for (int i = 0; i < jsonArrayData.length(); i++) {
                                     Log.v("Response", response);

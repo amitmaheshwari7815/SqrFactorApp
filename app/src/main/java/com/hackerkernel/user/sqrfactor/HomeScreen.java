@@ -2,6 +2,7 @@ package com.hackerkernel.user.sqrfactor;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -55,6 +56,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -65,7 +68,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,7 +78,7 @@ import java.util.Map;
 public class HomeScreen extends ToolbarActivity {
 
     Toolbar toolbar;
-    TabLayout tabLayout;
+    static TabLayout tabLayout;
     ImageView imageView;
     DrawerLayout drawerLayout;
     NavigationView navigationView;
@@ -85,15 +90,17 @@ public class HomeScreen extends ToolbarActivity {
     private SearchResultAdapter searchResultAdapter;
     LinearLayout linearLayout;
     private EditText searchEditText;
+    public static DatabaseReference ref;
+    public static FirebaseDatabase database;
     private ArrayList<SearchResultClass> searchResultClasses=new ArrayList<>();
     private RecyclerView recyclerView;
     BadgeView badge7;
     private FragmentTabHost mTabHost;
-    int count1;
+    static int count1;
+    private UserClass userClass;
+    static Context context;
 
-    @SuppressLint("ResourceType")
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,8 +117,9 @@ public class HomeScreen extends ToolbarActivity {
         final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
-
+        userClass = gson.fromJson(json, UserClass.class);
+        database= FirebaseDatabase.getInstance();
+        ref = database.getReference();
 
         actionBar.setHomeAsUpIndicator(R.drawable.user_menu);
         actionBar.setDisplayHomeAsUpEnabled(true);
@@ -175,7 +183,9 @@ public class HomeScreen extends ToolbarActivity {
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.chatmsg));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.notify4));
         tabLayout.addTab(tabLayout.newTab().setIcon(R.drawable.toggle));
-        getnotificationCount();
+        //getnotificationCount();
+        // RealTimeNotificationListner();
+
 
 
 
@@ -197,10 +207,12 @@ public class HomeScreen extends ToolbarActivity {
 
                     case 2:
                         tab.setIcon(R.drawable.notifycolor1);
+//                        if(tab.getCustomView()!=null)
                         View v = tab.getCustomView().findViewById(R.id.badgeCotainer);
                         if(v != null) {
                             v.setVisibility(View.GONE);
                         }
+                        ref.child("notification").child(userClass.getUserId()+"").child("unread").removeValue();
                         getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new NotificationsFragment()).commit();
                         break;
 
@@ -208,8 +220,6 @@ public class HomeScreen extends ToolbarActivity {
                     case 3:
                         tab.setIcon(R.drawable.toggle1color);
                         new ModalSheet().show(getSupportFragmentManager(), "");
-                        //Intent i4 = new Intent(HomeScreen.this, MessagesActivity.class);
-                        //startActivity(i4);
                         break;
 
                 }
@@ -246,7 +256,7 @@ public class HomeScreen extends ToolbarActivity {
 
 
             }
- });
+        });
         navigationView = findViewById(R.id.navigation_view);
         View headerLayout = navigationView.inflateHeaderView(R.layout.navigation_drawer);
         ImageView profileImage = (ImageView) headerLayout.findViewById(R.id.profile_image);
@@ -285,7 +295,7 @@ public class HomeScreen extends ToolbarActivity {
                     SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
                     Gson gson = new Gson();
                     String json = mPrefs.getString("MyObject", "");
-                    UserClass userClass = gson.fromJson(json, UserClass.class);
+                    final UserClass userClass = gson.fromJson(json, UserClass.class);
                     FirebaseMessaging.getInstance().unsubscribeFromTopic("pushNotifications" + userClass.getUserId());
                     FirebaseMessaging.getInstance().unsubscribeFromTopic("chats" + userClass.getUserId());
 
@@ -297,6 +307,14 @@ public class HomeScreen extends ToolbarActivity {
                                 public void onResponse(String response) {
                                     Log.v("ReponseFeed", response);
                                     Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                    Date date = new Date();
+                                    IsOnline isOnline=new IsOnline("False",formatter.format(date));
+//                            HashMap<String,String> status=new HashMap<>();
+//                            status.put("android","True");
+//                            status.put("web","False");
+//                            status.put("time",formatter.format(date) );
+                                    ref.child("Status").child(userClass.getUserId()+"").child("android").setValue(isOnline);
 
                                 }
 
@@ -349,9 +367,7 @@ public class HomeScreen extends ToolbarActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else
             super.onBackPressed();
-        //LinearLayout ll = (LinearLayout)tabLayout.getChildAt(0);
-        //ll.getChildAt(tabLayout.getSelectedTabPosition()).setSelected(false);
-        //ll.getChildAt(0).setSelected(true);
+
     }
 
 
@@ -429,34 +445,45 @@ public class HomeScreen extends ToolbarActivity {
 
     }
 
-    public void getnotificationCount(){
-        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
+    @Override
+    protected void onStart() {
+        super.onStart();
+        this.context=getApplicationContext();
+    }
 
+    public static void  getnotificationCount(){
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
         StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/notificationcount",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        Toast.makeText(context, response, Toast.LENGTH_LONG).show();
                         try {
+
                             JSONObject jsonObject = new JSONObject(response);
                             count1 =jsonObject.getInt("count");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
 
-                        TabLayout.Tab tab1 = tabLayout.getTabAt(2);
-                        tab1.setCustomView(R.layout.badged);
-                        if(tab1 != null && tab1.getCustomView() != null) {
-                            TextView b = (TextView) tab1.getCustomView().findViewById(R.id.badge);
-                            if(b != null) {
-                                b.setText(count1+"");
-                            }
-                            View v = tab1.getCustomView().findViewById(R.id.badgeCotainer);
-                            if(v != null) {
-                                v.setVisibility(View.VISIBLE);
+                        if(count1!=0) {
+                            TabLayout.Tab tab1 = tabLayout.getTabAt(2);
+                            if (tab1.getCustomView() == null)
+                                tab1.setCustomView(R.layout.badged);
+
+                            if (tab1 != null && tab1.getCustomView() != null) {
+                                TextView b = (TextView) tab1.getCustomView().findViewById(R.id.badge);
+                                if (b != null) {
+                                    b.setText(count1 + "");
+                                }
+                                View v = tab1.getCustomView().findViewById(R.id.badgeCotainer);
+                                if (v != null) {
+                                    v.setVisibility(View.VISIBLE);
+                                }
                             }
                         }
+
 
                     }
 
@@ -483,6 +510,25 @@ public class HomeScreen extends ToolbarActivity {
         requestQueue.add(myReq);
     }
 
+    //    private void RealTimeNotificationListner()
+//    {
+//
+//        ref.child("Notifications").child(userClass.getUserId()+"").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//
+//                Toast.makeText(getApplicationContext(),"real Notification changed",Toast.LENGTH_LONG).show();
+//
+//                getnotificationCount();
+//
+//            }
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//            }
+//        });
+//
+//    }
     public void getUnReadMsgCount(){
         RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
 
@@ -528,4 +574,5 @@ public class HomeScreen extends ToolbarActivity {
 
         requestQueue.add(myReq);
     }
+
 }

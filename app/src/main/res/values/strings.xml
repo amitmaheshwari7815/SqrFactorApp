@@ -254,5 +254,6 @@ Week Winners and 3 words for a week will be announced at 11 PM on dates – 10, 
         <item>Oldest</item>
     </string-array>
 
-
+    <string name="facebook_app_id">2148313522109510</string>
+    <string name="fb_login_protocol_scheme">fb2148313522109510</string>
 </resources>

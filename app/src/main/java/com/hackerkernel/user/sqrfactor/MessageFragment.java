@@ -63,7 +63,6 @@ public class MessageFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_message, container, false);
         database= FirebaseDatabase.getInstance();
-
         ref = database.getReference();
 
         recycler = (RecyclerView)v.findViewById(R.id.msg_recycler);
@@ -97,11 +96,6 @@ public class MessageFragment extends Fragment {
                                 userProfile=user.getString("profile");
                                 userName=user.getString("name");
                                 userId=user.getInt("id");
-                                HashMap<String,String> status=new HashMap<>();
-                                status.put("isOnline","True");
-                                status.put("time", ServerValue.TIMESTAMP.toString());
-                                //IsOnline isOnline=new IsOnline("True",ServerValue.TIMESTAMP.toString());
-                                ref.child("Status").child(userId+"").setValue(status);
 
                                 JSONArray jsonArrayData = jsonObject.getJSONArray("friends");
                                 for (int i = 0; i < jsonArrayData.length(); i++) {
@@ -111,9 +105,9 @@ public class MessageFragment extends Fragment {
                                     chatFriends.add(chatFriends1);
                                 }
                                 chatAdapter.notifyDataSetChanged();
-                                DatabaseReference presenceRef = FirebaseDatabase.getInstance().getReference().child("Status").child(userId+"");
-                                IsOnline isOnline=new IsOnline("False",ServerValue.TIMESTAMP.toString());
-                                presenceRef.onDisconnect().setValue(isOnline);
+//                                DatabaseReference presenceRef = FirebaseDatabase.getInstance().getReference().child("Status").child(userId+"");
+//                                IsOnline isOnline=new IsOnline("False",ServerValue.TIMESTAMP.toString());
+//                                presenceRef.onDisconnect().setValue(isOnline);
                                 StatusLinstner();
 
 
@@ -155,6 +149,18 @@ public class MessageFragment extends Fragment {
 //            presenceRef.onDisconnect().setValue(isOnline);
             StatusLinstner();
         }
+        ref.child("notification").child(userClass.getUserId()+"").child("all").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+                HomeScreen.getnotificationCount();
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         return v;
@@ -168,25 +174,20 @@ public class MessageFragment extends Fragment {
     public void StatusLinstner()
     {
 
-
-
-
         for(int i=0;i<chatFriends.size();i++)
         {
             final int finalI = i;
             ref.child("Status").child(chatFriends.get(i).getUserID()+"").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    Long timestamp ;
-                    //String isOnline;
-                    //HashMap<String, String> yourData = (HashMap<String, String>) dataSnapshot.getValue();
-                    //for (DataSnapshot dataSnapshot2 : dataSnapshot.getChildren()) {
-                    Log.v("DataSnapShot",dataSnapshot.getKey());
 
-                    IsOnline isOnline=dataSnapshot.getValue(IsOnline.class);
+                    //Toast.makeText(getActivity(),"listning",Toast.LENGTH_LONG).show();
+                    IsOnline isOnline=dataSnapshot.child("android").getValue(IsOnline.class);
+                    IsOnline isOnline1=dataSnapshot.child("web").getValue(IsOnline.class);
 
-                    if(isOnline!=null && isOnline.getIsOnline().equals("True"))
+                    if(isOnline!=null && (isOnline.getIsOnline().equals("True") || isOnline1.getIsOnline().equals("True")))
                     {
+
                         ChatFriends chatFriend= chatFriends.get(finalI);
                         chatFriend.setIsOnline("True");
                         chatFriends.set(finalI,chatFriend);
@@ -195,7 +196,7 @@ public class MessageFragment extends Fragment {
                         //chatAdapter.notifyDataSetChanged();
                     }
 
-                    else
+                    else if(isOnline!=null)
                     {
                         ChatFriends chatFriend= chatFriends.get(finalI);
                         chatFriend.setIsOnline("False");
@@ -203,6 +204,7 @@ public class MessageFragment extends Fragment {
                         //chatAdapter.notifyItemChanged(finalI);
                         //chatAdapter.notifyItemInserted(finalI);
                         chatAdapter.notifyItemChanged(finalI);
+
                     }
 
                 }
@@ -214,22 +216,4 @@ public class MessageFragment extends Fragment {
         }
 
     }
-
-
-
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        Log.v("OnStart","OnstartCllaed");
-        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
-        HashMap<String,String> status=new HashMap<>();
-        status.put("isOnline","True");
-        status.put("time", ServerValue.TIMESTAMP.toString());
-        ref.child("Status").child(userClass.getUserId()+"").setValue(status);
-    }
-
 }

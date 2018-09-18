@@ -17,12 +17,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Base64;
@@ -31,8 +34,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,6 +48,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -57,6 +64,11 @@ import com.baoyz.widget.PullRefreshLayout;
 import com.bumptech.glide.Glide;
 import com.ethanhua.skeleton.Skeleton;
 import com.ethanhua.skeleton.SkeletonScreen;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.gson.Gson;
 
 
@@ -111,6 +123,15 @@ public class StatusFragment extends Fragment {
     private boolean isLoading=false;
     private static String nextPageUrl;
     private String oldUrl;
+    public static DatabaseReference ref;
+    public static FirebaseDatabase database;
+
+    FloatingActionButton fabView, fabStatus, fabDesign, fabArticle;
+    private boolean fabExpanded = false;
+    private LinearLayout layoutFabStatus;
+    private LinearLayout layoutFabDesign;
+    private LinearLayout layoutFabArticle;
+    Animation rotate_forward, rotate_Backward, fab_open, fab_close;
 
 
     @Override
@@ -129,11 +150,55 @@ public class StatusFragment extends Fragment {
         final ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fregment_status, container, false);
 
         recyclerView = rootView.findViewById(R.id.news_recycler);
+
+
+        final LinearLayout stausLinear = rootView.findViewById(R.id.status_linear);
         layoutManager = new LinearLayoutManager(this.getActivity());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
         newsFeedAdapter = new NewsFeedAdapter(newsstatus, this.getActivity());
         recyclerView.setAdapter(newsFeedAdapter);
+        database= FirebaseDatabase.getInstance();
+        ref = database.getReference();
+
+//
+//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+//                super.onScrolled(recyclerView, dx, dy);
+//                if (dy > 0 && fabView.getVisibility() == View.VISIBLE) {
+//                    fabView.hide();
+//                } else if (dy < 0 && fabView.getVisibility() != View.VISIBLE) {
+//                    fabView.show();
+//                }
+//
+//            }
+//        });
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy)
+            {
+                if (dy > 0 ||dy<0 && fabView.isShown())
+                {
+                    fabView.hide();
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    fabView.show();
+                }
+
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+        });
+
+
+
 
         final SkeletonScreen skeletonScreen = Skeleton.bind(recyclerView)
                 .adapter(newsFeedAdapter)
@@ -151,11 +216,70 @@ public class StatusFragment extends Fragment {
             }
         }, 2000);
 
+        final LinearLayout statusLinear = (LinearLayout)rootView.findViewById(R.id.status_linear);
+
+
+
         Log.v("status","hello");
         SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
         UserClass userClass = gson.fromJson(json, UserClass.class);
+
+        fabView = rootView.findViewById(R.id.fab_view);
+        fabStatus = rootView.findViewById(R.id.fab_status);
+        fabDesign = rootView.findViewById(R.id.fab_design);
+        fabArticle = rootView.findViewById(R.id.fab_article);
+
+        layoutFabStatus = (LinearLayout) rootView.findViewById(R.id.layoutFabStatus);
+        layoutFabDesign = (LinearLayout) rootView.findViewById(R.id.layoutFabDesign);
+        layoutFabArticle = (LinearLayout) rootView.findViewById(R.id.layoutFabArticle);
+
+        rotate_forward = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_forward);
+        rotate_Backward = AnimationUtils.loadAnimation(getContext(), R.anim.rotate_backward);
+        fab_open = AnimationUtils.loadAnimation(getContext(), R.anim.fab_open);
+        fab_close = AnimationUtils.loadAnimation(getContext(), R.anim.fab_close);
+
+        fabView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (fabExpanded == true){
+                    closeSubMenusFab();
+                } else {
+                    openSubMenusFab();
+                }
+            }
+        });
+        closeSubMenusFab();
+
+        fabStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getActivity().getApplicationContext(), StatusPostActivity.class);
+                intent.putExtra("Fab",1);
+                getActivity().startActivity(intent);
+            }
+        });
+        fabDesign.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getActivity().getApplicationContext(), DesignActivity.class);
+                intent.putExtra("Fab",1);
+                getActivity().startActivity(intent);
+            }
+        });
+        fabArticle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent = new Intent(getActivity().getApplicationContext(), ArticleActivity.class);
+                intent.putExtra("Fab",1);
+                getActivity().startActivity(intent);
+            }
+        });
+
 
 //        newsProfileImage=rootView.findViewById(R.id.newsProfileImage);
 //        Glide.with(getContext()).load("https://archsqr.in/"+userClass.getProfile())
@@ -164,19 +288,19 @@ public class StatusFragment extends Fragment {
         camera = rootView.findViewById(R.id.news_camera);
         displayImage = rootView.findViewById(R.id.news_upload_image);
         btnSubmit = rootView.findViewById(R.id.news_postButton);
-        newsProfileImage =rootView.findViewById(R.id.newsProfileImage);
-        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
-                .into(newsProfileImage);
+//        newsProfileImage =rootView.findViewById(R.id.newsProfileImage);
+//        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+//                .into(newsProfileImage);
 
-        writePost = rootView.findViewById(R.id.news_editPost);
-        writePost.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
-                getActivity().startActivity(intent);
-                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
-            }
-        });
+//        writePost = rootView.findViewById(R.id.news_editPost);
+//        writePost.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(getActivity().getApplicationContext(), PostActivity.class);
+//                getActivity().startActivity(intent);
+//                getActivity().overridePendingTransition( R.anim.slide_in_up, R.anim.slide_out_up );
+//            }
+//        });
 
         layout = rootView.findViewById(R.id.news_pullToRefresh);
         layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
@@ -233,18 +357,52 @@ public class StatusFragment extends Fragment {
                     isLoading=true;
                     Log.v("rolling",layoutManager.getChildCount()+" "+layoutManager.getItemCount()+" "+layoutManager.findLastVisibleItemPosition()+" "+
                             layoutManager.findLastVisibleItemPosition());
+
                     FetchDataFromServer();
 
                 }
             }
         });
 
+        //RealTimeNotificationListner();
+        ref.child("notification").child(userClass.getUserId()+"").child("all").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                HomeScreen.getnotificationCount();
 
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
 
         return rootView;
 
+    }
+
+    private void openSubMenusFab(){
+        layoutFabStatus.setVisibility(View.VISIBLE);
+        layoutFabDesign.setVisibility(View.VISIBLE);
+        layoutFabArticle.setVisibility(View.VISIBLE);
+        fabStatus.startAnimation(fab_open);
+        fabDesign.setAnimation(fab_open);
+        fabArticle.setAnimation(fab_open);
+        fabView.startAnimation(rotate_forward);
+        fabView.setImageResource(R.drawable.ic_add_black_24dp);
+        fabExpanded = true;
+    }
+    private void closeSubMenusFab(){
+        layoutFabStatus.setVisibility(View.GONE);
+        layoutFabDesign.setVisibility(View.GONE);
+        layoutFabArticle.setVisibility(View.GONE);
+        fabStatus.startAnimation(fab_close);
+        fabDesign.setAnimation(fab_close);
+        fabArticle.setAnimation(fab_close);
+        fabView.startAnimation(rotate_Backward);
+        fabExpanded = false;
     }
     public void LoadNewsFeedDataFromServer()
     {
@@ -297,56 +455,56 @@ public class StatusFragment extends Fragment {
     }
 
     public void FetchDataFromServer() {
+        if (nextPageUrl != null) {
+            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("MorenewsFeedFromServer", response);
+                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                                nextPageUrl = jsonPost.getString("next_page_url");
+                                JSONArray jsonArrayData = jsonPost.getJSONArray("data");
+                                for (int i = 0; i < jsonArrayData.length(); i++) {
+                                    NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
+                                    newsstatus.add(newsstatus.size(), newsFeedStatus1);
+                                }
+
+                                newsFeedAdapter.notifyDataSetChanged();
+                                //newsFeedAdapter.setLoaded();
+                                // progressBar.setVisibility(View.GONE);
 
 
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.v("MorenewsFeedFromServer", response);
-                        Toast.makeText(context, response, Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONObject jsonPost = jsonObject.getJSONObject("posts");
-                            nextPageUrl=jsonPost.getString("next_page_url");
-                            JSONArray jsonArrayData = jsonPost.getJSONArray("data");
-                            for (int i = 0; i < jsonArrayData.length(); i++) {
-                                NewsFeedStatus newsFeedStatus1 = new NewsFeedStatus(jsonArrayData.getJSONObject(i));
-                                newsstatus.add(newsstatus.size(),newsFeedStatus1);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
-
-                            newsFeedAdapter.notifyDataSetChanged();
-                            //newsFeedAdapter.setLoaded();
-                            // progressBar.setVisibility(View.GONE);
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
-                    }
 
-                },
-                new Response.ErrorListener() {
+                    },
+                    new Response.ErrorListener() {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
 
-                    }
-                }) {
+                        }
+                    }) {
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer " + TokenClass.Token);
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    params.put("Authorization", "Bearer " + TokenClass.Token);
 
-                return params;
-            }
+                    return params;
+                }
 
-        };
+            };
 
-        requestQueue.add(myReq);
+            requestQueue.add(myReq);
+        }
     }
 
 }

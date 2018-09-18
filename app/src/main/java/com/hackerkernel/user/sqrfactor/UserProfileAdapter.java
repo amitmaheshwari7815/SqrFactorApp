@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -73,13 +74,14 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
     @Override
     public void onBindViewHolder(@NonNull final UserProfileAdapter.MyViewHolder holder, final int position) {
 
-        //UserProfileClass userProfileClass=userProfileClassArrayList.get(position);
+
         final NewsFeedStatus newsFeedStatus=userProfileClassArrayList.get(position);
         SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
         final UserClass userClass = gson.fromJson(json, UserClass.class);
         result = Integer.parseInt(newsFeedStatus.getComments());
+        int isAlreadyLiked=0;
 
         if(newsFeedStatus.getType().equals("status"))
         {
@@ -159,6 +161,15 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
         holder.postTime.setText(days+ " Days ago");
         //holder.fullDescription.setText(newsFeedStatus.);
         holder.buttonLikeList.setText(newsFeedStatus.getLike()+" Like");
+        holder.buttonLikeList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context,LikeListActivity.class);
+                intent.putExtra("id",newsFeedStatus.getPostId());
+                context.startActivity(intent);
+            }
+
+        });
         holder.buttonComment.setText(newsFeedStatus.getComments()+" Comment");
         holder.buttonComment.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.M)
@@ -177,12 +188,34 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
 
                 //context.startActivity(new Intent(context,CommentsPage.class));
                 Intent intent = new Intent(context, CommentsPage.class);
-                intent.putExtra("Activity","From_UserProfle_Adapter");
-                intent.putExtra("PostDataClass",userProfileClassArrayList.get(position)); //second param is Serializable
+                intent.putExtra("PostSharedId",newsFeedStatus.getSharedId()); //second param is Serializable
                 context.startActivity(intent);
 
             }
         });
+
+        for(int i=0;i<newsFeedStatus.getAllLikesId().size();i++)
+        {
+            if(userClass.getUserId()==newsFeedStatus.AllLikesId.get(i))
+            {
+                holder.buttonLikeList.setTextColor(context.getResources().getColor(R.color.sqr));
+                isAlreadyLiked=1;
+                holder.buttonLike.setChecked(true);
+                ///flag=1;
+            }
+        }
+        final int isAlreadyLikedFinal=isAlreadyLiked;
+
+        for(int i=0;i<newsFeedStatus.getAllCommentId().size();i++)
+        {
+            if(userClass.getUserId()==newsFeedStatus.AllCommentId.get(i))
+            {
+//                holder.c.setTextColor(context.getResources().getColor(R.color.sqr));
+//                holder.commentCheckBox.setChecked(true);
+                //holder.co.setChecked(true);
+            }
+        }
+
         if(userClass.getUserId()==newsFeedStatus.getUserId())
         {
             holder.user_post_menu.setVisibility(View.VISIBLE);
@@ -252,12 +285,14 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
                                 holder.comment_card.setVisibility(View.VISIBLE);
                                 database= FirebaseDatabase.getInstance();
                                 ref = database.getReference();
-                                SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
-                                Gson gson = new Gson();
-                                String json = mPrefs.getString("MyObject", "");
-                                UserClass userClass = gson.fromJson(json, UserClass.class);
-                                PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatus.getPostId(),newsFeedStatus.getPostTitle(),newsFeedStatus.getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
-                                ref.child("Notifications").child(newsFeedStatus.getUserId()+"").setValue(notificationClass);
+                                from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
+                                post post1=new post(newsFeedStatus.getFullDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
+                                PushNotificationClass pushNotificationClass=new PushNotificationClass("commented on your&nbsparticle",new Date().getTime(),fromUser,post1,"comment");
+                                String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
+                                ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+                                Map<String,String> unred=new HashMap<>();
+                                unred.put("unread",key);
+                                ref.child("notification").child(newsFeedStatus.getUserId()+"").child("unread").child(key).setValue(unred);
                                 holder.userComment.setText("");
                                 result=result+1;
                                 holder.buttonComment.setText(result+" Comment");
@@ -293,6 +328,113 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
                 requestQueue.add(stringRequest);
             }
         });
+        holder.buttonLike.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked) {
+                    Toast.makeText(context, "checked", Toast.LENGTH_SHORT).show();
+                    int likeCount=Integer.parseInt(newsFeedStatus.getLike());
+//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
+                    holder.buttonLikeList.setTextColor(context.getResources().getColor(R.color.sqr));
+                    if(isAlreadyLikedFinal==1)
+                        holder.buttonLikeList.setText(likeCount+" Like");
+                    else
+                    {
+                        likeCount=likeCount+1;
+                        holder.buttonLikeList.setText(likeCount+" Like");
+                    }
+
+                    database= FirebaseDatabase.getInstance();
+                    ref = database.getReference();
+
+                    Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
+                    if(newsFeedStatus.getType().equals("status"))
+                    {
+                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
+                        post post1=new post(newsFeedStatus.getFullDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
+                        PushNotificationClass pushNotificationClass=new PushNotificationClass("liked your status",new Date().getTime(),fromUser,post1,"like_post");
+                        String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("unread").child(key).setValue(unred);
+                    }
+                    else
+                    {
+                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
+                        post post1=new post(newsFeedStatus.getShortDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
+                        PushNotificationClass pushNotificationClass=new PushNotificationClass("liked your article",new Date().getTime(),fromUser,post1,"like_post");
+                        String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(newsFeedStatus.getUserId()+"").child("unread").child(key).setValue(unred);
+
+                    }
+                }
+                else {
+
+                    if(isAlreadyLikedFinal==1)
+                    {
+                        Log.v("isAlreadyLiked1",isAlreadyLikedFinal+" ");
+                        holder.buttonLikeList.setTextColor(context.getResources().getColor(R.color.gray));
+                        int likeCount1=Integer.parseInt(newsFeedStatus.getLike());
+                        Toast.makeText(context, "Unchecked1", Toast.LENGTH_SHORT).show();
+                        likeCount1=likeCount1-1;
+                        holder.buttonLikeList.setText(likeCount1+" Like");
+                    }
+                    else
+                    {
+                        Log.v("isAlreadyLiked2",isAlreadyLikedFinal+" ");
+                        Toast.makeText(context, "Unchecked2", Toast.LENGTH_SHORT).show();
+                        holder.buttonLikeList.setTextColor(context.getResources().getColor(R.color.gray));
+                        holder.buttonLikeList.setText(newsFeedStatus.getLike()+" Like");
+                    }
+
+
+                }
+                RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
+                StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
+                        new Response.Listener<String>() {
+                            @Override
+                            public void onResponse(String s) {
+                                Log.v("ResponseLike",s);
+
+
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError volleyError) {
+
+                            }
+                        }){
+                    @Override
+                    public Map<String, String> getHeaders() throws AuthFailureError {
+                        Map<String, String> params = new HashMap<String, String>();
+                        params.put("Accept", "application/json");
+                        params.put("Authorization", "Bearer " +TokenClass.Token);
+
+                        return params;
+                    }
+                    @Override
+                    protected Map<String, String> getParams() throws AuthFailureError {
+                        Map<String,String> params = new HashMap<>();
+
+                        params.put("likeable_id",newsFeedStatus.getSharedId()+"");
+                        params.put("likeable_type","users_post_share");
+//
+                        return params;
+                    }
+                };
+
+                requestQueue.add(stringRequest);
+            }
+
+
+        });
+
     }
     public void DeletePost(final String  user_post_id, final String  id, final String is_shared) {
 
@@ -370,13 +512,7 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
             commentLike=(ImageButton)itemView.findViewById(R.id.user_post_likecomment);
             comment_card = (CardView)itemView.findViewById(R.id.userProfile_commentCardView);
 
-            buttonLikeList.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
 
-                }
-
-            });
 
             commentpost.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -436,65 +572,7 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
                     context.startActivity(intent);
                 }
             });
-            buttonLike.setOnClickListener(new View.OnClickListener()
-            {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(View v) {
 
-                    if (flag == 0) {
-                        buttonLikeList.setTextColor(context.getColor(R.color.sqr));
-                        int result = Integer.parseInt(userProfileClassArrayList.get(getAdapterPosition()).getLike()+1);
-                        buttonLikeList.setText(result+" Like");
-                        flag = 1;
-                    }
-                    else {
-                        buttonLikeList.setTextColor(context.getColor(R.color.gray));
-                        int result = Integer.parseInt(userProfileClassArrayList.get(getAdapterPosition()).getLike());
-                        buttonLikeList.setText(result+" Like");
-                        flag = 0;
-                    }
-                    RequestQueue requestQueue = Volley.newRequestQueue(context.getApplicationContext());
-                    StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/like_post",
-                            new Response.Listener<String>() {
-                                @Override
-                                public void onResponse(String s) {
-                                    Log.v("ResponseLike",s);
-                                }
-                            },
-                            new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError volleyError) {
-
-                                }
-                            }){
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<String, String>();
-                            params.put("Accept", "application/json");
-                            params.put("Authorization", "Bearer "+TokenClass.Token);
-                            return params;
-                        }
-                        @Override
-                        protected Map<String, String> getParams() throws AuthFailureError {
-                            Map<String,String> params = new HashMap<>();
-                            //Adding parameters
-//                 params.put("image_value",image);
-                            params.put("likeable_id",userProfileClassArrayList.get(getAdapterPosition()).getSharedId()+"");
-//                        params.put("likeable_type","user_post_share");
-                            params.put("user_id",userProfileClassArrayList.get(getAdapterPosition()).getUserId()+"");
-
-
-                            return params;
-                        }
-                    };
-
-                    //Adding request to the queue
-                    requestQueue.add(stringRequest);
-                }
-
-
-            });
         }
     }
 }

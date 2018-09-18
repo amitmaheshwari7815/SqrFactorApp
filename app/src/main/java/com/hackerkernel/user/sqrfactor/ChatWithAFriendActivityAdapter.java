@@ -53,8 +53,7 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-        //Log.v("osition",position+"");
-        Toast.makeText(context,position+"",Toast.LENGTH_SHORT).show();
+
         MessageClass messageClass=messageClassArrayList.get(position);
         int fromId=messageClass.getUserFrom();
 
@@ -107,10 +106,7 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
 
 
 
-//   if(position==messageClassArrayList.size()-1)
-//   {
-//       ChatWithAFriendActivity.
-//   }
+
 
     }
     @Override
@@ -137,7 +133,7 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
         public MyViewHolder(View itemView) {
             super(itemView);
             freindLayout=(RelativeLayout)itemView.findViewById(R.id.frnd);
-//            freindLayout.setVisibility(View.GONE);
+
             myLayout=(RelativeLayout)itemView.findViewById(R.id.my);
 //            myLayout.setVisibility(View.GONE);
             frndProfile =(ImageView)itemView.findViewById(R.id.chat_frnd_profile);

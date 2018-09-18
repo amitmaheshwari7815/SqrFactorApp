@@ -168,8 +168,7 @@ public class RedActivity extends AppCompatActivity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               Intent intent = new Intent(RedActivity.this,HomeScreen.class);
-               startActivity(intent);
+                finish();
                 overridePendingTransition(R.anim.left_to_right, R.anim.right_to_left);
 
             }
@@ -187,6 +186,7 @@ public class RedActivity extends AppCompatActivity {
                 Intent intent = new Intent(RedActivity.this,TopContributors.class);
                 startActivity(intent);
                 overridePendingTransition(R.anim.enter, R.anim.exit);
+
             }
         });
 

@@ -197,4 +197,3 @@ public class NotificationClass implements Serializable {
         this.jsonObject = jsonObject;
     }
 }
-

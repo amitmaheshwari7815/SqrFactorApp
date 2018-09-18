@@ -108,21 +108,21 @@ public class DesignActivity extends ToolbarActivity {
             profileName.setText(userClass.getFirst_name()+"" +userClass.getLast_name());
         }
 
-        designLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-
-                try {
-                    startActivityForResult(builder.build(DesignActivity.this), PLACE_PICKER_REQUEST);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        designLocation.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+//
+//                try {
+//                    startActivityForResult(builder.build(DesignActivity.this), PLACE_PICKER_REQUEST);
+//                } catch (GooglePlayServicesRepairableException e) {
+//                    e.printStackTrace();
+//                } catch (GooglePlayServicesNotAvailableException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -203,6 +203,8 @@ public class DesignActivity extends ToolbarActivity {
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             String Imgurl = jsonObject.getString("asset_image");
+                            Log.v("imageUrl",Imgurl);
+                            Toast.makeText(getApplicationContext(),Imgurl+"",Toast.LENGTH_LONG).show();
                             editor.onImageUploadComplete(Imgurl, uuid);
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -354,7 +356,10 @@ public class DesignActivity extends ToolbarActivity {
                         intent.putExtra("Title",designTitle.getText().toString());
                         intent.putExtra("Location",designLocation.getText().toString());
                         intent.putExtra("ShortDescription",designShortDescription.getText().toString());
-                        intent.putExtra("Description",finalHtml);
+                        if(finalHtml!=null)
+                            intent.putExtra("Description",finalHtml);
+                        else
+                            intent.putExtra("Description",editor.getContentAsHTML());
                         startActivity(intent);
 
                         editor.clearAllContents();

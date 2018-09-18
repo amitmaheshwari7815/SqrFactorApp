@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
@@ -41,12 +42,14 @@ import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.MultiAutoCompleteTextView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -67,6 +70,7 @@ import com.github.irshulx.EditorListener;
 import com.google.gson.Gson;
 
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -77,6 +81,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -88,10 +93,9 @@ public class ArticleActivity extends ToolbarActivity {
 
     private Toolbar toolbar;
     private Editor editor;
-    private Editor editor1;
+    private MultiAutoCompleteTextView multiAutoCompleteTextView;
     private Uri uri;
-    private  String finalHtml;
-    //private String videoLink;
+    private  String finalHtml=null;
     String cropedImage;
     private WebView videoView;
     private String html;
@@ -190,6 +194,8 @@ public class ArticleActivity extends ToolbarActivity {
         {
             toolbar.setVisibility(View.GONE);
         }
+
+        GetTagFromServer();
 
         articleSelectBannerImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -316,6 +322,56 @@ public class ArticleActivity extends ToolbarActivity {
         editor.render();
 
     }
+    private void GetTagFromServer() {
+
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/searchtags",
+                new Response.Listener<String>() {
+                    @SuppressLint("WrongViewCast")
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray tags=jsonObject.getJSONArray("searched_tags");
+                            final ArrayList<String> tagName=new ArrayList<>();
+                            for(int i=0;i<tags.length();i++)
+                            {
+                                tagName.add(tags.getJSONObject(i).getString("name"));
+                            }
+
+                            // String[] languages = { "C","C++","Java","C#","PHP","JavaScript","jQuery","AJAX","JSON" };
+                            final ArrayAdapter<String> adapter = new ArrayAdapter<String>(ArticleActivity.this, android.R.layout.simple_spinner_dropdown_item, tagName);
+                            multiAutoCompleteTextView = findViewById(R.id.articleTags);
+                            multiAutoCompleteTextView.setAdapter(adapter);
+                            multiAutoCompleteTextView.setTokenizer(new MultiAutoCompleteTextView.CommaTokenizer());
+
+//
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+                return params;
+            }
+        };
+
+        requestQueue.add(myReq);
+
+    }
 
     public void uploadEditorImageToServer(final String uuid)
     {
@@ -374,14 +430,6 @@ public class ArticleActivity extends ToolbarActivity {
         return encode;
     }
 
-//    public void GetImageFromGallery(){
-//
-//        GalIntent = new Intent(Intent.ACTION_PICK,
-//                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//
-//        startActivityForResult(Intent.createChooser(GalIntent, "Select Image From Gallery"), 2);
-//
-//    }
 
 
     private void selectImage() {
@@ -599,29 +647,6 @@ public class ArticleActivity extends ToolbarActivity {
         }
     }
 
-//    public void HandleCrop(int code,Intent result)
-//        {
-//            if(code==RESULT_OK)
-//            {
-//                cropFinalImage.setImageURI(Crop.getOutput(result));
-//                cropFinalImage.setVisibility(View.VISIBLE);
-//
-//            }
-//            else if(code==Crop.RESULT_ERROR)
-//            {
-//                Toast.makeText(this,"Error here",Toast.LENGTH_LONG).show();
-//            }
-//
-//        }
-//    public void picImage()
-//    {
-//        Intent intent = new Intent();
-//        intent.setType("image/*");
-//        intent.setAction(Intent.ACTION_GET_CONTENT);
-//
-//        startActivityForResult(Intent.createChooser(intent, "Select Picture"),RESULT_LOAD_IMAGE);
-//    }
-
 
     public void SendArticleDataToServer(final String image)
     {
@@ -636,6 +661,7 @@ public class ArticleActivity extends ToolbarActivity {
 //                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //                            editor.setFocusable(View.NOT_FOCUSABLE);
 //                        }
+                        multiAutoCompleteTextView.setText("");
                         articleTag.setText("");
                         articleTitle.setText("");
                         articleShortDescription.setText("");
@@ -664,10 +690,13 @@ public class ArticleActivity extends ToolbarActivity {
                 Log.v("data",articleTitle.getText().toString()+articleTag.getText().toString()+articleShortDescription.getText().toString()+finalHtml);
                 params.put("post_type","article");
                 params.put("title",articleTitle.getText().toString());
-                params.put("tags",articleTag.getText().toString());
+                params.put("tags",multiAutoCompleteTextView.getText().toString());
                 params.put("description_short",articleShortDescription.getText().toString());
                 params.put("banner_image","data:image/jpeg;base64,"+image);
-                params.put("description",finalHtml);
+                if(finalHtml!=null)
+                    params.put("description",finalHtml);
+                else
+                    params.put("description",editor.getContentAsHTML());
                 return params;
             }
         };
@@ -774,6 +803,7 @@ public class ArticleActivity extends ToolbarActivity {
 
 
     }
+
     private void showVideo(String videoLink)
     {
         Toast.makeText(this,videoLink,Toast.LENGTH_LONG).show();
@@ -820,6 +850,7 @@ public class ArticleActivity extends ToolbarActivity {
             }
         });
     }
+
 
 
 }

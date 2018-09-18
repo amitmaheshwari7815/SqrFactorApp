@@ -6,12 +6,15 @@
     android:layout_height="match_parent"
     tools:context=".NotificationsFragment"
     android:orientation="vertical">
-
+<com.baoyz.widget.PullRefreshLayout
+    android:id="@+id/notification_pullRefresh"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recycler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
-
+</com.baoyz.widget.PullRefreshLayout>
 
     <!--android.support.v7.widget.CardView
         android:layout_width="match_parent"

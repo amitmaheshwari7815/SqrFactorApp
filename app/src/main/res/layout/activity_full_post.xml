@@ -53,7 +53,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Henry Cavill"
-                            android:textColor="#282828"
                             android:textSize="18sp"
                             android:fontFamily="@font/roboto_medium"/>
                         <LinearLayout
@@ -134,11 +133,24 @@
 
             </LinearLayout>
 
-            <WebView
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:id="@+id/webview"
-                android:fitsSystemWindows="true"
-                android:layout_height="wrap_content"/>
+                android:id="@+id/webView"
+                android:layout_height="wrap_content">
+
+            </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:visibility="gone"
+                android:id="@+id/fullPostDescription"
+                android:layout_height="wrap_content"
+                android:textSize="16dp"/>
+            <!--<WebView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:id="@+id/webview"-->
+            <!--android:fitsSystemWindows="true"-->
+            <!--android:layout_height="wrap_content"/>-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="40sp"
@@ -289,35 +301,35 @@
                         android:layout_marginTop="6sp"
                         android:layout_marginLeft="20sp"
                         android:layout_marginStart="65sp"/>
-                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="5sp"
-                    android:layout_marginStart="65sp"
-                    android:layout_marginLeft="20sp"
-                    android:layout_marginBottom="20sp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:layout_marginTop="5sp"
+                        android:layout_marginStart="65sp"
+                        android:layout_marginLeft="20sp"
+                        android:layout_marginBottom="20sp">
 
-                    <ImageButton
-                        android:id="@+id/news_commnent_like_button_fullpost"
-                        android:layout_width="14dp"
-                        android:layout_height="14dp"
-                        android:layout_gravity="center"
-                        android:background="@android:color/transparent"
-                        android:src="@drawable/ic_comment_like1"
-                        android:textAllCaps="false"/>
-                     <Button
-                         android:id="@+id/news_comment_likeList_fullpost"
-                         android:layout_width="50dp"
-                         android:layout_height="20sp"
-                         android:layout_gravity="center"
-                         android:background="@android:color/transparent"
-                         android:fontFamily="@font/roboto_medium"
-                         android:text="2 Like"
-                         android:textAllCaps="false"
-                         android:textColor="@color/gray" />
+                        <ImageButton
+                            android:id="@+id/news_commnent_like_button_fullpost"
+                            android:layout_width="14dp"
+                            android:layout_height="14dp"
+                            android:layout_gravity="center"
+                            android:background="@android:color/transparent"
+                            android:src="@drawable/ic_comment_like1"
+                            android:textAllCaps="false"/>
+                        <Button
+                            android:id="@+id/news_comment_likeList_fullpost"
+                            android:layout_width="50dp"
+                            android:layout_height="20sp"
+                            android:layout_gravity="center"
+                            android:background="@android:color/transparent"
+                            android:fontFamily="@font/roboto_medium"
+                            android:text="2 Like"
+                            android:textAllCaps="false"
+                            android:textColor="@color/gray" />
 
-                </LinearLayout>
+                    </LinearLayout>
                 </LinearLayout>
 
             </android.support.v7.widget.CardView>

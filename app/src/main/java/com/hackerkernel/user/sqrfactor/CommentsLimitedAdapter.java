@@ -3,10 +3,7 @@ package com.hackerkernel.user.sqrfactor;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,9 +11,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -45,19 +39,29 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimitedAdapter.MyViewHolder> {
 
-    private ArrayList<comments_limited> comments_limitedArrayList=new ArrayList<>();
+    private ArrayList<comments_list> comments_limitedArrayList=new ArrayList<>();
     private Context context;
     private int flag=0,user_id,commentable_id,postId;
     private String isShared;
 
-    public CommentsLimitedAdapter(ArrayList<comments_limited> comments_limitedArrayList, Context context,int user_id,int commentable_id,int postId,String isShared) {
+//    public CommentsLimitedAdapter(ArrayList<comments_limited> comments_limitedArrayList, Context context,int user_id,int commentable_id,int postId,String isShared) {
+//
+//        this.comments_limitedArrayList = comments_limitedArrayList;
+//        this.context = context;
+//        this.isShared=isShared;
+//        this.commentable_id=commentable_id;
+//        this.postId=postId;
+//        this.user_id=user_id;
+//    }
+
+    public CommentsLimitedAdapter(ArrayList<comments_list> comments_limitedArrayList, Context context) {
 
         this.comments_limitedArrayList = comments_limitedArrayList;
         this.context = context;
-        this.isShared=isShared;
-        this.commentable_id=commentable_id;
-        this.postId=postId;
-        this.user_id=user_id;
+//        this.isShared=isShared;
+//        this.commentable_id=commentable_id;
+//        this.postId=postId;
+//        this.user_id=user_id;
     }
 
 
@@ -72,6 +76,7 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
 
+        final comments_list commentsList=comments_limitedArrayList.get(position);
         SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
@@ -83,45 +88,44 @@ public class CommentsLimitedAdapter extends RecyclerView.Adapter<CommentsLimited
 
 
         holder.commentBody.setText(comments_limitedArrayList.get(position).getBody());
-        holder.buttonLike.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(View v) {
-                if (flag == 0) {
-
-                    holder.buttonLike.setTextColor(context.getColor(R.color.sqr));
-                    int result = comments_limitedArrayList.get(position).getLikeCount()+1;
-                    holder.numberOfLikes.setText(result+" Like");
-                    flag = 1;
-                }
-                else {
-                    holder.buttonLike.setTextColor(context.getColor(R.color.gray));
-                    int result = comments_limitedArrayList.get(position).getLikeCount();
-                    holder.numberOfLikes.setText(result+" Like");
-                    flag = 0;
-                }
-
-            }
-        });
+//        holder.buttonLike.setOnClickListener(new View.OnClickListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.M)
+//            @Override
+//            public void onClick(View v) {
+//                if (flag == 0) {
+//                    holder.buttonLike.setTextColor(context.getColor(R.color.sqr));
+//                    int result = comments_limitedArrayList.get(position).getCommentLikeCount()+1;
+//                    holder.numberOfLikes.setText(result+" Like");
+//                    flag = 1;
+//                }
+//                else {
+//                    holder.buttonLike.setTextColor(context.getColor(R.color.gray));
+//                    int result = comments_limitedArrayList.get(position).getCommentLikeCount();
+//                    holder.numberOfLikes.setText(result+" Like");
+//                    flag = 0;
+//                }
+//
+//            }
+//        });
         //holder.commenterUser.setText(comments_limitedArrayList.get(position).getUserClass().getUser_name());
 
         Glide.with(context).
-                load("https://archsqr.in/"+comments_limitedArrayList.get(position).getCommentUserPrfile())
+                load("https://archsqr.in/"+commentsList.getFrom_user_profile())
                 .into(holder.commenterProfile);
 
-        holder.commenterUserName.setText(comments_limitedArrayList.get(position).getCommentUserName());
+        holder.commenterUserName.setText(commentsList.getFrom_user_user_name());
         holder.commenterUserName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent=new Intent(context,UserProfileActivity.class);
                 //Log.v("Data",newsFeedStatus.getUserId()+" "+userName+" "+newsFeedStatus.getPostId());
-                intent.putExtra("User_id",comments_limitedArrayList.get(position).getUser_id());
-                intent.putExtra("ProfileUserName",comments_limitedArrayList.get(position).getCommentUserName());
+                intent.putExtra("User_id",commentsList.getFrom_user_id());
+                intent.putExtra("ProfileUserName",commentsList.getFrom_user_user_name());
                 context.startActivity(intent);
             }
         });
-        holder.numberOfLikes.setText(comments_limitedArrayList.get(position).getLikeCount()+"");
-        String dtc = comments_limitedArrayList.get(position).getUpdated_at();
+        holder.numberOfLikes.setText(commentsList.getCommentLikeCount()+"");
+        String dtc = commentsList.getComment_date();
         Log.v("dtc",dtc);
         SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
         SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);

@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -56,11 +57,14 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         if(chatFriend.getIsOnline().equals("True"))
         {
             holder.online.setVisibility(View.VISIBLE);
+            holder.offLine.setVisibility(View.GONE);
             //Toast.makeText(context,chatFriend.getIsOnline()+"",Toast.LENGTH_LONG).show();
         }
         else
         {
             holder.online.setVisibility(View.GONE);
+            holder.offLine.setVisibility(View.VISIBLE);
+
             //Toast.makeText(context,chatFriend.getIsOnline()+"",Toast.LENGTH_LONG).show();
         }
 
@@ -73,8 +77,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        ImageView frndProfile,online;
-        TextView frndName,chatMessage;
+        ImageView frndProfile,online,offLine;
+        TextView frndName,chatMessage,chatTime;
 
 
 
@@ -102,6 +106,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
             frndName =(TextView) itemView.findViewById(R.id.chat_frnd_name);
             chatMessage =(TextView)itemView.findViewById(R.id.chat_last_message);
             online=(ImageView) itemView.findViewById(R.id.onlineicon);
+            offLine =(ImageView)itemView.findViewById(R.id.offlineicon);
+//            chatTime = (EditText)itemView.findViewById(R.id.chat_time);
         }
     }
 }

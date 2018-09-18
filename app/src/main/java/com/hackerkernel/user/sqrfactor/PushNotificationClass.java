@@ -3,84 +3,58 @@ package com.hackerkernel.user.sqrfactor;
 import java.io.Serializable;
 
 public class PushNotificationClass implements Serializable {
-    private int notificationFromId;
-    private String notificationSenderUrl;
-    private int postId;
-    private String notificationTitle;
-    private String notificationBody;
-    private String notificationType;
-    private String notificationSenderName;
+    private String body;
+    private long created_at;
+    private String type;
+    private from_user from_user;
+    private post post;
 
-    public PushNotificationClass()
-    {
+    public PushNotificationClass(String body, long created_at,from_user from_user , post post,String type) {
+        this.body = body;
+        this.created_at = created_at;
+        this.from_user=from_user;
+        this.post= post;
+        this.type = type;
 
     }
-    public PushNotificationClass(int notificationFromId, String notificationSenderUrl, int postId, String notificationTitle, String notificationBody, String notificationType,String notificationSenderName) {
-        this.notificationFromId = notificationFromId;
-        this.notificationSenderUrl = notificationSenderUrl;
-        this.postId = postId;
-        this.notificationTitle = notificationTitle;
-        this.notificationBody = notificationBody;
-        this.notificationType = notificationType;
-        this.notificationSenderName = notificationSenderName;
+
+    public com.hackerkernel.user.sqrfactor.post getPost() {
+        return post;
     }
 
-    public int getNotificationFromId() {
-        return notificationFromId;
+    public void setPost(com.hackerkernel.user.sqrfactor.post post) {
+        this.post = post;
     }
 
-    public void setNotificationFromId(int notificationFromId) {
-        this.notificationFromId = notificationFromId;
+    public com.hackerkernel.user.sqrfactor.from_user getFrom_user() {
+        return from_user;
     }
 
-    public String getNotificationSenderUrl() {
-        return notificationSenderUrl;
+    public void setFrom_user(com.hackerkernel.user.sqrfactor.from_user from_user) {
+        this.from_user = from_user;
     }
 
-    public void setNotificationSenderUrl(String notificationSenderUrl) {
-        this.notificationSenderUrl = notificationSenderUrl;
+    public String getBody() {
+        return body;
     }
 
-    public int getPostId() {
-        return postId;
+    public void setBody(String body) {
+        this.body = body;
     }
 
-    public void setPostId(int postId) {
-        this.postId = postId;
+    public long getCreated_at() {
+        return created_at;
     }
 
-    public String getNotificationTitle() {
-        return notificationTitle;
+    public void setCreated_at(long created_at) {
+        this.created_at = created_at;
     }
 
-    public void setNotificationTitle(String notificationTitle) {
-        this.notificationTitle = notificationTitle;
+    public String getType() {
+        return type;
     }
 
-    public String getNotificationBody() {
-        return notificationBody;
-    }
-
-    public void setNotificationBody(String motificationBody) {
-        this.notificationBody = motificationBody;
-    }
-
-    public String getNotificationType() {
-        return notificationType;
-    }
-
-    public String getNotificationSenderName() {
-        return notificationSenderName;
-    }
-
-    public void setNotificationSenderName(String notificationSenderName) {
-        this.notificationSenderName = notificationSenderName;
-    }
-
-    public void setNotificationType(String notificationType) {
-        this.notificationType = notificationType;
+    public void setType(String type) {
+        this.type = type;
     }
 }
-
-
-

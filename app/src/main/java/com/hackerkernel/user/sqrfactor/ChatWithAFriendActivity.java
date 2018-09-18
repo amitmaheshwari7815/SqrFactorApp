@@ -72,7 +72,6 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
     //private EndlessRecyclerOnScrollListener scrollListener;
 
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_with_afriend);
@@ -103,22 +102,16 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         friendProfile = intent.getExtras().getString("FriendProfileUrl");
         friendName = intent.getExtras().getString("FriendName");
         isOnline = intent.getExtras().getString("isOnline");
-        Toast.makeText(context,id+"",Toast.LENGTH_SHORT).show();
-        //layout = (PullRefreshLayout) findViewById(R.id.chatSwipeRefreshLayout);
-//        Log.v("Record",id+" "+friendProfile+" "+friendName);
 
-
-        database = FirebaseDatabase.getInstance();
         actionBar.setTitle(friendName);
         if (isOnline.equals("True")) {
             actionBar.setSubtitle("Online");
-
-            //actionBar.setSubtitleTextColor(Color.GREEN);
         } else {
             actionBar.setSubtitle("Offline");
         }
 
-
+        database= FirebaseDatabase.getInstance();
+        ref = database.getReference();
         recycler = (RecyclerView) findViewById(R.id.recycler);
         recycler.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -130,6 +123,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         chatWithAFriendActivityAdapter = new ChatWithAFriendActivityAdapter(messageClassArrayList, this, id, friendProfile, friendName);
         recycler.setAdapter(chatWithAFriendActivityAdapter);
         bottom_arrow=(ImageView)findViewById(R.id.bottom_arrow);
+
 
 
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/myallMSG/getChat/" + id,
@@ -144,7 +138,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                             nextPageUrl=jsonObject.getString("nextChats");
                             JSONObject jsonObjectChat = jsonObject.getJSONObject("chats");
                             JSONArray jsonArrayData=jsonObjectChat.getJSONArray("data");
-                            Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
+                            // Toast.makeText(getApplicationContext(), response,Toast.LENGTH_SHORT).show();
                             for (int i = 0; i < jsonArrayData.length(); i++) {
                                 MessageClass messageClass = new MessageClass(jsonArrayData.getJSONObject(i));
                                 messageClassArrayList.add(messageClass);
@@ -211,8 +205,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                 {
                     isLoading=false;
                 }
-                //isLoading=false;
-                //Toast.makeText(context,"moving down",Toast.LENGTH_SHORT).show();
+
             }
 
             @Override
@@ -252,7 +245,6 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                 //
                 SendMessageToServer();
                 LastMessage lastMessage = new LastMessage(MessageFragment.userId, messageToSend.getText().toString(), MessageFragment.userName);
-
                 MessageFragment.ref.child("Chats").child(id + "").setValue(lastMessage);
                 Toast.makeText(ChatWithAFriendActivity.this, "Messeage sent..", Toast.LENGTH_LONG).show();
             }
@@ -306,25 +298,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
                                     chatWithAFriendActivityAdapter.notifyItemInserted(0);
                                 }
 
-//                                int insertIndex = 0;
-//                                messageClassArrayList.addAll(insertIndex, messageClassArrayList1);
-//                                // messageClassArrayList.addAll(finalmessageClassArrayList);
-//                                Log.v("ArraySize222",messageClassArrayList.size()+"");
-//                                chatWithAFriendActivityAdapter.notifyDataSetChanged();
-//                                //  chatWithAFriendActivityAdapter.notifyItemRangeInserted(insertIndex, messageClassArrayList1.size());
-////                                for(int i=0;i<messageClassArrayList1.size();i++)
-////                                {
-////                                    messageClassArrayList.add(0,messageClassArrayList1.get(i));
-////
-////                                    chatWithAFriendActivityAdapter.notifyItemInserted(0);
-////                                }
-//                                messageClassArrayList.addAll(messageClassArrayList1);
-//                                chatWithAFriendActivityAdapter.notifyDataSetChanged();
 //
-//                                //Collections.reverse(messageClassArrayList);
-
-
-                                //isLoading=false;
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -355,59 +329,55 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
         }
 
     }
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 
     public void FirebaseListner()
     {
-        if(isFirstTimeLoading)
-        {
-            isFirstTimeLoading=false;
 
-        }
-        else {
-            MessageFragment.ref.child("Chats").child(MessageFragment.userId+"").addValueEventListener(new ValueEventListener() {
-                @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                    LastMessage lastMessage = dataSnapshot.getValue(LastMessage.class);
-                    if(lastMessage!=null && id==lastMessage.getSenderId())
+        ref.child("Chats").child(MessageFragment.userId+"").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+
+
+                LastMessage lastMessage = dataSnapshot.getValue(LastMessage.class);
+                Toast.makeText(getApplicationContext(),lastMessage.getMessage()+"  "+lastMessage.getSenderId(),Toast.LENGTH_LONG).show();
+                if(lastMessage!=null && id==lastMessage.getSenderId())
+                {
+
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date date = new Date();
+
+
+                    if(messageClassArrayList.size()!=0)
                     {
-                        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                        Date date = new Date();
+                        messageClass=
+                                new MessageClass(messageClassArrayList.get(messageClassArrayList.size()-1).getMessageId()+1,id,MessageFragment.userId,lastMessage.getMessage(),"1",formatter.format(date),formatter.format(date));
 
-
-                        if(messageClassArrayList.size()!=0)
-                        {
-                            messageClass=
-                                    new MessageClass(messageClassArrayList.get(messageClassArrayList.size()-1).getMessageId()+1,id,MessagesActivity.userId,lastMessage.getMessage(),"1",formatter.format(date),formatter.format(date));
-
-                        }
-
-                        messageClassArrayList.add(messageClass);
-                        chatWithAFriendActivityAdapter.notifyDataSetChanged();
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                recycler.smoothScrollToPosition(messageClassArrayList.size()-1);
-                            }
-                        }, 1);
-
-
-
-                        Toast.makeText(ChatWithAFriendActivity.this,"MessageFromServer"+lastMessage.getMessage(),Toast.LENGTH_LONG).show();
                     }
 
-                }
-                @Override
-                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    messageClassArrayList.add(messageClass);
+                    chatWithAFriendActivityAdapter.notifyDataSetChanged();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            recycler.smoothScrollToPosition(messageClassArrayList.size()-1);
+                        }
+                    }, 1);
 
-                }
-            });
 
-        }
+
+                    Toast.makeText(ChatWithAFriendActivity.this,"MessageFromServer"+lastMessage.getMessage(),Toast.LENGTH_LONG).show();
+                }
+
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
     }
+
 
     public  void SendMessageToServer()
     {
@@ -424,7 +394,7 @@ public class ChatWithAFriendActivity extends AppCompatActivity {
 
                         Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         MessageClass messageClass=
-                                new MessageClass(messageClassArrayList.get(messageClassArrayList.size()-1).getMessageId()+1,MessagesActivity.userId,id,messageToSend.getText().toString(),"1",formatter.format(date),formatter.format(date));
+                                new MessageClass(messageClassArrayList.get(messageClassArrayList.size()-1).getMessageId()+1,MessageFragment.userId,id,messageToSend.getText().toString(),"1",formatter.format(date),formatter.format(date));
 
                         messageClassArrayList.add(messageClass);
                         messageToSend.setText("");

@@ -16,6 +16,8 @@ public class ProfileClass1 implements Serializable {
     public int postId, userId, sharedId, commentId;
     public transient JSONObject jsonObject;
     public ArrayList<comments_limited> commentsLimitedArrayList = new ArrayList<>();
+    public ArrayList<Integer> AllLikesId=new ArrayList<>();
+    public ArrayList<Integer> AllCommentId=new ArrayList<>();
 
 
     public ProfileClass1(int postId, int userId, int sharedId, int commentId, String userImageUrl, String authImageUrl, String authName, String time, String postTitle, String shortDescription, String postImage, String like, String comments, String share, String commentProfileImageUrl, String commentUserName, String commentTime, String commentDescription, String commentLike) {
@@ -50,6 +52,7 @@ public class ProfileClass1 implements Serializable {
         this.commentsLimitedArrayList = commentsLimitedArrayList;
     }
 
+
     public ProfileClass1(JSONObject jsonObject) {
         this.jsonObject = jsonObject;
 
@@ -80,20 +83,27 @@ public class ProfileClass1 implements Serializable {
             this.user_name_of_post = user.getString("user_name");
 
             JSONArray likes = jsonObject.getJSONArray("likes");
+
+
+            for(int i=0;i<likes.length();i++)
+            {
+                this.AllLikesId.add(i,likes.getJSONObject(i).getInt("user_id"));
+            }
+
             this.like = likes.length() + "";
 
             JSONArray commentsLimited = jsonObject.getJSONArray("comments_limited");
 
+            this.comments = commentsLimited.length()+"";
+
             for (int i = 0; i < commentsLimited.length(); i++) {
                 try {
+
                     JSONObject jsonObject1 = commentsLimited.getJSONObject(i);
-                    this.commentId = jsonObject1.getInt("id");
+                    JSONObject user1 =jsonObject1.getJSONObject("user");
+                    this.AllCommentId.add(i,user1.getInt("id"));
                     comments_limited limited=new comments_limited(jsonObject1);
 
-//                    comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
-//                            jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
-//                            jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
-//                            jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
                     this.commentsLimitedArrayList.add(limited);
 
 
@@ -107,6 +117,22 @@ public class ProfileClass1 implements Serializable {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public ArrayList<Integer> getAllLikesId() {
+        return AllLikesId;
+    }
+
+    public void setAllLikesId(ArrayList<Integer> allLikesId) {
+        AllLikesId = allLikesId;
+    }
+
+    public ArrayList<Integer> getAllCommentId() {
+        return AllCommentId;
+    }
+
+    public void setAllCommentId(ArrayList<Integer> allCommentId) {
+        AllCommentId = allCommentId;
     }
 
     public String getUserImageUrl() {

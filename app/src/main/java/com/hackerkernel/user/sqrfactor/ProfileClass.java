@@ -123,133 +123,133 @@ public class ProfileClass {
     }
 
 
-            public String getUser_name () {
-                return user_name;
-            }
+    public String getUser_name () {
+        return user_name;
+    }
 
-            public void setUser_name (String user_name){
-                this.user_name = user_name;
-            }
+    public void setUser_name (String user_name){
+        this.user_name = user_name;
+    }
 
-            public String getName () {
-                return name;
-            }
+    public String getName () {
+        return name;
+    }
 
-            public void setName (String name){
-                this.name = name;
-            }
+    public void setName (String name){
+        this.name = name;
+    }
 
-            public String getFirst_name () {
-                return first_name;
-            }
+    public String getFirst_name () {
+        return first_name;
+    }
 
-            public void setFirst_name (String first_name){
-                this.first_name = first_name;
-            }
+    public void setFirst_name (String first_name){
+        this.first_name = first_name;
+    }
 
-            public String getLast_name () {
-                return last_name;
-            }
+    public String getLast_name () {
+        return last_name;
+    }
 
-            public void setLast_name (String last_name){
-                this.last_name = last_name;
-            }
+    public void setLast_name (String last_name){
+        this.last_name = last_name;
+    }
 
-            public String getProfile () {
-                return profile;
-            }
+    public String getProfile () {
+        return profile;
+    }
 
-            public void setProfile (String profile){
-                this.profile = profile;
-            }
+    public void setProfile (String profile){
+        this.profile = profile;
+    }
 
-            public String getEmail () {
-                return email;
-            }
+    public String getEmail () {
+        return email;
+    }
 
-            public void setEmail (String email){
-                this.email = email;
-            }
+    public void setEmail (String email){
+        this.email = email;
+    }
 
-            public String getMobile_number () {
-                return mobile_number;
-            }
+    public String getMobile_number () {
+        return mobile_number;
+    }
 
-            public void setMobile_number (String mobile_number){
-                this.mobile_number = mobile_number;
-            }
+    public void setMobile_number (String mobile_number){
+        this.mobile_number = mobile_number;
+    }
 
-            public String getUser_type () {
-                return user_type;
-            }
+    public String getUser_type () {
+        return user_type;
+    }
 
-            public void setUser_type (String user_type){
-                this.user_type = user_type;
-            }
+    public void setUser_type (String user_type){
+        this.user_type = user_type;
+    }
 
-            public String getPost_time () {
-                return post_time;
-            }
+    public String getPost_time () {
+        return post_time;
+    }
 
-            public void setPost_time (String post_time){
-                this.post_time = post_time;
-            }
+    public void setPost_time (String post_time){
+        this.post_time = post_time;
+    }
 
-            public String getPostType () {
-                return postType;
-            }
+    public String getPostType () {
+        return postType;
+    }
 
-            public void setPostType (String postType){
-                this.postType = postType;
-            }
+    public void setPostType (String postType){
+        this.postType = postType;
+    }
 
-            public String getPost_title () {
-                return post_title;
-            }
+    public String getPost_title () {
+        return post_title;
+    }
 
-            public void setPost_title (String post_title){
-                this.post_title = post_title;
-            }
+    public void setPost_title (String post_title){
+        this.post_title = post_title;
+    }
 
-            public String getPost_image () {
-                return post_image;
-            }
+    public String getPost_image () {
+        return post_image;
+    }
 
-            public void setPost_image (String post_image){
-                this.post_image = post_image;
-            }
+    public void setPost_image (String post_image){
+        this.post_image = post_image;
+    }
 
-            public String getBanner_image () {
-                return banner_image;
-            }
+    public String getBanner_image () {
+        return banner_image;
+    }
 
-            public void setBanner_image (String banner_image){
-                this.banner_image = banner_image;
-            }
+    public void setBanner_image (String banner_image){
+        this.banner_image = banner_image;
+    }
 
-            public String getShort_description () {
-                return short_description;
-            }
+    public String getShort_description () {
+        return short_description;
+    }
 
-            public void setShort_description (String short_description){
-                this.short_description = short_description;
-            }
+    public void setShort_description (String short_description){
+        this.short_description = short_description;
+    }
 
-            public String getDescription () {
-                return description;
-            }
+    public String getDescription () {
+        return description;
+    }
 
-            public void setDescription (String description){
-                this.description = description;
-            }
+    public void setDescription (String description){
+        this.description = description;
+    }
 
-            public String getLike () {
-                return like;
-            }
+    public String getLike () {
+        return like;
+    }
 
-            public void setLike (String like){
-                this.like = like;
-            }
+    public void setLike (String like){
+        this.like = like;
+    }
 
     public String getType() {
         return type;
@@ -308,148 +308,147 @@ public class ProfileClass {
     }
 
     public String getComment () {
-                return comment;
-            }
+        return comment;
+    }
 
-            public void setComment (String comment){
-                this.comment = comment;
-            }
+    public void setComment (String comment){
+        this.comment = comment;
+    }
 
-            public String getShare () {
-                return share;
-            }
+    public String getShare () {
+        return share;
+    }
 
-            public void setShare (String share){
-                this.share = share;
-            }
+    public void setShare (String share){
+        this.share = share;
+    }
 
-            public String getCommentProfileImageUrl () {
-                return commentProfileImageUrl;
-            }
+    public String getCommentProfileImageUrl () {
+        return commentProfileImageUrl;
+    }
 
-            public void setCommentProfileImageUrl (String commentProfileImageUrl){
-                this.commentProfileImageUrl = commentProfileImageUrl;
-            }
+    public void setCommentProfileImageUrl (String commentProfileImageUrl){
+        this.commentProfileImageUrl = commentProfileImageUrl;
+    }
 
-            public String getCommentUserName () {
-                return commentUserName;
-            }
+    public String getCommentUserName () {
+        return commentUserName;
+    }
 
-            public void setCommentUserName (String commentUserName){
-                this.commentUserName = commentUserName;
-            }
+    public void setCommentUserName (String commentUserName){
+        this.commentUserName = commentUserName;
+    }
 
-            public String getCommentTime () {
-                return commentTime;
-            }
+    public String getCommentTime () {
+        return commentTime;
+    }
 
-            public void setCommentTime (String commentTime){
-                this.commentTime = commentTime;
-            }
+    public void setCommentTime (String commentTime){
+        this.commentTime = commentTime;
+    }
 
-            public String getCommentDescription () {
-                return commentDescription;
-            }
+    public String getCommentDescription () {
+        return commentDescription;
+    }
 
-            public void setCommentDescription (String commentDescription){
-                this.commentDescription = commentDescription;
-            }
+    public void setCommentDescription (String commentDescription){
+        this.commentDescription = commentDescription;
+    }
 
-            public String getCommentLike () {
-                return commentLike;
-            }
+    public String getCommentLike () {
+        return commentLike;
+    }
 
-            public void setCommentLike (String commentLike){
-                this.commentLike = commentLike;
-            }
+    public void setCommentLike (String commentLike){
+        this.commentLike = commentLike;
+    }
 
-            public int getUser_id () {
-                return user_id;
-            }
+    public int getUser_id () {
+        return user_id;
+    }
 
-            public void setUser_id ( int user_id){
-                this.user_id = user_id;
-            }
+    public void setUser_id ( int user_id){
+        this.user_id = user_id;
+    }
 
-            public int getPost_id () {
-                return post_id;
-            }
+    public int getPost_id () {
+        return post_id;
+    }
 
-            public void setPost_id ( int post_id){
-                this.post_id = post_id;
-            }
+    public void setPost_id ( int post_id){
+        this.post_id = post_id;
+    }
 
-            public int getPost_user_id () {
-                return post_user_id;
-            }
+    public int getPost_user_id () {
+        return post_user_id;
+    }
 
-            public void setPost_user_id ( int post_user_id){
-                this.post_user_id = post_user_id;
-            }
+    public void setPost_user_id ( int post_user_id){
+        this.post_user_id = post_user_id;
+    }
 
-            public int getSharedId () {
-                return sharedId;
-            }
+    public int getSharedId () {
+        return sharedId;
+    }
 
-            public void setSharedId ( int sharedId){
-                this.sharedId = sharedId;
-            }
+    public void setSharedId ( int sharedId){
+        this.sharedId = sharedId;
+    }
 
-            public int getCommentId () {
-                return commentId;
-            }
+    public int getCommentId () {
+        return commentId;
+    }
 
-            public void setCommentId ( int commentId){
-                this.commentId = commentId;
-            }
+    public void setCommentId ( int commentId){
+        this.commentId = commentId;
+    }
 
-            public JSONObject getJsonObject () {
-                return jsonObject;
-            }
+    public JSONObject getJsonObject () {
+        return jsonObject;
+    }
 
-            public void setJsonObject (JSONObject jsonObject){
-                this.jsonObject = jsonObject;
-            }
+    public void setJsonObject (JSONObject jsonObject){
+        this.jsonObject = jsonObject;
+    }
 
-            public String getFollowerscnt () {
-                return followerscnt;
-            }
+    public String getFollowerscnt () {
+        return followerscnt;
+    }
 
-            public void setFollowerscnt (String followerscnt){
-                this.followerscnt = followerscnt;
-            }
+    public void setFollowerscnt (String followerscnt){
+        this.followerscnt = followerscnt;
+    }
 
-            public String getFollowingcnt () {
-                return followingcnt;
-            }
+    public String getFollowingcnt () {
+        return followingcnt;
+    }
 
-            public void setFollowingcnt (String followingcnt){
-                this.followingcnt = followingcnt;
-            }
+    public void setFollowingcnt (String followingcnt){
+        this.followingcnt = followingcnt;
+    }
 
-            public String getPortfoliocnt () {
-                return portfoliocnt;
-            }
+    public String getPortfoliocnt () {
+        return portfoliocnt;
+    }
 
-            public void setPortfoliocnt (String portfoliocnt){
-                this.portfoliocnt = portfoliocnt;
-            }
+    public void setPortfoliocnt (String portfoliocnt){
+        this.portfoliocnt = portfoliocnt;
+    }
 
-            public String getBluePrintcnt () {
-                return bluePrintcnt;
-            }
+    public String getBluePrintcnt () {
+        return bluePrintcnt;
+    }
 
-            public void setBluePrintcnt (String bluePrintcnt){
-                this.bluePrintcnt = bluePrintcnt;
-            }
+    public void setBluePrintcnt (String bluePrintcnt){
+        this.bluePrintcnt = bluePrintcnt;
+    }
 
-            public ArrayList<comments_limited> getCommentsLimitedArrayList () {
-                return commentsLimitedArrayList;
-            }
+    public ArrayList<comments_limited> getCommentsLimitedArrayList () {
+        return commentsLimitedArrayList;
+    }
 
-            public void setCommentsLimitedArrayList
+    public void setCommentsLimitedArrayList
             (ArrayList < comments_limited > commentsLimitedArrayList) {
-                this.commentsLimitedArrayList = commentsLimitedArrayList;
-            }
-        }
-
+        this.commentsLimitedArrayList = commentsLimitedArrayList;
+    }
+}
