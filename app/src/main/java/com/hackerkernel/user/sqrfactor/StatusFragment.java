@@ -399,7 +399,7 @@ public class StatusFragment extends Fragment {
     }
     public void LoadNewsFeedDataFromServer()
     {
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         newsstatus.clear();
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/news-feed",
                 new Response.Listener<String>() {
