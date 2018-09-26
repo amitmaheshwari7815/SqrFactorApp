@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -169,30 +170,37 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
 
 
         String dtc = profileClass.getTime();
-        // Log.v("dtc",dtc);
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
-        Log.v("sdf1",sdf1.toString());
-        Log.v("sdf2",sdf2.toLocalizedPattern());
-        Date date = null;
-        try{
-            date = sdf1.parse(dtc);
-            String newDate = sdf2.format(date);
-            Log.v("date",date+"");
-            System.out.println(newDate);
-            Log.e("Date",newDate);
+        try
+        {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+            Date past = format.parse(dtc);
+            Date now = new Date();
+            long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
+            long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
+            long hours=TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
+            long days=TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime());
 
-        } catch (ParseException e) {
-            e.printStackTrace();
+            if(seconds<60)
+            {
+                holder.postTime.setText(seconds+" sec ago");
+
+            }
+            else if(minutes<60)
+            {
+                holder.postTime.setText(minutes+" min ago");
+            }
+            else if(hours<24)
+            {
+                holder.postTime.setText(hours+" hours ago");
+            }
+            else
+            {
+                holder.postTime.setText(days+" days ago");
+            }
         }
-        Calendar thatDay = Calendar.getInstance();
-        thatDay.setTime(date);
-        long today = System.currentTimeMillis();
-
-        long diff = today - thatDay.getTimeInMillis();
-        long days = diff/(24*60*60*1000);
-
-        holder.postTime.setText(days+ " Days ago");
+        catch (Exception j){
+            j.printStackTrace();
+        }
         //holder.fullDescription.setText(profileClass.);
         holder.buttonLikeList.setText(profileClass.getLike()+" Like");
         holder.buttonLikeList.setOnClickListener(new View.OnClickListener() {
@@ -212,12 +220,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
             @Override
             public void onClick(View v) {
                 if(flag1 == 0) {
-                    holder.buttonComment.setTextColor(context.getColor(R.color.sqr));
+                    holder.buttonComment.setTextColor(ContextCompat.getColor(context,R.color.sqr));
                     flag1 = 1;
 
                 }
                 else {
-                    holder.buttonComment.setTextColor(context.getColor(R.color.gray));
+                    holder.buttonComment.setTextColor(ContextCompat.getColor(context,R.color.gray));
                     flag1 = 0;
                 }
 
@@ -250,11 +258,58 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
                         likeCount=likeCount+1;
                         holder.buttonLikeList.setText(likeCount+" Like");
                     }
-
                     database= FirebaseDatabase.getInstance();
                     ref = database.getReference();
+                    SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+                    Gson gson = new Gson();
+                    String json = mPrefs.getString("MyObject", "");
+                    UserClass userClass = gson.fromJson(json, UserClass.class);
 
                     Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
+                    if(profileClass.getType().equals("status")&& userClass.getUserId()!=profileClass.getUserId())
+                    {
+                        PushNotificationClass pushNotificationClass;
+                        from_user fromUser;
+                        post post1=new post(profileClass.getFullDescription(),profileClass.getSlug(),"post Title",profileClass.getType(),profileClass.getPostId());
+                        if(userClass.getName()!="null")
+                        {
+                            fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                            pushNotificationClass=new PushNotificationClass(userClass.getName()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+                        else
+                        {
+                            fromUser=new from_user(userClass.getEmail(),userClass.getFirst_name()+" "+userClass.getLast_name(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                            pushNotificationClass=new PushNotificationClass(userClass.getFirst_name()+" "+userClass.getLast_name()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+
+                        String key =ref.child("notification").child(profileClass.getUserId()+"").child("all").push().getKey();
+                        ref.child("notification").child(profileClass.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(profileClass.getUserId()+"").child("unread").child(key).setValue(unred);
+                    }
+                    else if(userClass.getUserId()!=profileClass.getUserId())
+                    {
+                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                        post post1=new post(profileClass.getShortDescription(),profileClass.getSlug(),profileClass.getPostTitle(),profileClass.getType(),profileClass.getPostId());
+                        PushNotificationClass pushNotificationClass;
+                        if(userClass.getName().equals("null"))
+                        {
+                            pushNotificationClass=new PushNotificationClass(userClass.getUser_name()+" liked your article ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+                        else
+                        {
+                            pushNotificationClass=new PushNotificationClass(userClass.getName()+" liked your article ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+
+                        //=new PushNotificationClass(userClass.getUser_name()+" liked your article",new Date().getTime(),fromUser,post1,"like_post");
+                        String key =ref.child("notification").child(profileClass.getUserId()+"").child("all").push().getKey();
+                        ref.child("notification").child(profileClass.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(profileClass.getUserId()+"").child("unread").child(key).setValue(unred);
+
+                    }
                 }
                 else {
 

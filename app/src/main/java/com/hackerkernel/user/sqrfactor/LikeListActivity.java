@@ -55,7 +55,7 @@ public class LikeListActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         user_id = intent.getIntExtra("id",0);
-        Toast.makeText(this, user_id+"", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, user_id+"", Toast.LENGTH_SHORT).show();
         likelist();
         final DragToClose dragToClose = findViewById(R.id.drag_to_close);
         dragToClose.setDragListener(new DragListener() {

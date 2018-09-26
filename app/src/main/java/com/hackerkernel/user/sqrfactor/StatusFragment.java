@@ -161,19 +161,6 @@ public class StatusFragment extends Fragment {
         database= FirebaseDatabase.getInstance();
         ref = database.getReference();
 
-//
-//        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-//            @Override
-//            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-//                super.onScrolled(recyclerView, dx, dy);
-//                if (dy > 0 && fabView.getVisibility() == View.VISIBLE) {
-//                    fabView.hide();
-//                } else if (dy < 0 && fabView.getVisibility() != View.VISIBLE) {
-//                    fabView.show();
-//                }
-//
-//            }
-//        });
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
         {
             @Override
@@ -198,8 +185,6 @@ public class StatusFragment extends Fragment {
         });
 
 
-
-
         final SkeletonScreen skeletonScreen = Skeleton.bind(recyclerView)
                 .adapter(newsFeedAdapter)
                 .shimmer(true)
@@ -215,8 +200,6 @@ public class StatusFragment extends Fragment {
                 skeletonScreen.hide();
             }
         }, 2000);
-
-        final LinearLayout statusLinear = (LinearLayout)rootView.findViewById(R.id.status_linear);
 
 
 
@@ -377,7 +360,17 @@ public class StatusFragment extends Fragment {
 
             }
         });
+        ref.child("Chats").child(userClass.getUserId()+"").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                HomeScreen.getUnReadMsgCount();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
 
         return rootView;
 
@@ -436,7 +429,7 @@ public class StatusFragment extends Fragment {
 
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity().getApplicationContext(), "Token" + error+"", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(getActivity().getApplicationContext(), "Token" + error+"", Toast.LENGTH_SHORT).show();
                     }
                 }) {
 
@@ -462,7 +455,7 @@ public class StatusFragment extends Fragment {
                         @Override
                         public void onResponse(String response) {
                             Log.v("MorenewsFeedFromServer", response);
-                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 JSONObject jsonPost = jsonObject.getJSONObject("posts");

@@ -65,6 +65,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.github.irshulx.Editor;
 import com.github.irshulx.EditorListener;
 import com.google.gson.Gson;
@@ -73,6 +75,11 @@ import com.google.gson.Gson;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.parser.Tag;
+import org.jsoup.select.Elements;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -83,6 +90,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 //import io.github.angebagui.mediumtextview.MediumTextView;
@@ -97,8 +105,11 @@ public class ArticleActivity extends ToolbarActivity {
     private Uri uri;
     private  String finalHtml=null;
     String cropedImage;
+    ImageView mRemoveButton;
+    private boolean isEdit=false;
     private WebView videoView;
     private String html;
+    private int postId;
     private String imageString;
     private Button saveArticleButton,video_post_close;
     private EditText articleTitle,articleShortDescription,articleTag;
@@ -107,9 +118,11 @@ public class ArticleActivity extends ToolbarActivity {
     private ImageView articleCustomBaneerImage,cropFinalImage,profileImage,selectBanerImageIcon,banner_attachment_image;
     private FrameLayout videoFrameLayout;
     private ImageButton article_insert_video;
+    private String Slug=null;
+    Bitmap bitmap;
     Intent CamIntent, GalIntent, CropIntent ;
     public  static final int RequestPermissionCode  = 1 ;
-
+    private static final int PIC_CROP = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
 
     @Override
@@ -148,6 +161,36 @@ public class ArticleActivity extends ToolbarActivity {
 
         articleTag = findViewById(R.id.articleTags);
         saveArticleButton = findViewById(R.id.saveArticle);
+
+        Intent intent1=getIntent();
+        if(intent1!=null && intent1.hasExtra("Post_Slug_ID"))
+        {
+            Toast.makeText(this,intent1.getStringExtra("Post_Slug_ID"),Toast.LENGTH_LONG).show();
+            isEdit=true;
+            Slug=intent1.getStringExtra("Post_Slug_ID");
+            postId=intent1.getIntExtra("Post_ID",0);
+            FetchDataFromServerAndBindToViews(intent1.getStringExtra("Post_Slug_ID"));
+
+
+        }
+        final FrameLayout frameLayout = findViewById(R.id.article_rl);
+        frameLayout.setVisibility(View.GONE);
+
+        mRemoveButton = findViewById(R.id.article_banner_remove);
+        mRemoveButton.setVisibility(View.GONE);
+
+        mRemoveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                frameLayout.setVisibility(View.GONE);
+                cropFinalImage.setImageBitmap(null);
+                cropFinalImage.setVisibility(View.GONE);
+                mRemoveButton.setVisibility(View.GONE);
+
+
+            }
+
+        });
 
         SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
@@ -200,17 +243,22 @@ public class ArticleActivity extends ToolbarActivity {
         articleSelectBannerImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                frameLayout.setVisibility(View.VISIBLE);
+                cropFinalImage.setVisibility(View.VISIBLE);
+                mRemoveButton.setVisibility(View.VISIBLE);
+
+
                 if (ContextCompat.checkSelfPermission(ArticleActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
 
                     ActivityCompat.requestPermissions(ArticleActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
                             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 }
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(ArticleActivity.this,
-                        Manifest.permission.CAMERA))
+                        android.Manifest.permission.CAMERA))
                 {
 
                     Toast.makeText(ArticleActivity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
@@ -230,17 +278,21 @@ public class ArticleActivity extends ToolbarActivity {
         selectBanerImageIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                frameLayout.setVisibility(View.VISIBLE);
+                cropFinalImage.setVisibility(View.VISIBLE);
+                mRemoveButton.setVisibility(View.VISIBLE);
+
                 if (ContextCompat.checkSelfPermission(ArticleActivity.this,
-                        Manifest.permission.READ_EXTERNAL_STORAGE)
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
 
                     ActivityCompat.requestPermissions(ArticleActivity.this,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
                             MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
                 }
 
                 if (ActivityCompat.shouldShowRequestPermissionRationale(ArticleActivity.this,
-                        Manifest.permission.CAMERA))
+                        android.Manifest.permission.CAMERA))
                 {
 
                     Toast.makeText(ArticleActivity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
@@ -258,6 +310,7 @@ public class ArticleActivity extends ToolbarActivity {
         });
 
 
+
         saveArticleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -270,7 +323,14 @@ public class ArticleActivity extends ToolbarActivity {
                 Bitmap bitmap = drawable.getBitmap();
                 String image=getStringImage(bitmap);
                 Log.v("cropedImage",image);
-                SendArticleDataToServer(image);
+                if(isEdit)
+                {
+                    SendArticleDataToServer1(image,"https://archsqr.in/api/article-edit");
+                }
+                else {
+                    SendArticleDataToServer(image,"https://archsqr.in/api/article-parse-post");
+                }
+
                 // Toast.makeText(getApplicationContext(),editor.getContentAsHTML(),Toast.LENGTH_LONG).show();
 //                if (!TextUtils.isEmpty(articleTitle.getText()) && !TextUtils.isEmpty(articleShortDescription.getText()) &&
 //                        !TextUtils.isEmpty(articleTag.getText())) {
@@ -327,7 +387,6 @@ public class ArticleActivity extends ToolbarActivity {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/searchtags",
                 new Response.Listener<String>() {
-                    @SuppressLint("WrongViewCast")
                     @Override
                     public void onResponse(String response) {
                         try {
@@ -381,17 +440,15 @@ public class ArticleActivity extends ToolbarActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         try {
+
                             JSONObject jsonObject = new JSONObject(response);
                             String Imgurl=jsonObject.getString("asset_image");
                             editor.onImageUploadComplete(Imgurl, uuid);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-//                        Log.v("Reponse", response);
-//                        Toast.makeText(getApplicationContext(),"response"+response,Toast.LENGTH_LONG).show();
-
-
 
                     }
                 },
@@ -434,11 +491,7 @@ public class ArticleActivity extends ToolbarActivity {
 
     private void selectImage() {
 
-
-
         final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
-
-
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -453,14 +506,13 @@ public class ArticleActivity extends ToolbarActivity {
                 if (options[item].equals("Take Photo"))
 
                 {
-
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
                     File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
 
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 
-                    startActivityForResult(intent, 4);
+                    startActivityForResult(intent, 1);
 
                 }
 
@@ -469,7 +521,7 @@ public class ArticleActivity extends ToolbarActivity {
                 {
 
                     Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, 5);
+                    startActivityForResult(intent, 2);
                 }
 
                 else if (options[item].equals("Cancel")) {
@@ -487,101 +539,102 @@ public class ArticleActivity extends ToolbarActivity {
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
 
-            if (requestCode == 4) {
+            if (requestCode == 1) {
+                uri = data.getData();
+                ImageCropFunction();
 
-                File f = new File(Environment.getExternalStorageDirectory().toString());
+//                File f = new File(Environment.getExternalStorageDirectory().toString());
+//
+//                for (File temp : f.listFiles()) {
+//
+//                    if (temp.getName().equals("temp.jpg")) {
+//
+//                        f = temp;
+//
+//                        break;
+//
+//                    }
+//
+//                }
+//
+//                try {
+//
+//                    Bitmap bitmap;
+//
+//                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+//
+//
+//
+//                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
+//
+//                            bitmapOptions);
+//
+//
+//
+//                    cropFinalImage.setImageBitmap(bitmap);
+//                    cropFinalImage.setVisibility(View.VISIBLE);
+//
+//
+//
+//                    String path = android.os.Environment
+//
+//                            .getExternalStorageDirectory()
+//
+//                            + File.separator
+//
+//                            + "Phoenix" + File.separator + "default";
+//                    articleSelectBannerImage.setText(String.valueOf(System.currentTimeMillis()) + ".jpg");
+//
+//
+//                    f.delete();
+//
+//                    OutputStream outFile = null;
+//
+//                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
+//
+//                    try {
+//
+//                        outFile = new FileOutputStream(file);
+//
+//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
+//
+//                        outFile.flush();
+//
+//                        outFile.close();
+//
+//                    } catch (FileNotFoundException e) {
+//
+//                        e.printStackTrace();
+//
+//                    } catch (IOException e) {
+//
+//                        e.printStackTrace();
+//
+//                    } catch (Exception e) {
+//
+//                        e.printStackTrace();
+//
+//                    }
+//
+//                } catch (Exception e) {
+//
+//                    e.printStackTrace();
+//
+//                }
 
-                for (File temp : f.listFiles()) {
-
-                    if (temp.getName().equals("temp.jpg")) {
-
-                        f = temp;
-
-                        break;
-
-                    }
-
-                }
-
-                try {
-
-                    Bitmap bitmap;
-
-                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+            } else if (requestCode == 2) {
 
 
-
-                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
-
-                            bitmapOptions);
-
-
-
-                    cropFinalImage.setImageBitmap(bitmap);
-                    cropFinalImage.setVisibility(View.VISIBLE);
-
-
-
-                    String path = android.os.Environment
-
-                            .getExternalStorageDirectory()
-
-                            + File.separator
-
-                            + "Phoenix" + File.separator + "default";
-                    articleSelectBannerImage.setText(String.valueOf(System.currentTimeMillis()) + ".jpg");
-
-
-                    f.delete();
-
-                    OutputStream outFile = null;
-
-                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-
-                    try {
-
-                        outFile = new FileOutputStream(file);
-
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
-
-                        outFile.flush();
-
-                        outFile.close();
-
-                    } catch (FileNotFoundException e) {
-
-                        e.printStackTrace();
-
-                    } catch (IOException e) {
-
-                        e.printStackTrace();
-
-                    } catch (Exception e) {
-
-                        e.printStackTrace();
-
-                    }
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-
-                }
-
-            } else if (requestCode == 5) {
-
-
-
-                Uri selectedImage = data.getData();
+                uri = data.getData();
+                ImageCropFunction();
 
                 String[] filePath = { MediaStore.Images.Media.DATA };
-                Cursor c = getContentResolver().query(selectedImage,filePath, null, null, null);
+                Cursor c = getContentResolver().query(uri,filePath, null, null, null);
 
                 c.moveToFirst();
 
@@ -591,16 +644,20 @@ public class ArticleActivity extends ToolbarActivity {
                 String[] fileName = picturePath.split("/");
                 c.close();
 
-                Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
+                bitmap = (BitmapFactory.decodeFile(picturePath));
 
                 // Log.w("path of image from gallery......******************.........", fileName[fileName.length-1]+"");
 
-                cropFinalImage.setImageBitmap(thumbnail);
-                cropFinalImage.setVisibility(View.VISIBLE);
                 articleSelectBannerImage.setText(fileName[fileName.length-1]+"");
 
             }
+            else if(requestCode== PIC_CROP) {
 
+                Bundle extras = data.getExtras();
+                bitmap = extras.getParcelable("data");
+                cropFinalImage.setImageBitmap(bitmap);
+                cropFinalImage.setVisibility(View.VISIBLE);
+            }
         }
 
 
@@ -624,45 +681,23 @@ public class ArticleActivity extends ToolbarActivity {
             editor.insertMap(data.getStringExtra("cords"));
         }
 
-        else if (requestCode == 0 && resultCode == RESULT_OK) {
-            ImageCropFunction();
 
         }
-        else if (requestCode == 2) {
-            if (data != null) {
-                uri = data.getData();
-                ImageCropFunction();
 
-            }
-        }
-        else if (requestCode == 1) {
-            if (data != null) {
-
-                Bundle bundle = data.getExtras();
-                Bitmap bitmap = bundle.getParcelable("data");
-                cropedImage = getStringImage(bitmap);
-                banner_attachment_image.setImageBitmap(bitmap);
-
-            }
-        }
-    }
-
-
-    public void SendArticleDataToServer(final String image)
+    public void SendArticleDataToServer(final String image,final String url)
     {
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/article-parse-post",
+        StringRequest myReq = new StringRequest(Request.Method.POST,url,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("Reponse", response);
-                        Toast.makeText(getApplicationContext(),"response"+response,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),"response"+response,Toast.LENGTH_LONG).show();
                         editor.clearAllContents();
 //                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
 //                            editor.setFocusable(View.NOT_FOCUSABLE);
 //                        }
                         multiAutoCompleteTextView.setText("");
-                        articleTag.setText("");
                         articleTitle.setText("");
                         articleShortDescription.setText("");
                         cropFinalImage.setVisibility(View.GONE);
@@ -687,11 +722,70 @@ public class ArticleActivity extends ToolbarActivity {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
-                Log.v("data",articleTitle.getText().toString()+articleTag.getText().toString()+articleShortDescription.getText().toString()+finalHtml);
+//                Log.v("article",articleTitle.getText().toString()+" "+multiAutoCompleteTextView.getText().toString()+" "+articleShortDescription.getText().toString()+
+//                " "+image+ " "+finalHtml);
+
                 params.put("post_type","article");
                 params.put("title",articleTitle.getText().toString());
                 params.put("tags",multiAutoCompleteTextView.getText().toString());
                 params.put("description_short",articleShortDescription.getText().toString());
+                params.put("banner_image","data:image/jpeg;base64,"+image);
+                if(finalHtml!=null)
+                    params.put("description",finalHtml);
+                else
+                    params.put("description",editor.getContentAsHTML());
+                return params;
+            }
+        };
+
+        requestQueue.add(myReq);
+    }
+
+    public void SendArticleDataToServer1(final String image,final String url)
+    {
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        StringRequest myReq = new StringRequest(Request.Method.POST,url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("Reponse", response);
+//                        Toast.makeText(getApplicationContext(),"response"+response,Toast.LENGTH_LONG).show();
+                        editor.clearAllContents();
+//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                            editor.setFocusable(View.NOT_FOCUSABLE);
+//                        }
+                        multiAutoCompleteTextView.setText("");
+                        articleTitle.setText("");
+                        articleShortDescription.setText("");
+                        cropFinalImage.setVisibility(View.GONE);
+
+                    }
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+                return params;
+            }
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                Log.v("article1",articleTitle.getText().toString()+" "+multiAutoCompleteTextView.getText().toString()+" "+articleShortDescription.getText().toString()+
+                        " "+finalHtml+" "+Slug +" "+image+ " ");
+                params.put("id",postId+"");
+                params.put("title",articleTitle.getText().toString());
+                params.put("tags",multiAutoCompleteTextView.getText().toString());
+                params.put("description_short",articleShortDescription.getText().toString());
+                params.put("slug",Slug);
                 params.put("banner_image","data:image/jpeg;base64,"+image);
                 if(finalHtml!=null)
                     params.put("description",finalHtml);
@@ -712,17 +806,20 @@ public class ArticleActivity extends ToolbarActivity {
             CropIntent = new Intent("com.android.camera.action.CROP");
             CropIntent.setDataAndType(uri, "image/*");
             CropIntent.putExtra("crop", "true");
-            CropIntent.putExtra("outputX", 900);
-            CropIntent.putExtra("outputY", 950);
-            CropIntent.putExtra("aspectX", 0);
-            CropIntent.putExtra("aspectY", 0);
+            CropIntent.putExtra("outputX", 640);
+            CropIntent.putExtra("outputY", 640);
+            CropIntent.putExtra("aspectX", 16);
+            CropIntent.putExtra("aspectY", 9);
             CropIntent.putExtra("scaleUpIfNeeded", true);
             CropIntent.putExtra("return-data", true);
 
-            startActivityForResult(CropIntent, 1);
+            startActivityForResult(CropIntent, PIC_CROP);
 
-        } catch (ActivityNotFoundException e) {
-
+        } catch(ActivityNotFoundException anfe){
+            //display an error message
+            String errorMessage = "your device doesn't support the crop action!";
+            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
         }
     }
 
@@ -739,12 +836,12 @@ public class ArticleActivity extends ToolbarActivity {
         {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                Toast.makeText(ArticleActivity.this,"Permission Granted, Now your application can access CAMERA.", Toast.LENGTH_LONG).show();
+//                Toast.makeText(ArticleActivity.this,"Permission Granted, Now your application can access CAMERA.", Toast.LENGTH_LONG).show();
 
             }
             else {
 
-                Toast.makeText(ArticleActivity.this,"Permission Canceled, Now your application cannot access CAMERA.", Toast.LENGTH_LONG).show();
+//                Toast.makeText(ArticleActivity.this,"Permission Canceled, Now your application cannot access CAMERA.", Toast.LENGTH_LONG).show();
 
             }
         }
@@ -754,7 +851,7 @@ public class ArticleActivity extends ToolbarActivity {
                 ContinueAfterPermission();
             } else {
                 // Permission Denied
-                Toast.makeText(ArticleActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ArticleActivity.this, "Permission Denied", Toast.LENGTH_SHORT).show();
             }
             return;
         }
@@ -806,7 +903,7 @@ public class ArticleActivity extends ToolbarActivity {
 
     private void showVideo(String videoLink)
     {
-        Toast.makeText(this,videoLink,Toast.LENGTH_LONG).show();
+//        Toast.makeText(this,videoLink,Toast.LENGTH_LONG).show();
         final WebView myWebView = (WebView) findViewById(R.id.articleVideoView);
         myWebView.setWebViewClient(new WebViewClient());
         myWebView.getSettings().setJavaScriptEnabled(true);
@@ -851,6 +948,212 @@ public class ArticleActivity extends ToolbarActivity {
         });
     }
 
+    private void FetchDataFromServerAndBindToViews(String post_slug_id) {
 
+        RequestQueue requestQueue = Volley.newRequestQueue(this);
+        // "https://archsqr.in/api/profile/detail/
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/post/article/edit/"+post_slug_id,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v("response",response);
+                        //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONObject jsonObjectFullPost = jsonObject.getJSONObject("articlePostEdit");
+                            final ArticleEditClass articleEditClass = new ArticleEditClass(jsonObjectFullPost);
+                            articleTitle.setText(articleEditClass.getTitle());
+                            articleShortDescription.setText(articleEditClass.getShort_description());
+                            //multiAutoCompleteTextView.setText(fullPost.get);
+
+                            if(articleEditClass.getImage()!=null) {
+                                Glide.with(getApplicationContext())
+                                        .asBitmap()
+                                        .load("https://archsqr.in/"+articleEditClass.getImage())
+                                        .into(new SimpleTarget<Bitmap>() {
+                                            @Override
+                                            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                                                Bitmap bitmapResized = Bitmap.createScaledBitmap(resource,
+                                                        (int) (resource.getWidth() * 0.5), (int) (resource.getHeight() * 0.5), false);
+                                                imageString = getStringImage(resource);
+                                                editor.insertImage(bitmapResized);
+                                            }
+                                        });
+                            }
+                            //Log.v("des0",articleEditClass.getDescription());
+
+                            setContentToView(articleEditClass.getDescription());
+                            if(articleEditClass.getBanner_image()!=null)
+                            {
+
+
+                                Glide.with(getApplicationContext()).load("https://archsqr.in/"+articleEditClass.getBanner_image())
+                                        .into(cropFinalImage);
+                                cropFinalImage.setVisibility(View.VISIBLE);
+                            }
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer " + TokenClass.Token);
+                return params;
+            }
+
+        };
+        requestQueue.add(myReq);
+    }
+
+    public void setContentToView(String content){
+        List<String> p = new ArrayList<>();
+        List<String> src = new ArrayList<>();
+        Document doc = Jsoup.parse(content);
+
+        Elements elements = doc.getAllElements();
+        int pos=0;
+
+        for(Element element :elements){
+            Tag tag = element.tag();
+
+            if(tag.getName().equalsIgnoreCase("a")){
+                String name  = element.html();
+                //String heading = element.select(tag.getName().toString()).text();
+                Log.v("des1",name);
+                if(name.contains("span")||name.contains("<i>")||name.contains("<b>"))
+                {
+                    continue;
+                }
+                else {
+                    editor.getInputExtensions().insertEditText(pos,"",name);
+                    pos++;
+                }
+
+            }
+
+            else if(tag.getName().equalsIgnoreCase("b")){
+                String title  = element.html();
+                //String heading = element.select(tag.getName().toString()).text();
+                Log.v("des2",title);
+                if(title.contains("&nbsp")||title.contains("href")||title.equals("<br>"))
+                {
+                    continue;
+                }
+
+                else {
+                    editor.getInputExtensions().insertEditText(pos,"",title);
+                    pos++;
+                    continue;
+                }
+
+            }
+
+            else if(tag.getName().equalsIgnoreCase("p")){
+
+                element.select("img").remove();
+                String body= element.html();
+
+                String[] parsedBody=body.split("\\.");
+                StringBuilder builder = new StringBuilder();
+                for(String s : parsedBody) {
+                    Log.v("des3",s);
+                    if(s.contains("&nbsp")||s.contains("<span")||s.contains("</span>")||s.contains("<br>"))
+                    {
+                        continue;
+                    }
+                    else
+                        builder.append(s+".");
+                }
+                String str = builder.toString();
+                if(body.contains("href")||body.equals("<br>")||body.contains("<b>"))
+                {
+                    continue;
+                }
+                else {
+                    editor.getInputExtensions().insertEditText(pos,"",str);
+                    pos++;
+                    continue;
+                }
+
+
+            }
+            else if (tag.getName().equalsIgnoreCase("img")){
+                String url  = element.select("img").attr("src");
+                Log.v("des4",url);
+
+                Glide.with(this)
+                        .asBitmap()
+                        .load(url)
+                        .into(new SimpleTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                                Bitmap bitmapResized = Bitmap.createScaledBitmap(resource,
+                                        (int) (resource.getWidth() * 0.5), (int) (resource.getHeight() * 0.5), false);
+                                imageString=getStringImage(resource);
+                                editor.insertImage(bitmapResized);
+                            }
+                        });
+                continue;
+            }
+            else if (tag.getName().equalsIgnoreCase("iframe")){
+                String url  = element.select("iframe").attr("src");
+                Log.v("des5",url);
+
+
+                final WebView myWebView = (WebView) findViewById(R.id.articleVideoView);
+                myWebView.setWebViewClient(new WebViewClient());
+                myWebView.getSettings().setJavaScriptEnabled(true);
+                myWebView.setWebChromeClient(new WebChromeClient());
+
+                String[] stringId=url.split("/");
+                String id=stringId[stringId.length-1];
+                String src1="src="+'"'+"https://www.youtube.com/embed/"+id+'"';
+                String html="<iframe width=\"100%\" height=\"400\" "+src1+"frameborder=\"0\" allowfullscreen=\"\"></iframe>";
+
+                finalHtml="   <html>\n" +
+                        "  <head>\n" +
+                        "    <title>Combined</title>\n" +
+                        "  </head>\n" +
+                        "  <body>\n" +
+                        "    <div id=\"page1\">\n" +
+                        editor.getContentAsHTML() +
+                        "    </div>\n" +
+                        "    <div id=\"page2\">\n" +
+                        html +
+                        "    </div>\n" +
+                        "  </body>\n" +
+                        "</html>";
+
+                myWebView.loadDataWithBaseURL(url,html, "text/html", "UTF-8", "");
+                videoFrameLayout.setVisibility(View.VISIBLE);
+//
+                video_post_close.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        videoFrameLayout.setVisibility(View.GONE);
+                    }
+                });
+                continue;
+            }
+
+
+
+        }
+    }
 
 }

@@ -42,6 +42,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
@@ -56,6 +57,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.facebook.login.LoginManager;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -90,6 +97,8 @@ public class HomeScreen extends ToolbarActivity {
     private SearchResultAdapter searchResultAdapter;
     LinearLayout linearLayout;
     private EditText searchEditText;
+    private ImageButton searchClose;
+    private SharedPreferences sp;
     public static DatabaseReference ref;
     public static FirebaseDatabase database;
     private ArrayList<SearchResultClass> searchResultClasses=new ArrayList<>();
@@ -99,6 +108,8 @@ public class HomeScreen extends ToolbarActivity {
     static int count1;
     private UserClass userClass;
     static Context context;
+    private  View v;
+    private GoogleApiClient mGoogleApiClient;
 
 
     @Override
@@ -113,6 +124,7 @@ public class HomeScreen extends ToolbarActivity {
         ActionBar actionBar = getSupportActionBar();
 //        actionBar.setLogo(R.drawable.profilepic);
         actionBar.setDisplayShowTitleEnabled(false);
+        sp = getSharedPreferences("login",MODE_PRIVATE);
 
         final SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
         Gson gson = new Gson();
@@ -128,6 +140,7 @@ public class HomeScreen extends ToolbarActivity {
 
         linearLayout=(LinearLayout)findViewById(R.id.mainfrag);
         searchEditText=(EditText)findViewById(R.id.user_search);
+        searchClose =(ImageButton) findViewById(R.id.search_close);
         recyclerView=(RecyclerView)findViewById(R.id.search_recycler);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -150,6 +163,7 @@ public class HomeScreen extends ToolbarActivity {
                 //Toast.makeText(getApplicationContext(),s+"",Toast.LENGTH_SHORT).show();
                 recyclerView.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.INVISIBLE);
+                searchClose.setVisibility(View.VISIBLE);
                 FetchSearchedDataFromServer(s+"");
 
 
@@ -165,7 +179,15 @@ public class HomeScreen extends ToolbarActivity {
                 }
             }
         });
-
+            searchClose.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    searchEditText.setText("");
+                    recyclerView.setVisibility(View.GONE);
+                    linearLayout.setVisibility(View.VISIBLE);
+                    searchClose.setVisibility(View.GONE);
+                }
+            });
         SharedPreferences sharedPreferences = getSharedPreferences("PREF_NAME", MODE_PRIVATE);
         String token = sharedPreferences.getString("TOKEN", "sqr");
         TokenClass.Token = token;
@@ -202,13 +224,19 @@ public class HomeScreen extends ToolbarActivity {
                     case 1:
                         getSupportFragmentManager().beginTransaction().replace(R.id.mainfrag, new MessageFragment()).commit();
                         tab.setIcon(R.drawable.chatmsgcolor);
+                        if(tab.getCustomView()!=null) {
+                            v = tab.getCustomView().findViewById(R.id.badgeCotainer);
+                        }
+                        if(v != null) {
+                            v.setVisibility(View.GONE);
+                        }
 
                         break;
 
                     case 2:
                         tab.setIcon(R.drawable.notifycolor1);
-//                        if(tab.getCustomView()!=null)
-                        View v = tab.getCustomView().findViewById(R.id.badgeCotainer);
+                        if(tab.getCustomView()!=null)
+                        v = tab.getCustomView().findViewById(R.id.badgeCotainer);
                         if(v != null) {
                             v.setVisibility(View.GONE);
                         }
@@ -262,7 +290,7 @@ public class HomeScreen extends ToolbarActivity {
         ImageView profileImage = (ImageView) headerLayout.findViewById(R.id.profile_image);
         headerLayout.setVisibility(View.VISIBLE);
 
-        Toast.makeText(this, userClass.getProfile(), Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, userClass.getProfile(), Toast.LENGTH_SHORT).show();
         Glide.with(this).load("https://archsqr.in/" + userClass.getProfile())
                 .into(profileImage);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -289,7 +317,20 @@ public class HomeScreen extends ToolbarActivity {
                 }
                 if (id == R.id.navigation_logout) {
 
-//
+                    sp.edit().putBoolean("logged",false).apply();
+
+                    LoginManager.getInstance().logOut();
+
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+                            new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(Status status) {
+                                    // ...
+//                                    Toast.makeText(getApplicationContext(),"Logged Out",Toast.LENGTH_SHORT).show();
+                                    Intent i=new Intent(getApplicationContext(),LoginScreen.class);
+                                    startActivity(i);
+                                }
+                            });
 //                    //call api here for logout
 //
                     SharedPreferences mPrefs = getSharedPreferences("User", MODE_PRIVATE);
@@ -299,6 +340,7 @@ public class HomeScreen extends ToolbarActivity {
                     FirebaseMessaging.getInstance().unsubscribeFromTopic("pushNotifications" + userClass.getUserId());
                     FirebaseMessaging.getInstance().unsubscribeFromTopic("chats" + userClass.getUserId());
 
+
                     RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
 
                     StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/logout",
@@ -306,7 +348,7 @@ public class HomeScreen extends ToolbarActivity {
                                 @Override
                                 public void onResponse(String response) {
                                     Log.v("ReponseFeed", response);
-                                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                                    Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                                     SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                                     Date date = new Date();
                                     IsOnline isOnline=new IsOnline("False",formatter.format(date));
@@ -355,6 +397,7 @@ public class HomeScreen extends ToolbarActivity {
             }
         });
     }
+
 
 
 
@@ -448,6 +491,13 @@ public class HomeScreen extends ToolbarActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+        mGoogleApiClient.connect();
         this.context=getApplicationContext();
     }
 
@@ -458,7 +508,7 @@ public class HomeScreen extends ToolbarActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(context, response, Toast.LENGTH_LONG).show();
                         try {
 
                             JSONObject jsonObject = new JSONObject(response);
@@ -510,44 +560,38 @@ public class HomeScreen extends ToolbarActivity {
         requestQueue.add(myReq);
     }
 
-    //    private void RealTimeNotificationListner()
-//    {
-//
-//        ref.child("Notifications").child(userClass.getUserId()+"").addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//
-//                Toast.makeText(getApplicationContext(),"real Notification changed",Toast.LENGTH_LONG).show();
-//
-//                getnotificationCount();
-//
-//            }
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//
-//            }
-//        });
-//
-//    }
-    public void getUnReadMsgCount(){
-        RequestQueue requestQueue = Volley.newRequestQueue(HomeScreen.this);
 
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/notificationcount",
+    public static void getUnReadMsgCount(){
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/unread_counts",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        TabLayout.Tab tab = tabLayout.getTabAt(1);
-                        tab.setCustomView(R.layout.badged);
-                        if(tab != null && tab.getCustomView() != null) {
-                            TextView b = (TextView) tab.getCustomView().findViewById(R.id.badge);
-                            if(b != null) {
-                                b.setText("3");
-                            }
-                            View v = tab.getCustomView().findViewById(R.id.badgeCotainer);
-                            if(v != null) {
-                                v.setVisibility(View.VISIBLE);
+//                        Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+                        try {
+
+                            JSONObject jsonObject = new JSONObject(response);
+                            count1 =jsonObject.getInt("Unread Messages");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                        if(count1!=0) {
+                            TabLayout.Tab tab1 = tabLayout.getTabAt(1);
+                            if (tab1.getCustomView() == null)
+                                tab1.setCustomView(R.layout.badged);
+
+                            if (tab1 != null && tab1.getCustomView() != null) {
+                                TextView b = (TextView) tab1.getCustomView().findViewById(R.id.badge);
+                                if (b != null) {
+                                    b.setText(count1 + "");
+                                }
+                                View v = tab1.getCustomView().findViewById(R.id.badgeCotainer);
+                                if (v != null) {
+                                    v.setVisibility(View.VISIBLE);
+                                }
                             }
                         }
                     }
@@ -574,5 +618,4 @@ public class HomeScreen extends ToolbarActivity {
 
         requestQueue.add(myReq);
     }
-
 }

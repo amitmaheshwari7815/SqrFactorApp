@@ -6,7 +6,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
 <include layout="@layout/activity_toolbar"/>
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -19,7 +18,7 @@
             android:weightSum="4">
 
             <ImageView
-                android:id="@+id/newsProfileImage"
+                android:id="@+id/statusProfileImage"
                 android:layout_width="0sp"
                 android:layout_height="60sp"
                 android:layout_marginTop="10sp"
@@ -100,7 +99,8 @@
             android:layout_alignParentStart="true"
             android:background="@drawable/gray_border"
             android:orientation="horizontal"
-            android:paddingTop="10sp">
+            android:paddingTop="10sp"
+            android:layout_alignParentLeft="true">
 
             <ImageView
                 android:id="@+id/news_camera"
@@ -129,4 +129,5 @@
         </RelativeLayout>
 
     </RelativeLayout>
+
 </LinearLayout>

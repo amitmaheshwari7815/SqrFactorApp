@@ -92,7 +92,7 @@ public class ContributorsFragment extends Fragment {
                     public void onResponse(String response) {
                         isDataFetched=true;
                         Log.v("ReponseFeed33", response);
-                        Toast.makeText(getActivity().getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getActivity().getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             //    JSONObject jsonObjectChat = jsonObject.getJSONObject("chats");

@@ -5,7 +5,9 @@
     android:layout_height="match_parent"
     tools:context=".SearchPageFragment"
     android:orientation="vertical">
-
+<FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <EditText
         android:id="@+id/user_search"
         android:layout_width="match_parent"
@@ -21,6 +23,16 @@
         android:padding="10sp"
         android:drawableLeft="@drawable/ic_search_black_24dp"/>
 
+    <ImageButton
+        android:id="@+id/search_close"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|center"
+        android:layout_marginEnd="15sp"
+        android:background="@color/white"
+        android:src="@drawable/ic_close"
+        android:visibility="gone"/>
+</FrameLayout>
     <android.support.v7.widget.RecyclerView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

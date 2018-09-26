@@ -71,7 +71,7 @@ public class PortfolioActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.v("portfolioResponse", response);
-                        Toast.makeText(PortfolioActivity.this, response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(PortfolioActivity.this, response, Toast.LENGTH_LONG).show();
                         try {
 
                             JSONObject jsonObject = new JSONObject(response);

@@ -24,6 +24,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -44,6 +46,8 @@ public class Settings extends AppCompatActivity {
     private ArrayList<UserData> userDataArrayList = new ArrayList<>();
     private SharedPreferences.Editor editor;
     private SharedPreferences mPrefs;
+    public static DatabaseReference ref;
+    public static FirebaseDatabase database;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +62,14 @@ public class Settings extends AppCompatActivity {
         followers =(TextView)findViewById(R.id.followers);
         following =(TextView)findViewById(R.id.following);
         //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new SettingsFragment()).commit();
+
+        database= FirebaseDatabase.getInstance();
+        ref = database.getReference();
+        SharedPreferences sharedPreferences = getSharedPreferences("PREF_NAME", MODE_PRIVATE);
+        String token = sharedPreferences.getString("TOKEN", "sqr");
+        TokenClass.Token = token;
+        TokenClass tokenClass = new TokenClass(token);
+        Log.v("Token1", token);
 
         SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();

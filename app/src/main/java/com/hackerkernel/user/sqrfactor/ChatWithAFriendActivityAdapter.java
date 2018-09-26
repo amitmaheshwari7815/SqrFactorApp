@@ -1,6 +1,7 @@
 package com.hackerkernel.user.sqrfactor;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -22,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
+
+import static android.content.Context.MODE_PRIVATE;
 
 public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWithAFriendActivityAdapter.MyViewHolder> {
 
@@ -53,41 +58,53 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, int position) {
 
-
+        SharedPreferences mPrefs =context.getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
         MessageClass messageClass=messageClassArrayList.get(position);
         int fromId=messageClass.getUserFrom();
 
         String dtc = messageClassArrayList.get(position).getCreatedAt();
-        Log.v("dtc",dtc);
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
-        Log.v("sdf1",sdf1.toString());
-        Log.v("sdf2",sdf2.toLocalizedPattern());
-        Date date = null;
-        try{
-            date = sdf1.parse(dtc);
-            String newDate = sdf2.format(date);
-            Log.v("date",date+"");
-            System.out.println(newDate);
-            Log.e("Date",newDate);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar thatDay = Calendar.getInstance();
-        thatDay.setTime(date);
-        long today = System.currentTimeMillis();
-
-        long diff = today - thatDay.getTimeInMillis();
-        long days = diff/(24*60*60*1000);
-
         if(fromId==friendId)
         {
             int x=count++;
             Log.v("count",x+"");
             holder.freindLayout.setVisibility(View.VISIBLE);
             holder.frndChatMessage.setText(messageClassArrayList.get(position).getChat());
-            holder.frndchatTime.setText(days+" Days ago");
+
+            try
+            {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+                Date past = format.parse(dtc);
+                Date now = new Date();
+                long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
+                long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
+                long hours=TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
+                long days1=TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime());
+
+                if(seconds<60)
+                {
+                    holder.frndchatTime.setText(seconds+" sec ago");
+
+                }
+                else if(minutes<60)
+                {
+                    holder.frndchatTime.setText(minutes+" min ago");
+                }
+                else if(hours<24)
+                {
+                    holder.frndchatTime.setText(hours+" hours ago");
+                }
+                else
+                {
+                    holder.frndchatTime.setText(days1+" days ago");
+                }
+            }
+            catch (Exception j){
+                j.printStackTrace();
+            }
+
             holder.frndName.setText(friendName);
             Glide.with(context).load("https://archsqr.in/"+friendProfileUrl)
                     .into(holder.frndProfile);
@@ -97,9 +114,40 @@ public class ChatWithAFriendActivityAdapter extends RecyclerView.Adapter<ChatWit
         {
             holder.myLayout.setVisibility(View.VISIBLE);
             holder.myMessage.setText(messageClassArrayList.get(position).getChat());
-            holder.myChatTime.setText(days+" Days ago");
-            holder.myName.setText(MessageFragment.userName);
-            Glide.with(context).load("https://archsqr.in/"+MessageFragment.userProfile)
+            try
+            {
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+                Date past = format.parse(dtc);
+                Date now = new Date();
+                long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
+                long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
+                long hours=TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
+                long days1=TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime());
+
+                if(seconds<60)
+                {
+                    holder.myChatTime.setText(seconds+" sec ago");
+
+                }
+                else if(minutes<60)
+                {
+                    holder.myChatTime.setText(minutes+" min ago");
+                }
+                else if(hours<24)
+                {
+                    holder.myChatTime.setText(hours+" hours ago");
+                }
+                else
+                {
+                    holder.myChatTime.setText(days1+" days ago");
+                }
+            }
+            catch (Exception j){
+                j.printStackTrace();
+            }
+
+            holder.myName.setText(userClass.getUser_name());
+            Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
                     .into(holder.myProfile);
 
         }

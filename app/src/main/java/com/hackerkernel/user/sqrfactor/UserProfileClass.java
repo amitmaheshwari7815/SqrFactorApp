@@ -88,48 +88,43 @@ public class UserProfileClass {
             this.email = user.getString("email");
             this.mobile_number = user.getString("mobile_number");
             this.name = user.getString("name");
-            Object jsonPost1= jsonObject.get("posts");
-            if(jsonPost1 instanceof String){
-
-            }
-            else {
-                JSONObject jsonPost = jsonObject.getJSONObject("posts");
-                if (jsonPost != null) {
-                    JSONArray jsonArrayData = jsonPost.getJSONArray("data");
-                    for (int i = 0; i < jsonArrayData.length(); i++) {
+            JSONObject jsonPost = jsonObject.getJSONObject("posts");
+            if (jsonPost != null) {
+                JSONArray jsonArrayData = jsonPost.getJSONArray("data");
+                for (int i = 0; i < jsonArrayData.length(); i++) {
 
 
-                        JSONObject post = jsonArrayData.getJSONObject(i);
+                    JSONObject post = jsonArrayData.getJSONObject(i);
 
-                        NewsFeedStatus newsFeedStatus = new NewsFeedStatus(post);
-                        postDataClassArrayList.add(newsFeedStatus);
+                    NewsFeedStatus newsFeedStatus = new NewsFeedStatus(post);
+                    postDataClassArrayList.add(newsFeedStatus);
 
-                        JSONArray likes = post.getJSONArray("likes");
-                        this.like = likes.length() + "";
+                    JSONArray likes = post.getJSONArray("likes");
+                    this.like = likes.length() + "";
 
-                        JSONArray commentsLimited = post.getJSONArray("comments_limited");
+                    JSONArray commentsLimited = post.getJSONArray("comments_limited");
 
-                        for (int j = 0; j < commentsLimited.length(); j++) {
-                            try {
-                                JSONObject jsonObject1 = commentsLimited.getJSONObject(j);
-                                this.commentId = jsonObject1.getInt("id");
-                                comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
-                                        jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
-                                        jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
-                                        jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
-                                this.commentsLimitedArrayList.add(limited);
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
+                    for (int j = 0; j < commentsLimited.length(); j++) {
+                        try {
+                            JSONObject jsonObject1 = commentsLimited.getJSONObject(j);
+                            this.commentId = jsonObject1.getInt("id");
+                            comments_limited limited = new comments_limited(jsonObject1.getJSONArray("likes").length(), jsonObject1.getJSONObject("user").getString("first_name") + " " + jsonObject1.getJSONObject("user").getString("last_name"),
+                                    jsonObject1.getJSONObject("user").getString("profile"), jsonObject1.getInt("id"), jsonObject1.getInt("user_id"),
+                                    jsonObject1.getInt("commentable_id"), jsonObject1.getString("commentable_type"),
+                                    jsonObject1.getString("body"), jsonObject1.getString("created_at"), jsonObject1.getString("updated_at"));
+                            this.commentsLimitedArrayList.add(limited);
 
 
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
+
                     }
+
                 }
             }
+
 
         } catch(JSONException e){
             e.printStackTrace();

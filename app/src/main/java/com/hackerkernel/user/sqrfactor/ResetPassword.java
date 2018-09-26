@@ -12,6 +12,7 @@ public class ResetPassword extends ToolbarActivity {
         setContentView(R.layout.activity_reset_password);
 
         toolbar = (Toolbar)findViewById(R.id.toolbar);
+        toolbar.setTitleTextColor(getResources().getColor(R.color.white));
         setSupportActionBar(toolbar);
 
         //ActionBar actionBar = getSupportActionBar();

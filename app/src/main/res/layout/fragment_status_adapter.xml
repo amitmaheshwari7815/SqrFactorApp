@@ -61,13 +61,13 @@
                         android:text="5 minutes ago"
                         android:textSize="12sp"
                         android:fontFamily="@font/roboto"/>
-                    <TextView
-                        android:id="@+id/news_post_type"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=" | Article"
-                        android:fontFamily="@font/roboto"
-                        android:textSize="12sp"/>
+                    <!--<TextView-->
+                        <!--android:id="@+id/news_post_type"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:text=" | Article"-->
+                        <!--android:fontFamily="@font/roboto"-->
+                        <!--android:textSize="12sp"/>-->
                     </LinearLayout>
                 </LinearLayout>
 
@@ -98,15 +98,16 @@
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_medium"
                     android:textSize="16dp"
+                    android:visibility="gone"
                     android:layout_marginTop="5sp"
-                    android:text="Article"/>
+                    android:text=""/>
 
                 <TextView
                     android:id="@+id/news_short_Descrip"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto"
-                    android:text="how are you"
+                    android:text=""
                     android:layout_marginTop="5sp"
                     android:textSize="16sp"/>
 
@@ -118,7 +119,8 @@
                     android:background="@color/sqr"
                     android:fontFamily="@font/roboto"
                     android:padding="3dp"
-                    android:text="Article"
+                    android:text="Architecture"
+                    android:visibility="gone"
                     android:textAllCaps="false"
                     android:textColor="@color/white"
                     android:textSize="14sp" />

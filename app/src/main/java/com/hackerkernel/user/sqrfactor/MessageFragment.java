@@ -1,9 +1,12 @@
 package com.hackerkernel.user.sqrfactor;
 
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +14,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -32,6 +36,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,17 +51,26 @@ public class MessageFragment extends Fragment {
     private ArrayList<ChatFriends> chatFriends = new ArrayList<>();
     //private ArrayList<ChatFriends> chatFriends = new ArrayList<>();
     private ChatAdapter chatAdapter;
+    private Context context;
     RecyclerView recycler;
     LinearLayoutManager layoutManager;
     public static String userProfile,userName;
     public static  int userId;
     public static FirebaseDatabase database;
     public static DatabaseReference ref;
+    UserClass userClass;
 
     public MessageFragment() {
         // Required empty public constructor
     }
 
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        context = getActivity();
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,69 +91,14 @@ public class MessageFragment extends Fragment {
         SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
+        userClass = gson.fromJson(json, UserClass.class);
         //String token_id=FirebaseInstanceId.getInstance().getToken();
-        RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
+
 
         if(savedInstanceState==null)
         {
-            StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/message/"+userClass.getUserId(),
-                    new Response.Listener<String>() {
-                        @Override
-                        public void onResponse(String response) {
-                            Log.v("ReponseFeed", response);
-                            //Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                            try {
-                                JSONObject jsonObject = new JSONObject(response);
-                                JSONObject user=jsonObject.getJSONObject("user");
-
-                                //CurrentLoginedUser currentLoginedUser=new CurrentLoginedUser(userId,userName,userProfile);
-                                userProfile=user.getString("profile");
-                                userName=user.getString("name");
-                                userId=user.getInt("id");
-
-                                JSONArray jsonArrayData = jsonObject.getJSONArray("friends");
-                                for (int i = 0; i < jsonArrayData.length(); i++) {
-                                    Log.v("Response",response);
-                                    ChatFriends chatFriends1 = new ChatFriends(jsonArrayData.getJSONObject(i));
-                                    chatFriends1.setIsOnline("False");
-                                    chatFriends.add(chatFriends1);
-                                }
-                                chatAdapter.notifyDataSetChanged();
-//                                DatabaseReference presenceRef = FirebaseDatabase.getInstance().getReference().child("Status").child(userId+"");
-//                                IsOnline isOnline=new IsOnline("False",ServerValue.TIMESTAMP.toString());
-//                                presenceRef.onDisconnect().setValue(isOnline);
-                                StatusLinstner();
-
-
-
-
-
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                    },
-                    new Response.ErrorListener() {
-
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-
-                        }
-                    }) {
-
-                @Override
-                public Map<String, String> getHeaders() throws AuthFailureError {
-                    Map<String, String> params = new HashMap<String, String>();
-                    params.put("Accept", "application/json");
-                    params.put("Authorization", "Bearer "+TokenClass.Token);
-                    return params;
-                }
-
-            };
-
-            requestQueue.add(myReq);
+            getAllFriendsList();
+            //HomeScreen.getUnReadMsgCount();
         }
 
         else {
@@ -149,12 +109,30 @@ public class MessageFragment extends Fragment {
 //            presenceRef.onDisconnect().setValue(isOnline);
             StatusLinstner();
         }
-        ref.child("notification").child(userClass.getUserId()+"").child("all").addValueEventListener(new ValueEventListener() {
+
+        ref.child("Chats").child(userClass.getUserId()+"").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //Toast.makeText(getContext(), "chat Listing", Toast.LENGTH_SHORT).show();
+                LastMessage lastMessage = dataSnapshot.getValue(LastMessage.class);
+                int index=getIndexByProperty(lastMessage.getSenderId());
+//                ChatFriends chatFriends1=null;
+//                if(index>0)
+//                {
+//                    chatFriends1 = chatFriends.get(index);
+//                    chatFriends1.setUnread_count(Integer.parseInt(chatFriends1.getUnread_count())+1+"");
+//                    chatFriends.set(index,chatFriends1 );
+//                    chatAdapter.notifyItemChanged(index);
+//                }
 
-                HomeScreen.getnotificationCount();
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        getAllFriendsList();
 
+                    }
+                }, 200);
             }
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -164,6 +142,93 @@ public class MessageFragment extends Fragment {
 
 
         return v;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        getAllFriendsList();
+        HomeScreen.getUnReadMsgCount();
+
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+
+    }
+
+
+    private void getAllFriendsList() {
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+
+        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/message/"+userClass.getUserId(),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            JSONArray jsonArrayData = jsonObject.getJSONArray("friends");
+                            if (chatFriends!=null)
+                            {
+                                chatFriends.clear();
+                            }
+                            for (int i = 0; i < jsonArrayData.length(); i++) {
+                                Log.v("Response",response);
+                                ChatFriends chatFriends1 = new ChatFriends(jsonArrayData.getJSONObject(i));
+                                chatFriends1.setIsOnline("False");
+                                chatFriends.add(chatFriends1);
+                            }
+                            Collections.sort(chatFriends, new Comparator<ChatFriends>(){
+                                public int compare(ChatFriends o1, ChatFriends o2){
+                                    return o2.getCreated_at().compareTo(o1.getCreated_at());
+                                }
+                            });
+                            chatAdapter.notifyDataSetChanged();
+//
+                            StatusLinstner();
+
+
+
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                },
+                new Response.ErrorListener() {
+
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+
+                    }
+                }) {
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("Accept", "application/json");
+                params.put("Authorization", "Bearer "+TokenClass.Token);
+                return params;
+            }
+
+        };
+
+        requestQueue.add(myReq);
+    }
+
+    private int getIndexByProperty(int userId) {
+        for (int i = 0; i < chatFriends.size(); i++) {
+            if (chatFriends.get(i) !=null && chatFriends.get(i).getUserID()==userId) {
+                return i;
+            }
+        }
+        return -1;// not there is list
     }
     @Override
     public void onSaveInstanceState(Bundle outState) {

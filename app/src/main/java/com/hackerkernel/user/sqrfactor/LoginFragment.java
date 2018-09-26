@@ -10,8 +10,11 @@ import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputEditText;
+import android.support.v4.app.FragmentActivity;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -45,8 +48,14 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInApi;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -78,7 +87,7 @@ import static android.content.Context.RECEIVER_VISIBLE_TO_INSTANT_APPS;
 import static com.android.volley.VolleyLog.TAG;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements View.OnClickListener,GoogleApiClient.OnConnectionFailedListener {
 
     private SharedPreferences loginPreferences;
     private SharedPreferences.Editor loginPrefsEditor;
@@ -90,15 +99,21 @@ public class LoginFragment extends Fragment {
     private CheckBox loginRemberMe;
     private SharedPreferences.Editor editor;
     private SharedPreferences mPrefs;
-    private   FirebaseDatabase database;
-    private   DatabaseReference ref;
+    private  FirebaseDatabase database;
+    private  DatabaseReference ref;
     private LoginButton facebookLoagin;
     private CallbackManager callbackManager;
     private static final String EMAIL = "email";
-    private static final int RC_SIGN_IN = 007;
+    private static final int RC_SIGN_IN = 9001;
     private GoogleApiClient mGoogleApiClient;
     private SignInButton googleLogin;
     private AccessToken accessToken;
+    private SharedPreferences sp;
+    private GoogleSignInClient mGoogleSignInClient;
+    private Button fb_Button,Google_Button;
+
+    private Context context;
+
 
 
 
@@ -108,6 +123,7 @@ public class LoginFragment extends Fragment {
         FacebookSdk.sdkInitialize(getApplicationContext());
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         callbackManager = CallbackManager.Factory.create();
+
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_login, container, false);
 
@@ -120,6 +136,7 @@ public class LoginFragment extends Fragment {
         database= FirebaseDatabase.getInstance();
 
         ref = database.getReference();
+        sp = getActivity().getSharedPreferences("login",MODE_PRIVATE);
 
         login = (Button) rootView.findViewById(R.id.login);
         forgot = (TextView) rootView.findViewById(R.id.forgot);
@@ -141,13 +158,15 @@ public class LoginFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Toast.makeText(getActivity().getApplicationContext(), "Token" + loginEmail.getText() + loginPassword.getText(), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity().getApplicationContext(), "Token" + loginEmail.getText() + loginPassword.getText(), Toast.LENGTH_SHORT).show();
                 // if(!TextUtils.isEmpty(loginEmail.getText())&&!TextUtils.isEmpty(loginPassword.getText())) {
 //                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 //                imm.hideSoftInputFromWindow(loginEmail.getWindowToken(), 0);
 
                 username = loginEmail.getText().toString();
                 password = loginPassword.getText().toString();
+
+                sp.edit().putBoolean("logged",true).apply();
 
                 if (loginRemberMe.isChecked()) {
                     loginPrefsEditor.putBoolean("saveLogin", true);
@@ -166,36 +185,42 @@ public class LoginFragment extends Fragment {
         });
 
         forgot.setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
             @Override
             public void onClick(View v) {
 
-                Intent i = new Intent(getContext().getApplicationContext(), ResetPassword.class);
+                Intent i = new Intent(getActivity(), ResetPassword.class);
                 startActivity(i);
 
             }
         });
-
-        info = (TextView)rootView.findViewById(R.id.info);
+        fb_Button = (Button) rootView.findViewById(R.id.fb_login);
+        fb_Button.setOnClickListener(new View.OnClickListener() {
+                                         @Override
+                                         public void onClick(View v) {
+                                             if (v == fb_Button) {
+                                                 facebookLoagin.performClick();
+                                             }
+                                         }
+                                     });
         facebookLoagin = (LoginButton) rootView.findViewById(R.id.facebook_login);
         facebookLoagin.setReadPermissions(Arrays.asList(new String[]{"public_profile","email", "user_birthday"}));
         facebookLoagin.setFragment(this);
         facebookLoagin.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
-                Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "Login successful", Toast.LENGTH_SHORT).show();
                 getProfileData();
 
             }
 
             @Override
             public void onCancel() {
-                Toast.makeText(getActivity(), "Login canceled", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "Login canceled", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(FacebookException exception) {
-                Toast.makeText(getActivity(), "Login error", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getActivity(), "Login error", Toast.LENGTH_SHORT).show();
             }
         });
         try {
@@ -207,8 +232,6 @@ public class LoginFragment extends Fragment {
                 md.update(signature.toByteArray());
                 Log.d("KeyHash", "KeyHash:" + Base64.encodeToString(md.digest(),
                         Base64.DEFAULT));
-                Toast.makeText(getActivity().getApplicationContext(), Base64.encodeToString(md.digest(),
-                        Base64.DEFAULT), Toast.LENGTH_LONG).show();
             }
         } catch (PackageManager.NameNotFoundException e) {
 
@@ -216,11 +239,20 @@ public class LoginFragment extends Fragment {
 
         }
 
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        mGoogleApiClient = new GoogleApiClient.Builder(getApplicationContext()).enableAutoManage((FragmentActivity) getActivity(),this).addApi(Auth.GOOGLE_SIGN_IN_API,gso)
+                .build();
+
+
         googleLogin = rootView.findViewById(R.id.google_login);
+        googleLogin.setSize(SignInButton.SIZE_STANDARD);
         googleLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                        signIn();
             }
 
         });
@@ -230,10 +262,103 @@ public class LoginFragment extends Fragment {
 
         }
 
+    private void signIn() {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         callbackManager.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            handleSignInResult(result);
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mGoogleApiClient.stopAutoManage((FragmentActivity) getActivity());
+        mGoogleApiClient.disconnect();
+    }
+
+    private void handleSignInResult(GoogleSignInResult result) {
+
+        if(result.isSuccess()){
+            GoogleSignInAccount account = result.getSignInAccount();
+            String name = account.getDisplayName();
+            final String gmail_email = account.getEmail();
+//            String profile_url = account.getPhotoUrl().toString();
+
+            RequestQueue requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
+            StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/sociallogin",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("Reponse", response);
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+                                UserClass userClass = new UserClass(jsonObject);
+                                // notification listner for like and comment
+                                FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications" + userClass.getUserId());
+                                FirebaseMessaging.getInstance().subscribeToTopic("chats"+userClass.getUserId());
+                                //code for user status
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                Date date = new Date();
+
+                                IsOnline isOnline=new IsOnline("True",formatter.format(date));
+                                ref.child("Status").child(userClass.getUserId()+"").child("android").setValue(isOnline);
+                                IsOnline isOnline1=new IsOnline("False",formatter.format(date));
+
+                                ref.child("Status").child(userClass.getUserId()+"").child("web").setValue(isOnline1);
+
+                                JSONObject TokenObject = jsonObject.getJSONObject("success");
+                                String Token = TokenObject.getString("token");
+
+                                editor.putString("TOKEN", Token);
+                                SharedPreferences.Editor prefsEditor = mPrefs.edit();
+                                Gson gson = new Gson();
+                                String json = gson.toJson(userClass);
+                                prefsEditor.putString("MyObject", json);
+                                prefsEditor.commit();
+                                editor.commit();
+                                Intent i = new Intent(getActivity(), HomeScreen.class);
+                                getActivity().startActivity(i);
+                                getActivity().finish();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    return params;
+                }
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("email", gmail_email);
+                    params.put("service", "google");
+                    return params;
+                }
+
+            };
+            requestQueue.add(myReq);
+        }
 
     }
     public void getProfileData() {
@@ -410,4 +535,19 @@ public class LoginFragment extends Fragment {
         requestQueue.add(myReq);
     }
 
+    @Override
+    public void onClick(View v) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        context = getApplicationContext();
+    }
 }

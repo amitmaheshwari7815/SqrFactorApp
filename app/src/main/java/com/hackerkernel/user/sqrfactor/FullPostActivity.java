@@ -135,7 +135,7 @@ public class FullPostActivity extends AppCompatActivity {
 
         if(getIntent().getStringExtra("Post_Slug_ID")!=null)
             slug = getIntent().getStringExtra("Post_Slug_ID");
-        Toast.makeText(this,slug,Toast.LENGTH_LONG).show();
+//        Toast.makeText(this,slug,Toast.LENGTH_LONG).show();
         LoadFullPostDataFromServer();
 
     }
@@ -157,7 +157,7 @@ public class FullPostActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONObject jsonObjectFullPost = jsonObject.getJSONObject("post");
@@ -511,7 +511,7 @@ public class FullPostActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String s) {
                         Log.v("ResponseLike",s);
-                        Toast.makeText(getApplicationContext(), s , Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), s , Toast.LENGTH_LONG).show();
                         finish();
                     }
                 },
@@ -550,7 +550,7 @@ public class FullPostActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONObject jsonObjectFullPost = jsonObject.getJSONObject("posts");

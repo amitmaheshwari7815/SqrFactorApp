@@ -162,37 +162,41 @@
 
 
 
-    <android.support.design.widget.TextInputLayout
+        <MultiAutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="60sp"
             android:layout_margin="10sp"
+            android:layout_gravity="center_horizontal"
             android:background="@drawable/gray_border"
-            android:padding="10sp"
-            app:hintTextAppearance="@color/colorPrimary"
-            android:layout_gravity="center">
+            android:hint="Tags | Separate tags with commas"
+            android:id="@+id/articleTags"
+            android:padding="5sp"
+            android:fontFamily="@font/roboto"
+            android:inputType="text">
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_gravity="center_horizontal"
-                android:background="@android:color/transparent"
-                android:hint="Tags | Separate tags with commas"
-                android:id="@+id/articleTags"
-                android:padding="5sp"
-                android:inputType="text"/>
-
-        </android.support.design.widget.TextInputLayout>
+        </MultiAutoCompleteTextView>
+        <FrameLayout
+            android:id="@+id/article_rl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/post_buttons"
+            android:layout_marginTop="1dp">
 
         <ImageView
             android:id="@+id/cropFinalImage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10sp"
-            android:scaleType="fitXY"
-            android:visibility="gone"
-            android:src="@drawable/profilepic" />
+            android:layout_height="wrap_content"/>
 
+            <ImageButton
+                android:id="@+id/article_banner_remove"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="right"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:src="@drawable/ic_close" />
 
+        </FrameLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="horizontal"

@@ -113,10 +113,6 @@ Week Winners and 3 words for a week will be announced at 11 PM on dates – 10, 
     </string>
     <string-array name="countries">
         <item>Choose country</item>
-        <item>Antarctica</item>
-        <item>Blah</item>
-        <item>Blah</item>
-        <item>Blah</item>
     </string-array>
     <string-array name="INR">
         <item>INR</item>

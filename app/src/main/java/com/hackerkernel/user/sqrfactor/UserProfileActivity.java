@@ -55,9 +55,11 @@ public class UserProfileActivity extends AppCompatActivity {
     static UserProfileAdapter userProfileAdapter;
     private static Context context;
     RecyclerView recyclerView;
+    private String friendProfileUrl;
     boolean flag = false;
     private String profileNameOfUser;
     private int user_id;
+    int count=0;
     public  String nextPageUrl;
     private boolean isLoading =false;
 
@@ -65,6 +67,7 @@ public class UserProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_profile);
+
 
         context=getApplicationContext();
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,7 +77,8 @@ public class UserProfileActivity extends AppCompatActivity {
         Intent intent = getIntent();
         user_id = intent.getIntExtra("User_id", 0);
         profileNameOfUser = intent.getStringExtra("ProfileUserName");
-        Toast.makeText(getApplicationContext(), user_id + " " + profileNameOfUser, Toast.LENGTH_LONG).show();
+        friendProfileUrl=intent.getStringExtra("ProfileUrl");
+//        Toast.makeText(getApplicationContext(), user_id + " " + profileNameOfUser, Toast.LENGTH_LONG).show();
 
 
         //LoadData();
@@ -185,8 +189,29 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
         });
-        FollowMethod();
-        LoadData();
+
+        messagebtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent intent=new Intent(context,ChatWithAFriendActivity.class);
+                intent.putExtra("FriendId",user_id);
+                intent.putExtra("FriendName",profileNameOfUser);
+                intent.putExtra("FriendProfileUrl",friendProfileUrl);
+                intent.putExtra("isOnline","True");
+                startActivity(intent);
+
+//                    if(chatFriends.get(getAdapterPosition()).getName().equals("null"))
+//                    {
+//                        intent.putExtra("FriendName",chatFriends.get(getAdapterPosition()).getUserName());
+//                    }
+//                    else
+//                    {
+//                        intent.putExtra("FriendName",chatFriends.get(getAdapterPosition()).getName());
+//                    }
+
+            }
+        });
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -216,6 +241,8 @@ public class UserProfileActivity extends AppCompatActivity {
                 }
             }
         });
+        //FollowMethod();
+        LoadData();
 
     }
 
@@ -226,7 +253,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        Toast.makeText(UserProfileActivity.this, s, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(UserProfileActivity.this, s, Toast.LENGTH_LONG).show();
                         Log.v("ResponseLike", s);
                         try {
                             JSONObject jsonObject = new JSONObject(s);
@@ -241,6 +268,12 @@ public class UserProfileActivity extends AppCompatActivity {
                                 followbtn.setText("Following");
                                 flag = false;
                             }
+
+//                            if (count==0)
+//                            {
+//                                count=1;
+//                                LoadData();
+//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -269,7 +302,6 @@ public class UserProfileActivity extends AppCompatActivity {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
-
                 params.put("to_user", user_id + "");
                 return params;
             }
@@ -282,29 +314,54 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public void LoadData() {
 
-        RequestQueue requestQueue = Volley.newRequestQueue(UserProfileActivity.this);
-       // userProfileClassArrayList.clear();
+        RequestQueue requestQueue2 = Volley.newRequestQueue(getApplicationContext());
+        if(userProfileClassArrayList!=null)
+            userProfileClassArrayList.clear();
+
+        Log.v("username", profileNameOfUser);
         //https://archsqr.in/api/profile/detail/Shivani2292
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/" + profileNameOfUser,
+        //https://archsqr.in/profile/detail/Sarvagnee
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/profile/detail/" + profileNameOfUser,
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+//                        Toast.makeText(UserProfileActivity.this, response, Toast.LENGTH_LONG).show();
                         Log.v("MorenewsFeedFromServer", response);
-                        Toast.makeText(UserProfileActivity.this, response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
-                            UserProfileClass userProfileClass = new UserProfileClass(jsonObject);
-                            userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
+
                             followCnt.setText(jsonObject.getString("followerCnt"));
                             followingCnt.setText(jsonObject.getString("followingCnt"));
                             portfolioCnt.setText(jsonObject.getString("portfolioCnt"));
                             bluePrintCnt.setText(jsonObject.getString("blueprintCnt"));
-                            nextPageUrl=jsonObject.getString("nextPage");
                             userName.setText(jsonObject.getJSONObject("user").getString("user_name"));
-                            Glide.with(getApplicationContext()).load("https://archsqr.in/" + jsonObject.getJSONObject("user").getString("profile"))
-                                    .into(userProfileImage);
+                            followbtn.setText(jsonObject.getString("isfollowing"));
 
-                            userProfileAdapter.notifyDataSetChanged();
+
+                            if(jsonObject.has("message") && jsonObject.getString("message").equals("No"))
+                            {
+
+                                Glide.with(getApplicationContext()).load( jsonObject.getJSONObject("user").getString("profile"))
+                                        .into(userProfileImage);
+                            }
+
+                            else {
+                                Glide.with(getApplicationContext()).load("https://archsqr.in/" + jsonObject.getJSONObject("user").getString("profile"))
+                                        .into(userProfileImage);
+                            }
+
+
+                            JSONObject jsonPost = jsonObject.getJSONObject("posts");
+                            UserProfileClass userProfileClass=null;
+                            if(jsonPost!=null)
+                            {
+                                nextPageUrl=jsonObject.getString("nextPage");
+                                userProfileClass= new UserProfileClass(jsonObject);
+                                userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
+                                userProfileAdapter.notifyDataSetChanged();
+                            }
+                            //userProfileAdapter.notifyDataSetChanged();
+//
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -320,12 +377,15 @@ public class UserProfileActivity extends AppCompatActivity {
                             try {
                                 String res = new String(response.data,
                                         HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+//                                Toast.makeText(getApplicationContext(),res,Toast.LENGTH_LONG).show();
                                 // Now you can use any deserializer to make sense of data
                                 JSONObject obj = new JSONObject(res);
                             } catch (UnsupportedEncodingException e1) {
+//                                Toast.makeText(getApplicationContext(),e1.toString(),Toast.LENGTH_LONG).show();
                                 // Couldn't properly decode data to string
                                 e1.printStackTrace();
                             } catch (JSONException e2) {
+//                                Toast.makeText(getApplicationContext(),e2.toString(),Toast.LENGTH_LONG).show();
                                 // returned data is not JSONObject?
                                 e2.printStackTrace();
                             }
@@ -342,9 +402,16 @@ public class UserProfileActivity extends AppCompatActivity {
                 return params;
             }
 
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username", profileNameOfUser );
+                return params;
+            }
+
         };
 
-        requestQueue.add(myReq);
+        requestQueue2.add(myReq);
 
     }
 

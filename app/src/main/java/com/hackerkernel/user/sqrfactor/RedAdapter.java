@@ -47,6 +47,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -195,30 +196,38 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
 
 
         String dtc = newsFeedStatus.getTime();
-        Log.v("dtc",dtc);
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM",Locale.ENGLISH);
-        Log.v("sdf1",sdf1.toString());
-        Log.v("sdf2",sdf2.toLocalizedPattern());
-        Date date = null;
-        try{
-            date = sdf1.parse(dtc);
-            String newDate = sdf2.format(date);
-            Log.v("date",date+"");
-            System.out.println(newDate);
-            Log.e("Date",newDate);
+        try
+        {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+            Date past = format.parse(dtc);
+            Date now = new Date();
+            long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
+            long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
+            long hours=TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
+            long days=TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime());
 
-        } catch (ParseException e) {
-            e.printStackTrace();
+            if(seconds<60)
+            {
+                holder.postTime.setText(seconds+" sec ago");
+
+            }
+            else if(minutes<60)
+            {
+                holder.postTime.setText(minutes+" min ago");
+            }
+            else if(hours<24)
+            {
+                holder.postTime.setText(hours+" hours ago");
+            }
+            else
+            {
+                holder.postTime.setText(days+" days ago");
+            }
         }
-        Calendar thatDay = Calendar.getInstance();
-        thatDay.setTime(date);
-        long today = System.currentTimeMillis();
+        catch (Exception j){
+            j.printStackTrace();
+        }
 
-        long diff = today - thatDay.getTimeInMillis();
-        long days = diff/(24*60*60*1000);
-
-        holder.postTime.setText(days+ " Days ago");
         holder.postViews.setText(newsFeedStatus.getWeek_views());
         holder.buttonLikeList.setText(newsFeedStatus.getLike()+" Like");
         holder.buttonComment.setText(newsFeedStatus.getComments()+" Comment");
@@ -249,7 +258,7 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         {
             if(userClass.getUserId()==newsFeedStatus.AllLikesId.get(i))
             {
-                holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                holder.buttonLikeList.setTextColor(ContextCompat.getColor(context,R.color.sqr));
                 isAlreadyLiked=1;
                 holder.buttonLike.setChecked(true);
             }
@@ -260,7 +269,7 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         {
             if(userClass.getUserId()==newsFeedStatus.AllCommentId.get(i))
             {
-                holder.buttonComment.setTextColor(context.getColor(R.color.sqr));
+                holder.buttonComment.setTextColor(ContextCompat.getColor(context,R.color.sqr));
             }
         }
 
@@ -295,9 +304,6 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
                                 result=result+1;
                                 holder.buttonComment.setText(result+" Comment");
 
-
-//                        //Showing toast message of the response
-//                        Toast.makeText(getActivity(), s , Toast.LENGTH_LONG).show();
                             }
                         },
                         new Response.ErrorListener() {
@@ -360,11 +366,21 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
                     UserClass userClass = gson.fromJson(json, UserClass.class);
 
                     Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
-                    if(newsFeedStatus.getType().equals("status"))
+                    if(newsFeedStatus.getType().equals("status")&& userClass.getUserId()!=newsFeedStatus.getUserId())
                     {
-                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
-                        post post1=new post(newsFeedStatus.getFullDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
-                        PushNotificationClass pushNotificationClass=new PushNotificationClass("commented on your&nbsparticle",new Date().getTime(),fromUser,post1,"like_post");
+                        PushNotificationClass pushNotificationClass;
+                        from_user fromUser;
+                        post post1=new post(newsFeedStatus.getFullDescription(),newsFeedStatus.getSlug(),"post Title",newsFeedStatus.getType(),newsFeedStatus.getPostId());
+                        if(userClass.getName()!="null")
+                        {
+                            fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                            pushNotificationClass=new PushNotificationClass(userClass.getName()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+                        else
+                        {
+                            fromUser=new from_user(userClass.getEmail(),userClass.getFirst_name()+" "+userClass.getLast_name(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                            pushNotificationClass=new PushNotificationClass(userClass.getFirst_name()+" "+userClass.getLast_name()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
 
                         String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
                         ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
@@ -374,11 +390,19 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
                         unred.put("unread",key);
                         ref.child("notification").child(newsFeedStatus.getUserId()+"").child("unread").child(key).setValue(unred);
                     }
-                    else
+                    else if(userClass.getUserId()!=newsFeedStatus.getUserId())
                     {
-                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name());
+                        from_user fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
                         post post1=new post(newsFeedStatus.getShortDescription(),newsFeedStatus.getSlug(),newsFeedStatus.getPostTitle(),newsFeedStatus.getType(),newsFeedStatus.getPostId());
-                        PushNotificationClass pushNotificationClass=new PushNotificationClass("commented on your&nbsparticle",new Date().getTime(),fromUser,post1,"like_post");
+                        PushNotificationClass pushNotificationClass;
+                        if(userClass.getName().equals("null"))
+                        {
+                            pushNotificationClass=new PushNotificationClass(userClass.getUser_name()+" liked your article ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+                        else
+                        {
+                            pushNotificationClass=new PushNotificationClass(userClass.getName()+" liked your article ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
 
                         String key =ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").push().getKey();
                         ref.child("notification").child(newsFeedStatus.getUserId()+"").child("all").child(key).setValue(pushNotificationClass);
@@ -539,4 +563,3 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
 //        alertDialog.show();
     }
 }
-

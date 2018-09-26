@@ -53,7 +53,6 @@ public class NotificationsFragment extends Fragment {
     public static DatabaseReference ref;
     public static FirebaseDatabase database;
     private String nextPageUrl;
-    private PullRefreshLayout layout;
 
 
     @Override
@@ -63,22 +62,13 @@ public class NotificationsFragment extends Fragment {
 
         ViewGroup view = (ViewGroup) inflater.inflate(R.layout.fragment_notifications, container, false);
 
-        layout = view.findViewById(R.id.notification_pullRefresh);
-        layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                //LoadNewsFeedDataFromServer();
-                //layout.setRefreshing(false);
-                layout.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        layout.setRefreshing(false);
-                        NotificationData();
-                    }
-                },1000);
+        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+        database= FirebaseDatabase.getInstance();
+        ref = database.getReference();
 
-            }
-        });
         recycler = (RecyclerView) view.findViewById(R.id.recycler);
         linearLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -87,8 +77,6 @@ public class NotificationsFragment extends Fragment {
 
         notificationsAdapter = new NotificationsAdapter(notificationsClassArrayList, getActivity());
         recycler.setAdapter(notificationsAdapter);
-
-        NotificationData();
 
         DividerItemDecoration decoration = new DividerItemDecoration(recycler.getContext(), linearLayoutManager.getOrientation());
         recycler.addItemDecoration(decoration);
@@ -120,12 +108,8 @@ public class NotificationsFragment extends Fragment {
                 }
             }
         });
-        return view;
 
-    }
 
-    public void NotificationData(){
-        notificationsClassArrayList.clear();
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
                 new Response.Listener<String>() {
@@ -172,30 +156,15 @@ public class NotificationsFragment extends Fragment {
 
         requestQueue.add(myReq);
 
-        SharedPreferences mPrefs =getActivity().getSharedPreferences("User",MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPrefs.getString("MyObject", "");
-        final UserClass userClass = gson.fromJson(json, UserClass.class);
-        database= FirebaseDatabase.getInstance();
-        ref = database.getReference();
-        ref.child("notification").child(userClass.getUserId()+"").child("all").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                HomeScreen.getnotificationCount();
-
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
+        return view;
 
     }
+
     public void LoadMoreNotification() {
         if (nextPageUrl != null) {
             RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
-            StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
+            StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
@@ -203,7 +172,6 @@ public class NotificationsFragment extends Fragment {
 //                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
-                                nextPageUrl = jsonObject.getString("nextpage");
                                 JSONArray jsonArrayData = jsonObject.getJSONArray("notifications");
                                 for (int i = 0; i < jsonArrayData.length(); i++) {
                                     Log.v("Response", response);

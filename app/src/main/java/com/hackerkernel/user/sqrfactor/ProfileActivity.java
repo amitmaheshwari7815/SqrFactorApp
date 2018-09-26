@@ -2,6 +2,7 @@ package com.hackerkernel.user.sqrfactor;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -46,6 +48,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -70,6 +73,7 @@ public class ProfileActivity extends ToolbarActivity {
     Button btnSubmit,editProfile;
     EditText writePost;
     Bitmap bitmap;
+    private Uri uri;
     boolean flag = false;
     LinearLayoutManager layoutManager;
     TextView blueprint, portfolio, followers, following;
@@ -78,7 +82,7 @@ public class ProfileActivity extends ToolbarActivity {
     private boolean isLoading=false;
     private static Context context;
     public  static final int RequestPermissionCode  = 1 ;
-
+    final int PIC_CROP = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
 
     @SuppressLint("ResourceAsColor")
@@ -132,7 +136,7 @@ public class ProfileActivity extends ToolbarActivity {
                         android.Manifest.permission.CAMERA))
                 {
 
-                    Toast.makeText(ProfileActivity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(ProfileActivity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
 
                 } else {
 
@@ -181,10 +185,10 @@ public class ProfileActivity extends ToolbarActivity {
             public void onClick(View v) {
 
                 Intent intent=new Intent(getApplicationContext(),Settings.class);
-                intent.putExtra("portFolioCount",portfolioCnt.getText().toString());
-                intent.putExtra("followingCount",followingCnt.getText().toString());
-                intent.putExtra("followersCount",followCnt.getText().toString());
-                intent.putExtra("bluePrintCount",bluePrintCnt.getText().toString());
+//                intent.putExtra("portFolioCount",portfolioCnt.getText().toString());
+//                intent.putExtra("followingCount",followingCnt.getText().toString());
+//                intent.putExtra("followersCount",followCnt.getText().toString());
+//                intent.putExtra("bluePrintCount",bluePrintCnt.getText().toString());
                 startActivity(intent);
             }
         });
@@ -196,6 +200,7 @@ public class ProfileActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 PopupMenu pop = new PopupMenu(getApplicationContext(), v);
+                pop.getMenu().add("About "+userClass.getName());
                 pop.getMenuInflater().inflate(R.menu.more_menu, pop.getMenu());
                 pop.show();
 
@@ -275,10 +280,6 @@ public class ProfileActivity extends ToolbarActivity {
 
 
                 int lastId=layoutManager.findLastVisibleItemPosition();
-//                if(dy>0)
-//                {
-//                    Toast.makeText(context,"moving up",Toast.LENGTH_SHORT).show();
-//                }
                 if(dy>0 && lastId + 2 > layoutManager.getItemCount() && !isLoading)
                 {
                     isLoading=true;
@@ -304,14 +305,14 @@ public class ProfileActivity extends ToolbarActivity {
         SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
         RequestQueue requestQueue = Volley.newRequestQueue(this);
-        StringRequest myReq = new StringRequest(Request.Method.GET, "https://archsqr.in/api/profile/detail/"+userClass.getUser_name(),
+        StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/profile/detail/"+userClass.getUser_name(),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(),response,Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             nextPageUrl = jsonObject.getString("nextPage");
@@ -355,6 +356,13 @@ public class ProfileActivity extends ToolbarActivity {
                 return params;
             }
 
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("username",userClass.getUser_name());
+                return params;
+            }
+
         };
 
 
@@ -366,12 +374,12 @@ public class ProfileActivity extends ToolbarActivity {
 
         if(nextPageUrl!=null) {
             RequestQueue requestQueue = Volley.newRequestQueue(context);
-            StringRequest myReq = new StringRequest(Request.Method.GET, nextPageUrl,
+            StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Log.v("ReponseFeed", response);
-                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 nextPageUrl = jsonObject.getString("nextPage");
@@ -408,6 +416,12 @@ public class ProfileActivity extends ToolbarActivity {
                     return params;
                 }
 
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", userClass.getUser_name() );
+                    return params;
+                }
             };
 
 
@@ -416,6 +430,8 @@ public class ProfileActivity extends ToolbarActivity {
 
 
     }
+
+
 
     private void selectImage() {
 
@@ -441,9 +457,9 @@ public class ProfileActivity extends ToolbarActivity {
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
-
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+//                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+////
+//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 
                     startActivityForResult(intent, 1);
 
@@ -487,114 +503,155 @@ public class ProfileActivity extends ToolbarActivity {
         if (resultCode == RESULT_OK) {
 
             if (requestCode == 1) {
+                uri = data.getData();
+                performCrop();
 
-                File f = new File(Environment.getExternalStorageDirectory().toString());
-
-                for (File temp : f.listFiles()) {
-
-                    if (temp.getName().equals("temp.jpg")) {
-
-                        f = temp;
-
-                        break;
-
-                    }
-
-                }
-
-                try {
-
-                    Bitmap bitmap;
-
-                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-
-
-
-                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
-
-                            bitmapOptions);
-
-
-
-                    profileImage.setImageBitmap(bitmap);
-
-
-
-                    String path = android.os.Environment
-
-                            .getExternalStorageDirectory()
-
-                            + File.separator
-
-                            + "Phoenix" + File.separator + "default";
+//                File f = new File(Environment.getExternalStorageDirectory().toString());
+//
+//                for (File temp : f.listFiles()) {
+//
+//                    if (temp.getName().equals("temp.jpg")) {
+//
+//                        f = temp;
+//
+//                        break;
+//
+//                    }
+//
+//                }
+//
+//                try {
+//
+//
+//                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+//
+//
+//
+//                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
+//
+//                            bitmapOptions);
+//                    uri= data.getData();
+//                    performCrop();
+//
+//
+//                } catch (Exception e) {
+//
+//                    e.printStackTrace();
+//
+//                }
+            }
 
 
+            else if (requestCode == 2) {
 
-                    f.delete();
-
-                    OutputStream outFile = null;
-
-                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-
-                    try {
-
-                        outFile = new FileOutputStream(file);
-
-                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
-
-                        outFile.flush();
-
-                        outFile.close();
-
-                    } catch (FileNotFoundException e) {
-
-                        e.printStackTrace();
-
-                    } catch (IOException e) {
-
-                        e.printStackTrace();
-
-                    } catch (Exception e) {
-
-                        e.printStackTrace();
-
-                    }
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-
-                }
-
-            } else if (requestCode == 2) {
-
-
-
-                Uri selectedImage = data.getData();
+                uri = data.getData();
+                performCrop();
 
                 String[] filePath = { MediaStore.Images.Media.DATA };
-                Cursor c = getContentResolver().query(selectedImage,filePath, null, null, null);
+                Cursor c = getContentResolver().query(uri,filePath, null, null, null);
 
                 c.moveToFirst();
 
                 int columnIndex = c.getColumnIndex(filePath[0]);
 
+
                 String picturePath = c.getString(columnIndex);
                 String[] fileName = picturePath.split("/");
                 c.close();
 
-                Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
-
-                // Log.w("path of image from gallery......******************.........", fileName[fileName.length-1]+"");
-
-                profileImage.setImageBitmap(thumbnail);
-
 
             }
+            else if(requestCode== PIC_CROP)
+            {
 
+                Bundle extras = data.getExtras();
+                bitmap  = extras.getParcelable("data");
+                profileImage.setImageBitmap(bitmap);
+                ChangeProfile();
+            }
         }
 
     }
+    public String getStringImage(Bitmap bitmap){
+        ByteArrayOutputStream ba = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG,100,ba);
+        byte[] imagebyte = ba.toByteArray();
+        String encode = Base64.encodeToString(imagebyte,Base64.DEFAULT);
+        return encode;
+    }
+    private void performCrop(){
+        try {
+            Intent cropIntent = new Intent("com.android.camera.action.CROP");
+            //indicate image type and Uri
+            cropIntent.setDataAndType(uri, "image/*");
+            //set crop properties
+            cropIntent.putExtra("crop", "true");
+            //indicate aspect of desired crop
+            cropIntent.putExtra("aspectX", 1);
+            cropIntent.putExtra("aspectY", 1);
+            //indicate output X and Y
+            cropIntent.putExtra("outputX", 60);
+            cropIntent.putExtra("outputY", 60);
+            //retrieve data on return
+            cropIntent.putExtra("return-data", true);
+            //start the activity - we handle returning in onActivityResult
+            startActivityForResult(cropIntent, PIC_CROP);
+
+        }
+        catch(ActivityNotFoundException anfe){
+            //display an error message
+            String errorMessage = "Whoops - your device doesn't support the crop action!";
+            Toast toast = Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT);
+            toast.show();
+        }
+    }
+    public void ChangeProfile(){
+            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+            StringRequest myReq = new StringRequest(Request.Method.POST,  "https://archsqr.in/api/parse/change_profile",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("ReponseFeed", response);
+//                            Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+                            try {
+                                JSONObject jsonObject = new JSONObject(response);
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    },
+                    new Response.ErrorListener() {
+
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+
+                        }
+                    }) {
+
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    params.put("Authorization", "Bearer " + TokenClass.Token);
+
+                    return params;
+                }
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    String image = getStringImage(bitmap);
+
+                    params.put("profile_image","data:image/jpeg;base64,"+image );
+                    return params;
+                }
+
+            };
 
 
-}
+            requestQueue.add(myReq);
+        }
+
+
+
+    }

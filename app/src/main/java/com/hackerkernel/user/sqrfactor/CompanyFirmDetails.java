@@ -102,7 +102,7 @@ public class CompanyFirmDetails extends AppCompatActivity {
                     @Override
                     public void onResponse(String s) {
                         Log.v("ResponseLike", s);
-                        Toast.makeText(CompanyFirmDetails.this,"Response"+s,Toast.LENGTH_LONG).show();
+//                        Toast.makeText(CompanyFirmDetails.this,"Response"+s,Toast.LENGTH_LONG).show();
 
                         try {
                             JSONObject jsonObject = new JSONObject(s);

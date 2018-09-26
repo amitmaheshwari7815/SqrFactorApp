@@ -305,7 +305,7 @@ public class ProfessionalActivity extends AppCompatActivity {
                     public void onResponse(String s) {
                         Log.v("ResponseLike",s);
 
-                        Toast.makeText(ProfessionalActivity.this,s,Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(ProfessionalActivity.this,s,Toast.LENGTH_SHORT).show();
                         try {
                             JSONObject jsonObject = new JSONObject(s);
                             YearsSinceServiceText.setText("");

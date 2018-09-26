@@ -86,7 +86,7 @@ public class Credits extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 PageRefersh(previousPageUrl);
-                Toast.makeText(getApplicationContext(),previousPageUrl+" ",Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(),previousPageUrl+" ",Toast.LENGTH_LONG).show();
                 prevPage.setVisibility(View.GONE);
             }
         });
@@ -202,7 +202,7 @@ public class Credits extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         creditsClassArrayList.clear();
                         try {
                             JSONObject jsonObject = new JSONObject(response);

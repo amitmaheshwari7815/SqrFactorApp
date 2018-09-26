@@ -1,3 +1,7 @@
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -33,12 +37,74 @@
         android:layout_margin="10sp"
         android:background="@drawable/gray_border"
         android:padding="5sp"
+        android:id="@+id/architecture_company_name"
         app:hintTextAppearance="@style/TextAppearance.AppCompat.Small">
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/registerFristName"
+            android:id="@+id/architecture_company_name_text"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/transparent"
+            android:hint="Architecture Firm/Companies Name"
+            android:inputType="text"
+            android:padding="5sp" />
+
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_margin="10sp"
+        android:background="@drawable/gray_border"
+        android:padding="5sp"
+        android:id="@+id/architecture_organizations_name"
+        app:hintTextAppearance="@style/TextAppearance.AppCompat.Small">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/architecture_organizations_name_text"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/transparent"
+            android:hint="Architecture Organization Name"
+            android:inputType="text"
+            android:padding="5sp" />
+
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_margin="10sp"
+        android:background="@drawable/gray_border"
+        android:padding="5sp"
+        android:id="@+id/architecture_college_name"
+        app:hintTextAppearance="@style/TextAppearance.AppCompat.Small">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/architecture_college_name_text"
+            android:layout_gravity="center_horizontal"
+            android:background="@android:color/transparent"
+            android:hint="Architecture College Name"
+            android:inputType="text"
+            android:padding="5sp" />
+
+    </android.support.design.widget.TextInputLayout>
+    <android.support.design.widget.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="60sp"
+        android:layout_margin="10sp"
+        android:background="@drawable/gray_border"
+        android:padding="5sp"
+        android:id="@+id/registerFristName"
+        app:hintTextAppearance="@style/TextAppearance.AppCompat.Small">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/registerFristName_text"
             android:layout_gravity="center_horizontal"
             android:background="@android:color/transparent"
             android:hint="First Name"
@@ -54,6 +120,7 @@
         android:layout_margin="10sp"
         android:background="@drawable/gray_border"
         android:padding="5sp"
+        android:id="@+id/registerLastName"
         app:hintTextAppearance="@style/TextAppearance.AppCompat.Small">
 
         <EditText
@@ -63,7 +130,7 @@
             android:background="@android:color/transparent"
             android:hint="Last Name"
             android:inputType="text"
-            android:id="@+id/registerLastName"
+            android:id="@+id/registerLastName_text"
             android:padding="5sp" />
 
     </android.support.design.widget.TextInputLayout>
@@ -198,26 +265,42 @@
         android:gravity="center"
         android:text="OR"/>
 
-    <Button
+    <FrameLayout
+        android:id="@+id/fb_frame"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10sp"
+        android:layout_gravity="center">
+    <com.facebook.login.widget.LoginButton
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:background="@drawable/fbcolor"
-        android:text="Login with Facebook"
-        android:id="@+id/loginWithFacebook"
+        android:id="@+id/facebook_signup"
         android:textSize="15sp"
         android:textColor="#ffffff"
         android:layout_margin="10sp"
+        android:visibility="gone"
         android:layout_gravity="center"/>
 
-    <Button
+        <Button
+            android:id="@+id/fb_signup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/fbcolor"
+            android:text="Login with Facebook"
+            android:textSize="15sp"
+            android:textColor="#ffffff"/>
+    </FrameLayout>
+
+    <com.google.android.gms.common.SignInButton
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/googlepluscolor"
-        android:text="Login with Google Plus"
-        android:id="@+id/loginWithGooglePlus"
+        android:id="@+id/google_signup"
         android:textSize="15sp"
         android:textColor="#ffffff"
         android:layout_margin="10sp"
         android:layout_gravity="center"/>
 
 </LinearLayout>
+</ScrollView>

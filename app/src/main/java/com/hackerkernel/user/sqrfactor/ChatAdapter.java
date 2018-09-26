@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,9 +40,6 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         ChatFriends chatFriend = chatFriends.get(position);
 
-        //if(chatFriend.getUserName().equals())
-
-        //Log.v("DATattatatata",chatFriend.getName()+" "+chatFriend.getUserName());
         String name=chatFriend.getName();
         if(name.equals("null"))
         {
@@ -53,23 +51,46 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         }
         Glide.with(context).load("https://archsqr.in/"+chatFriend.getUserProfile())
                 .into(holder.frndProfile);
-        holder.chatMessage.setText("hello");
+        holder.chatMessage.setText(chatFriend.getChat());
+
+//
+        if(!chatFriend.getUnread_count().equals("0"))
+        {
+            Log.v("count",chatFriend.getUnread_count()+"");
+            holder.unreadCount.setText(chatFriend.getUnread_count());
+            holder.unreadCount.setVisibility(View.VISIBLE);
+        }
+        else {
+            //holder.unreadCount.setText(chatFriend.getUnread_count());
+            holder.unreadCount.setVisibility(View.GONE);
+        }
+//        holder.unreadCount.setText(chatFriend.getUnread_count()+"");
+//        holder.unreadCount.setVisibility(View.VISIBLE);
+
+
         if(chatFriend.getIsOnline().equals("True"))
         {
             holder.online.setVisibility(View.VISIBLE);
-            holder.offLine.setVisibility(View.GONE);
+            holder.offline.setVisibility(View.GONE);
             //Toast.makeText(context,chatFriend.getIsOnline()+"",Toast.LENGTH_LONG).show();
         }
         else
         {
             holder.online.setVisibility(View.GONE);
-            holder.offLine.setVisibility(View.VISIBLE);
-
+            holder.offline.setVisibility(View.VISIBLE);
             //Toast.makeText(context,chatFriend.getIsOnline()+"",Toast.LENGTH_LONG).show();
         }
 
 
     }
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+//    @Override
+//    public int getItemViewType(int position) {
+//        return position;
+//    }
 
     @Override
     public int getItemCount() {
@@ -77,8 +98,8 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder{
-        ImageView frndProfile,online,offLine;
-        TextView frndName,chatMessage,chatTime;
+        ImageView frndProfile,online,offline;
+        TextView frndName,chatMessage,unreadCount;
 
 
 
@@ -103,11 +124,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
                 }
             });
             frndProfile =(ImageView)itemView.findViewById(R.id.chat_frnd_profile);
+            unreadCount=(TextView)itemView.findViewById(R.id.unreadCount);
             frndName =(TextView) itemView.findViewById(R.id.chat_frnd_name);
             chatMessage =(TextView)itemView.findViewById(R.id.chat_last_message);
             online=(ImageView) itemView.findViewById(R.id.onlineicon);
-            offLine =(ImageView)itemView.findViewById(R.id.offlineicon);
-//            chatTime = (EditText)itemView.findViewById(R.id.chat_time);
+            offline =(ImageView)itemView.findViewById(R.id.offlineicon);
         }
     }
 }

@@ -151,7 +151,7 @@ public class CommentsPage extends ToolbarActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String s) {
-                        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject=new JSONObject(s);
                             JSONArray commentListArray=jsonObject.getJSONArray("comments_list");
@@ -207,7 +207,7 @@ public class CommentsPage extends ToolbarActivity {
                         commentBody.setText("");
 
 //                        //Showing toast message of the response
-                        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), s, Toast.LENGTH_LONG).show();
                     }
                 },
                 new Response.ErrorListener() {
