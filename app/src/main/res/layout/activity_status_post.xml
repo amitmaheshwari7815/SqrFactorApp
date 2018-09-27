@@ -40,7 +40,15 @@
                 android:fontFamily="@font/roboto_medium"/>
 
         </LinearLayout>
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/profile_details">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
         <LinearLayout
             android:id="@+id/linear_status"
             android:layout_width="match_parent"
@@ -88,9 +96,10 @@
                     android:clickable="true"
                     android:src="@drawable/ic_close" />
 
-
             </FrameLayout>
         </LinearLayout>
+        </LinearLayout>
+        </ScrollView>
         <RelativeLayout
             android:id="@+id/post_buttons"
             android:layout_width="match_parent"

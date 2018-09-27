@@ -78,6 +78,7 @@
                     android:layout_gravity="end|center"
                     android:src="@drawable/ic_more_verticle"
                     android:layout_marginRight="10sp"
+                    android:visibility="gone"
                     android:layout_marginLeft="10sp"/>
 
             </LinearLayout>

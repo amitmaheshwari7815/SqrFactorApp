@@ -43,6 +43,7 @@ public class Settings extends AppCompatActivity {
     private TextView text1,text2,text3,text4,text5,profileUserName;
     private TextView bluePrint1,portfolio1,followers1,following1;
     private TextView bluePrint,portfolio,followers,following;
+    private TextView profileName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
     private ArrayList<UserData> userDataArrayList = new ArrayList<>();
     private SharedPreferences.Editor editor;
     private SharedPreferences mPrefs;
@@ -54,13 +55,13 @@ public class Settings extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
-        profilePic=(ImageView)findViewById(R.id.userProfilePic);
+        profilePic=(ImageView)findViewById(R.id.profile_profile_image);
 
-        profileUserName=(TextView)findViewById(R.id.userProfileName);
-        bluePrint =(TextView)findViewById(R.id.blueprint);
-        portfolio =(TextView)findViewById(R.id.portfolio);
-        followers =(TextView)findViewById(R.id.followers);
-        following =(TextView)findViewById(R.id.following);
+        profileUserName=(TextView)findViewById(R.id.profile_profile_name);
+        bluePrint =(TextView)findViewById(R.id.profile_blueprintClick);
+        portfolio =(TextView)findViewById(R.id.profile_portfolioClick);
+        followers =(TextView)findViewById(R.id.profile_followersClick);
+        following =(TextView)findViewById(R.id.profile_followingClick);
         //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new SettingsFragment()).commit();
 
         database= FirebaseDatabase.getInstance();
@@ -85,39 +86,36 @@ public class Settings extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
-        menu = (ImageView)findViewById(R.id.morebtn);
+        menu = (ImageView)findViewById(R.id.profile_about_morebtn);
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                PopupMenu pop = new PopupMenu(getApplicationContext(), v);
+                pop.getMenu().add(1,1,0,"About "+userClass.getName());
+                pop.getMenuInflater().inflate(R.menu.more_menu, pop.getMenu());
+                pop.show();
 
-                PopupMenu popupMenu = new PopupMenu(Settings.this,v);
-                popupMenu.inflate(R.menu.profie_menu);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
+                pop.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        return false;
+
+                        switch (item.getItemId()){
+
+                            case 1:
+                                Intent i = new Intent(getApplicationContext(), About.class);
+                                startActivity(i);
+                                return true;
+
+                        }
+                        return true;
                     }
                 });
-                popupMenu.show();
 
             }
         });
 
-        Intent intent = getIntent();
-
-
-        bluePrint1 = (TextView)findViewById(R.id.blueprint1);
-
-        if(intent.getStringExtra("bluePrintCount")!=null)
-        {
-            bluePrint1.setText(intent.getStringExtra("bluePrintCount"));
-        }
-        else
-        {
-            Toast.makeText(getApplicationContext(),userClass.getBlueprintCount(),Toast.LENGTH_LONG).show();
-            bluePrint1.setText(userClass.getBlueprintCount());
-        }
+        bluePrint1 = (TextView)findViewById(R.id.profile_blueprintcnt);
+        bluePrint1.setText(userClass.getBlueprintCount());
 
         bluePrint.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -131,16 +129,9 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        portfolio1 = (TextView)findViewById(R.id.portfolio1);
+        portfolio1 = (TextView)findViewById(R.id.profile_portfoliocnt);
+        portfolio1.setText(userClass.getPortfolioCount());
 
-        if(intent.getStringExtra("portFolioCount")!=null)
-        {
-            portfolio1.setText(intent.getStringExtra("portFolioCount"));
-        }
-        else
-        {
-            portfolio1.setText(userClass.getPortfolioCount());
-        }
 
         portfolio.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -153,16 +144,9 @@ public class Settings extends AppCompatActivity {
             }
         });
 
-        followers1 = (TextView)findViewById(R.id.followers1);
+        followers1 = (TextView)findViewById(R.id.profile_followerscnt);
+        followers1.setText(userClass.getFollowerCount());
 
-        if(intent.getStringExtra("followersCount")!=null)
-        {
-            followers1.setText(intent.getStringExtra("followersCount"));
-        }
-        else
-        {
-            followers1.setText(userClass.getFollowerCount());
-        }
 
         followers.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -175,16 +159,8 @@ public class Settings extends AppCompatActivity {
 
             }
         });
-        following1 = (TextView)findViewById(R.id.following1);
-
-        if(intent.getStringExtra("followingCount")!=null)
-        {
-            following1.setText(intent.getStringExtra("followingCount"));
-        }
-        else
-        {
-            following1.setText(userClass.getFollowingCount());
-        }
+        following1 = (TextView)findViewById(R.id.profile_followingcnt);
+        following1.setText(userClass.getFollowingCount());
 
         following.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -379,13 +355,13 @@ public class Settings extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         Log.v("ReponseFeed", response);
-                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
+//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
                             JSONArray jsonArray = jsonObject.getJSONArray("User Data");
                             UserData  userData = new UserData(jsonArray.getJSONObject(0));
                            // userDataArrayList.add(userData);
-                            Toast.makeText(getApplicationContext(), userData.getId()+userData.getName_of_the_company()+userData.getAddress(), Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getApplicationContext(), userData.getId()+userData.getName_of_the_company()+userData.getAddress(), Toast.LENGTH_LONG).show();
 
                             mPrefs = getSharedPreferences("userData", MODE_PRIVATE);
                             SharedPreferences.Editor prefsEditor = mPrefs.edit();

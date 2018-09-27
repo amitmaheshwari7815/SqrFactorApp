@@ -410,7 +410,6 @@ public class HomeScreen extends ToolbarActivity {
             drawerLayout.closeDrawer(GravityCompat.START);
         } else
             super.onBackPressed();
-
     }
 
 

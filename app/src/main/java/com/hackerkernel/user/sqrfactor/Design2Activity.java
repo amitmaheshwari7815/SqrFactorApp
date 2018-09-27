@@ -18,6 +18,7 @@ import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,6 +39,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.akshaykale.imagepicker.ImagePickerFragment;
+import com.akshaykale.imagepicker.ImagePickerListener;
+import com.akshaykale.imagepicker.PhotoObject;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -46,6 +50,8 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.transition.Transition;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,7 +73,7 @@ import static android.Manifest.permission.CAMERA;
 import static com.hackerkernel.user.sqrfactor.ArticleActivity.RequestPermissionCode;
 import static com.hackerkernel.user.sqrfactor.Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE;
 
-public class Design2Activity extends AppCompatActivity {
+public class Design2Activity extends AppCompatActivity implements ImagePickerListener {
 
     private Toolbar toolbar;
     private String cropedImageString;
@@ -96,6 +102,7 @@ public class Design2Activity extends AppCompatActivity {
     public  static final int RequestPermissionCode  = 1 ;
     final int PIC_CROP = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
+    private ImagePickerFragment imagePickerFragment;
 
 
     @Override
@@ -301,28 +308,8 @@ public class Design2Activity extends AppCompatActivity {
                 bannerImageView.setVisibility(View.VISIBLE);
                 mRemoveButton.setVisibility(View.VISIBLE);
 
-                if (ContextCompat.checkSelfPermission(Design2Activity.this,
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
+                CameraOpen();
 
-                    ActivityCompat.requestPermissions(Design2Activity.this,
-                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                }
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(Design2Activity.this,
-                        android.Manifest.permission.CAMERA))
-                {
-
-//                    Toast.makeText(Design2Activity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
-
-                } else {
-
-                    ActivityCompat.requestPermissions(Design2Activity.this,new String[]{
-                            Manifest.permission.CAMERA}, RequestPermissionCode);
-
-                }
-                selectImage();
             }
         });
 
@@ -356,6 +343,40 @@ public class Design2Activity extends AppCompatActivity {
 
 
 
+    }
+
+    private void CameraOpen(){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        imagePickerFragment = new ImagePickerFragment();//.newInstance(mStackLevel);
+        imagePickerFragment.addOnClickListener(this);
+        //imagePickerFragment.setImageLoadEngine(new ILoad());
+        imagePickerFragment.show(ft, "dialog");
+    }
+
+
+    @Override
+    public void onPhotoClicked(PhotoObject photoObject) {
+        Glide.with(getApplicationContext()).clear(bannerImageView);
+        Glide.with(getApplicationContext())
+                .asBitmap()
+                .load(photoObject.getPath())
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        Bitmap bitmapResized = Bitmap.createScaledBitmap(resource,
+                                (int) (resource.getWidth() * 0.5), (int) (resource.getHeight() * 0.5), false);
+
+                        bannerImageView.setImageBitmap(bitmapResized);
+                    }
+                });
+
+        imagePickerFragment.dismiss();
+    }
+
+    @Override
+    public void onCameraClicked(Bitmap image) {
+        bannerImageView.setImageBitmap(image);
+        imagePickerFragment.dismiss();
     }
 
     private void PostEditedDesignToServer(final String image) {

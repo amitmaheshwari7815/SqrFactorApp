@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.PopupMenu;
+import android.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -48,8 +48,10 @@ public class Credits extends AppCompatActivity {
     CreditsAdapter creditsAdapter;
     private Button nextPage,prevPage;
     private RecyclerView recyclerView;
+    private TextView profileName,followCnt,followingCnt,portfolioCnt,bluePrintCnt;
     TextView bluePrint,portfolio,followers,following;
-    ImageView userProfile;
+    private Button editProfile;
+    ImageView userProfile,profileImage;
     private boolean isScrolling=false;
     int currentItems, totalItems, scrolledItems;
     ArrayList<CreditsClass> creditsClassArrayList = new ArrayList<>();
@@ -65,6 +67,20 @@ public class Credits extends AppCompatActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
         final UserClass userClass = gson.fromJson(json, UserClass.class);
+
+        profileName = (TextView) findViewById(R.id.profile_profile_name);
+        profileImage = (ImageView) findViewById(R.id.profile_profile_image);
+        followCnt = (TextView) findViewById(R.id.profile_followerscnt);
+        followingCnt = (TextView) findViewById(R.id.profile_followingcnt);
+        portfolioCnt = (TextView) findViewById(R.id.profile_portfoliocnt);
+        bluePrintCnt = (TextView) findViewById(R.id.profile_blueprintcnt);
+
+        profileName.setText(userClass.getName());
+        followCnt.setText(userClass.getFollowerCount());
+        followingCnt.setText(userClass.getFollowingCount());
+        portfolioCnt.setText(userClass.getPortfolioCount());
+        bluePrintCnt.setText(userClass.getBlueprintCount());
+
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView_credit);
         final LinearLayoutManager layoutManager = new LinearLayoutManager(Credits.this);
@@ -94,9 +110,8 @@ public class Credits extends AppCompatActivity {
         creditsAdapter = new CreditsAdapter(this, creditsClassArrayList);
         recyclerView.setAdapter(creditsAdapter);
 
-        userProfile = findViewById(R.id.userProfilePic);
                 Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
-                        .into(userProfile);
+                        .into(profileImage);
         toolbar = (Toolbar) findViewById(R.id.credits_toolbar);
         toolbar.setTitle("Credits");
         setSupportActionBar(toolbar);
@@ -104,72 +119,83 @@ public class Credits extends AppCompatActivity {
 
         PageRefersh(CurrentUrl);
 
-        menu = (ImageView) findViewById(R.id.morebtn);
+        menu = (ImageView) findViewById(R.id.profile_about_morebtn);
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                PopupMenu pop = new PopupMenu(getApplicationContext(), v);
+                pop.getMenu().add(1,1,0,"About "+userClass.getName());
+                pop.getMenuInflater().inflate(R.menu.more_menu, pop.getMenu());
+                pop.show();
 
-                PopupMenu popupMenu = new PopupMenu(Credits.this, v);
-                popupMenu.inflate(R.menu.profie_menu);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-
+                pop.setOnMenuItemClickListener(new android.widget.PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        return false;
+
+                        switch (item.getItemId()){
+
+                            case 1:
+                                Intent i = new Intent(getApplicationContext(), About.class);
+                                startActivity(i);
+                                return true;
+
+                        }
+                        return true;
                     }
                 });
-                popupMenu.show();
+
             }
         });
 
-        bluePrint = (TextView) findViewById(R.id.blueprint);
+        editProfile =(Button)findViewById(R.id.profile_editprofile);
+        editProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(),Settings.class);
+                startActivity(intent);
+            }
+        });
+
+        bluePrint = (TextView)findViewById(R.id.profile_blueprintClick);
+        portfolio = (TextView)findViewById(R.id.profile_portfolioClick);
+        followers = (TextView)findViewById(R.id.profile_followersClick);
+        following = (TextView)findViewById(R.id.profile_followingClick);
+
         bluePrint.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(Credits.this, ProfileActivity.class);
-                i.putExtra("UserName",userClass.getUser_name());
                 startActivity(i);
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
-                //.addToBackStack(null).commit();
-
             }
         });
 
-        portfolio = (TextView) findViewById(R.id.portfolio);
         portfolio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent j = new Intent(Credits.this, PortfolioActivity.class);
-                j.putExtra("UserName",userClass.getUser_name());
-                startActivity(j);
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
-                //.addToBackStack(null).commit();
+                Intent i = new Intent(Credits.this, PortfolioActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
+                startActivity(i);
             }
         });
-        followers = (TextView) findViewById(R.id.followers);
+
         followers.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent k = new Intent(Credits.this, FollowersActivity.class);
-                k.putExtra("UserName",userClass.getUser_name());
-                startActivity(k);
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
-                //.addToBackStack(null).commit();
-
+                Intent i = new Intent(Credits.this, FollowersActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
+                startActivity(i);
             }
         });
-        following = (TextView) findViewById(R.id.following);
+
         following.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent l = new Intent(Credits.this, FollowingActivity.class);
-                l.putExtra("UserName",userClass.getUser_name());
-                startActivity(l);
-                //getSupportFragmentManager().beginTransaction().replace(R.id.fragmentContainer, new Portfolio())
-                //.addToBackStack(null).commit();
-
+                Intent i = new Intent(Credits.this, FollowingActivity.class);
+                i.putExtra("UserName",userClass.getUser_name());
+                startActivity(i);
             }
         });
+
 //        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 //            @Override
 //            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {

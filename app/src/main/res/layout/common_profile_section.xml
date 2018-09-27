@@ -56,7 +56,7 @@
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="5"
+            android:text="0"
             android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"
             android:gravity="center"/>
@@ -68,7 +68,7 @@
             android:layout_weight="1"
             android:gravity="center"
             android:fontFamily="@font/roboto"
-            android:text="2"
+            android:text="0"
             android:textColor="@color/sqr"/>
 
         <TextView
@@ -76,7 +76,7 @@
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="3"
+            android:text="0"
             android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"
             android:gravity="center"/>
@@ -86,7 +86,7 @@
             android:layout_width="0sp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="21"
+            android:text="0"
             android:fontFamily="@font/roboto"
             android:textColor="@color/sqr"
             android:gravity="center"/>

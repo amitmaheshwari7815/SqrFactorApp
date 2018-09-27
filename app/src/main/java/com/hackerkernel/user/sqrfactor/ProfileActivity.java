@@ -200,7 +200,7 @@ public class ProfileActivity extends ToolbarActivity {
             @Override
             public void onClick(View v) {
                 PopupMenu pop = new PopupMenu(getApplicationContext(), v);
-                pop.getMenu().add("About "+userClass.getName());
+                pop.getMenu().add(1,1,0,"About "+userClass.getName());
                 pop.getMenuInflater().inflate(R.menu.more_menu, pop.getMenu());
                 pop.show();
 
@@ -210,7 +210,7 @@ public class ProfileActivity extends ToolbarActivity {
 
                         switch (item.getItemId()){
 
-                            case R.id.about:
+                            case 1:
                                 Intent i = new Intent(getApplicationContext(), About.class);
                                 startActivity(i);
                                 return true;
@@ -306,6 +306,10 @@ public class ProfileActivity extends ToolbarActivity {
         Gson gson = new Gson();
         String json = mPrefs.getString("MyObject", "");
         final UserClass userClass = gson.fromJson(json, UserClass.class);
+
+        if(profileClassList!= null){
+            profileClassList.clear();
+        }
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/profile/detail/"+userClass.getUser_name(),
                 new Response.Listener<String>() {
@@ -373,7 +377,7 @@ public class ProfileActivity extends ToolbarActivity {
     public void LoadMoreDataFromServer(){
 
         if(nextPageUrl!=null) {
-            RequestQueue requestQueue = Volley.newRequestQueue(context);
+            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
             StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
                     new Response.Listener<String>() {
                         @Override
@@ -457,11 +461,11 @@ public class ProfileActivity extends ToolbarActivity {
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-//                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
-////
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+//
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 
-                    startActivityForResult(intent, 1);
+                   startActivityForResult(intent, 1);
 
                 }
 

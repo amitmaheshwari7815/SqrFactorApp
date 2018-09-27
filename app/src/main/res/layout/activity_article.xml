@@ -212,6 +212,7 @@
                 android:layout_gravity="center_horizontal"
                 android:background="@android:color/transparent"
                 android:gravity="center_vertical"
+                android:clickable="true"
                 android:hint="Select Banner Image"
                 android:inputType="text"
                 android:textSize="18dp" />

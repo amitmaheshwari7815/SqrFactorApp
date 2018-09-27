@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -54,6 +55,7 @@ public class RedActivity extends AppCompatActivity {
     private String nextUrl;
     PullRefreshLayout layout;
     LinearLayout linearLayout;
+    private ImageButton searchClose;
     private EditText searchEditText;
     private SearchResultAdapter searchResultAdapter;
     private ArrayList<SearchResultClass> searchResultClasses=new ArrayList<>();
@@ -104,6 +106,7 @@ public class RedActivity extends AppCompatActivity {
         });
         linearLayout = findViewById(R.id.linear_red);
         searchEditText=(EditText)findViewById(R.id.user_search);
+        searchClose =(ImageButton) findViewById(R.id.search_close);
         recyclerView1=(RecyclerView)findViewById(R.id.search_recycler1);
         LinearLayoutManager layoutManager1 = new LinearLayoutManager(this);
 
@@ -126,6 +129,7 @@ public class RedActivity extends AppCompatActivity {
                 //Toast.makeText(getApplicationContext(),s+"",Toast.LENGTH_SHORT).show();
                 recyclerView1.setVisibility(View.VISIBLE);
                 linearLayout.setVisibility(View.INVISIBLE);
+                searchClose.setVisibility(View.VISIBLE);
                 FetchSearchedDataFromServer(s+"");
 
 
@@ -139,6 +143,15 @@ public class RedActivity extends AppCompatActivity {
                     linearLayout.setVisibility(View.VISIBLE);
 
                 }
+            }
+        });
+        searchClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchEditText.setText("");
+                recyclerView1.setVisibility(View.GONE);
+                linearLayout.setVisibility(View.VISIBLE);
+                searchClose.setVisibility(View.GONE);
             }
         });
 

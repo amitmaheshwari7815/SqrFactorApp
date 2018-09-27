@@ -17,6 +17,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 dependencies {
@@ -51,6 +52,8 @@ dependencies {
     implementation 'com.github.GoodieBag:Pinview:v1.3'
     implementation "pl.droidsonroids.gif:android-gif-drawable:1.2.4"
     implementation 'com.google.android.gms:play-services-places:15.0.1'
+    implementation 'com.mlsdev.rximagepicker:library:2.1.5'
+    implementation project(':imagepicker')
 }
 
 apply plugin: 'com.google.gms.google-services'

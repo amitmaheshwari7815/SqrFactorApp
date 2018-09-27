@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,7 +24,6 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
         this.searchResultClasses=searchResultClasses;
     }
 
-    @NonNull
     @Override
     public SearchResultAdapter.MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View itemView =  LayoutInflater.from(parent.getContext()).inflate(R.layout.search_layout_adapter, parent, false);
@@ -33,9 +33,27 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     @Override
     public void onBindViewHolder(@NonNull SearchResultAdapter.MyViewHolder holder, int position) {
 
+
+        //"https://graph.facebook.com/v2.10/10155827831771779/picture?type=normal",
+
+
         final SearchResultClass searchResultClass=searchResultClasses.get(position);
-        Glide.with(context).load("https://archsqr.in/"+searchResultClass.getProfile())
-                .into(holder.profileImage);
+
+        String[] parsedUrl=searchResultClass.getProfile().split("/");
+
+        if(parsedUrl.length>=2 && (parsedUrl[2].equals("graph.facebook.com")||parsedUrl[2].contains("googleusercontent.com")))
+        {
+            Glide.with(context).load(searchResultClass.getProfile())
+                    .into(holder.profileImage);
+        }
+        else {
+            Glide.with(context).load("https://archsqr.in/"+searchResultClass.getProfile())
+                    .into(holder.profileImage);
+        }
+
+
+
+
         holder.view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

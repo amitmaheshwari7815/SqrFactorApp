@@ -87,6 +87,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         if(profileClass.getType().equals("status"))
         {
             Log.v("status1",profileClass.getType());
+            holder.postTitle.setVisibility(View.GONE);
+            holder.postTag.setVisibility(View.GONE);
             //holder.postTitle.setText(profileClass.getPostTitle());
             holder.userName.setText(profileClass.getUser_name_of_post());
             userName=profileClass.getUser_name_of_post();
@@ -101,6 +103,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         {
             Log.v("status2",profileClass.getType());
             //holder.postTitle.setText(profileClass.getPostTitle());
+            holder.postTitle.setVisibility(View.VISIBLE);
+            holder.postTag.setVisibility(View.VISIBLE);
             holder.userName.setText(profileClass.getUser_name_of_post());
             userName=profileClass.getUser_name_of_post();
             holder.postTitle.setText(profileClass.getPostTitle());
@@ -114,6 +118,8 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         else if(profileClass.getType().equals("article"))
         {
             Log.v("status2",profileClass.getType());
+            holder.postTitle.setVisibility(View.VISIBLE);
+            holder.postTag.setVisibility(View.VISIBLE);
             holder.userName.setText(profileClass.getUser_name_of_post());
             userName=profileClass.getUser_name_of_post();
             holder.postTitle.setText(profileClass.getPostTitle());
@@ -401,7 +407,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
                                 }
                                 else if(profileClass.getType().equals("status"))
                                 {
-                                    //context.startActivity(new Intent(context,ArticleActivity.class));
+                                    context.startActivity(new Intent(context,StatusPostActivity.class));
                                 }
                                 break;
                             case R.id.deletePost:
@@ -481,7 +487,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView userName, postTime, postShortDescription, postDescription,postTitle,buttonLikeList,commentpost,user_comment_name,user_comment_time,user_comment;
+        TextView userName, postTime,postTag,postShortDescription, postDescription,postTitle,buttonLikeList,commentpost,user_comment_name,user_comment_time,user_comment;
         EditText userComment,user_write_comment;
         ImageView usercommentProfile, userProfile, postBannerImage,user_comment_image,user_post_menu;
         Button  buttonComment,buttonShare,user_post_likeListcomment;
@@ -491,6 +497,7 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
         public MyViewHolder(View itemView) {
             super(itemView);
             postTitle=(TextView)itemView.findViewById(R.id.user_post_title);
+            postTag = (TextView)itemView.findViewById(R.id.user_post_tag);
             postBannerImage = (ImageView) itemView.findViewById(R.id.user_post_image);
             userName = (TextView) itemView.findViewById(R.id.userprofle_name);
             postTime = (TextView) itemView.findViewById(R.id.user_post_time);

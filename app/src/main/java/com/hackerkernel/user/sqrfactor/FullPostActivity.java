@@ -50,6 +50,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -122,14 +123,6 @@ public class FullPostActivity extends AppCompatActivity {
         commentProfileImageUrl=findViewById(R.id.news_comment_image_fullpost);
         commentUserName=findViewById(R.id.news_comment_name_fullpost);
         news_comment_card=findViewById(R.id.news_comment_card_fullPost);
-        // htmlContent=(TextView)findViewById(R.id.htmlContent);
-        //editor=findViewById(R.id.editor1);
-        //webView=(WebView)findViewById(R.id.webview);
-        //editor=(Editor)findViewById(R.id.full_post_editor);
-
-        // htmlTextView = (HtmlTextView)findViewById(R.id.html_text);
-
-// loads html from string and displays http://www.example.com/cat_pic.png from the Internet
 
 
 
@@ -163,6 +156,16 @@ public class FullPostActivity extends AppCompatActivity {
                             JSONObject jsonObjectFullPost = jsonObject.getJSONObject("post");
                             final FullPost fullPost = new FullPost(jsonObjectFullPost);
                             sharedId=fullPost.getShared_id();
+                            if (fullPost.getType().equals("status")) {
+                              postTag.setVisibility(View.GONE);
+                              postTitle.setVisibility(View.GONE);
+                            } else if (fullPost.getType().equals("design")) {
+                               postTag.setVisibility(View.VISIBLE);
+                               postTitle.setVisibility(View.VISIBLE);
+                            } else if (fullPost.getType().equals("article")) {
+                                postTag.setVisibility(View.VISIBLE);
+                                postTitle.setVisibility(View.VISIBLE);
+                            }
                             if(!fullPost.getTitle().equals("null"))
                             {
                                 postTitle.setText(fullPost.getTitle());
@@ -180,9 +183,38 @@ public class FullPostActivity extends AppCompatActivity {
                             else {
                                 red_authName.setText(fullPost.getUser_name_of_post());
                             }
+                            try
+                            {
+                                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
+                                Date past = format.parse(fullPost.getUpdated_at());
+                                Date now = new Date();
+                                long seconds= TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime());
+                                long minutes=TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime());
+                                long hours=TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime());
+                                long days=TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime());
 
+                                if(seconds<60)
+                                {
+                                    red_postTime.setText(seconds+" sec ago");
 
-                            red_postTime.setText(ConvertTime(fullPost.getUpdated_at()) + " days ago");
+                                }
+                                else if(minutes<60)
+                                {
+                                    red_postTime.setText(minutes+" min ago");
+                                }
+                                else if(hours<24)
+                                {
+                                    red_postTime.setText(hours+" hours ago");
+                                }
+                                else
+                                {
+                                    red_postTime.setText(days+" days ago");
+                                }
+                            }
+                            catch (Exception j){
+                                j.printStackTrace();
+                            }
+
                             Glide.with(getApplicationContext()).load("https://archsqr.in/" + fullPost.getAuthImageUrl())
                                     .into(red_authImage);
 
@@ -310,10 +342,8 @@ public class FullPostActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked) {
-//                    Toast.makeText(context, "checked", Toast.LENGTH_SHORT).show();
                     int likeCount=Integer.parseInt(fullPost.getLike());
-//                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
-                    likeList.setTextColor(getColor(R.color.sqr));
+                    likeList.setTextColor(getResources().getColor(R.color.sqr));
                     if(isAlreadyLiked==1)
                         likeList.setText(likeCount+" Like");
                     else
@@ -324,31 +354,39 @@ public class FullPostActivity extends AppCompatActivity {
 
                     database= FirebaseDatabase.getInstance();
                     ref = database.getReference();
-                    SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
-                    Gson gson = new Gson();
-                    String json = mPrefs.getString("MyObject", "");
-                    UserClass userClass = gson.fromJson(json, UserClass.class);
+//
 
-                    Log.v("daattataatat",userClass.getUserId()+" "+userClass.getProfile()+" ");
-                    if(fullPost.getType().equals("status"))
+                    if(userClass.getUserId()!=fullPost.getUser_id())
                     {
-//                        PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),Integer.parseInt(fullPost.getUser_post_id()),fullPost.getDescription(),fullPost.getDescription(),"Like",userClass.getUser_name()+" liked your post");
-//                        ref.child("Notifications").child(fullPost.getUser_id()+"").setValue(pushNotificationClass);
+                        from_user fromUser;
+                        post post1=new post(fullPost.getShort_description(),fullPost.getSlug(),fullPost.getTitle(),fullPost.getType(),fullPost.getId());
+                        PushNotificationClass pushNotificationClass;
+                        if(userClass.getName()!="null")
+                        {
+                            fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                            pushNotificationClass=new PushNotificationClass(userClass.getName()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
+                        else
+                        {
+                            fromUser=new from_user(userClass.getEmail(),userClass.getFirst_name()+" "+userClass.getLast_name(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                            pushNotificationClass=new PushNotificationClass(userClass.getFirst_name()+" "+userClass.getLast_name()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                        }
 
+                        String key =ref.child("notification").child(fullPost.getUser_id()+"").child("all").push().getKey();
+                        ref.child("notification").child(fullPost.getUser_id()+"").child("all").child(key).setValue(pushNotificationClass);
+                        Map<String,String> unred=new HashMap<>();
+                        unred.put("unread",key);
+                        ref.child("notification").child(fullPost.getUser_id()+"").child("unread").child(key).setValue(unred);
                     }
-                    else
-                    {
-//                        PushNotificationClass pushNotificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),Integer.parseInt(fullPost.getUser_post_id()),fullPost.getTitle(),fullPost.getDescription(),"Like",userClass.getUser_name()+" liked your post");
-//                        ref.child("Notifications").child(fullPost.getUser_id()+"").setValue(pushNotificationClass);
 
-                    }
+
                 }
                 else {
 
                     if(isAlreadyLiked==1)
                     {
                         Log.v("isAlreadyLiked1",isAlreadyLiked+" ");
-                        likeList.setTextColor(getColor(R.color.gray));
+                        likeList.setTextColor(getResources().getColor(R.color.gray));
                         int likeCount1=Integer.parseInt(fullPost.getLike());
                         //Toast.makeText(context, "Unchecked1", Toast.LENGTH_SHORT).show();
                         likeCount1=likeCount1-1;
@@ -358,7 +396,7 @@ public class FullPostActivity extends AppCompatActivity {
                     {
                         Log.v("isAlreadyLiked2",isAlreadyLiked+" ");
                         //Toast.makeText(context, "Unchecked2", Toast.LENGTH_SHORT).show();
-                        likeList.setTextColor(getColor(R.color.gray));
+                        likeList.setTextColor(getResources().getColor(R.color.gray));
                         likeList.setText(fullPost.getLike()+" Like");
                     }
 
@@ -407,16 +445,17 @@ public class FullPostActivity extends AppCompatActivity {
         post.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
                 StringRequest stringRequest = new StringRequest(Request.Method.POST, "https://archsqr.in/api/comment",
                         new Response.Listener<String>() {
                             @Override
                             public void onResponse(String s) {
                                 Log.v("ResponseLike",s);
-                                SharedPreferences mPrefs =getApplicationContext().getSharedPreferences("User",MODE_PRIVATE);
-                                Gson gson = new Gson();
-                                String json = mPrefs.getString("MyObject", "");
-                                UserClass userClass = gson.fromJson(json, UserClass.class);
+//                                SharedPreferences mPrefs =getApplicationContext().getSharedPreferences("User",MODE_PRIVATE);
+//                                Gson gson = new Gson();
+//                                String json = mPrefs.getString("MyObject", "");
+//                                UserClass userClass = gson.fromJson(json, UserClass.class);
                                 commentTime.setText("0 minutes ago");
                                 commentDescription.setText( written_comment_body.getText().toString());
                                 Glide.with(getApplicationContext()).load("https://archsqr.in/"+userClass.getProfile())
@@ -425,8 +464,25 @@ public class FullPostActivity extends AppCompatActivity {
                                 news_comment_card.setVisibility(View.VISIBLE);
                                 database= FirebaseDatabase.getInstance();
                                 ref = database.getReference();
-//                                PushNotificationClass notificationClass=new PushNotificationClass(userClass.getUserId(),userClass.getProfile(),newsFeedStatuses.get(getAdapterPosition()).getPostId(),newsFeedStatuses.get(getAdapterPosition()).getPostTitle(),newsFeedStatuses.get(getAdapterPosition()).getShortDescription(),"Commented",userClass.getUser_name()+" commented on your post");
-//                                ref.child("Notifications").child(newsFeedStatuses.get(getAdapterPosition()).getUserId()+"").setValue(notificationClass);
+                                from_user fromUser;
+                                post post1=new post(fullPost.getShort_description(),fullPost.getSlug(),fullPost.getTitle(),fullPost.getType(),fullPost.getId());
+                                PushNotificationClass pushNotificationClass;
+                                if(userClass.getName()!="null")
+                                {
+                                    fromUser=new from_user(userClass.getEmail(),userClass.getName(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                                    pushNotificationClass=new PushNotificationClass(userClass.getName()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                                }
+                                else
+                                {
+                                    fromUser=new from_user(userClass.getEmail(),userClass.getFirst_name()+" "+userClass.getLast_name(),userClass.getUserId(),userClass.getUser_name(),userClass.getProfile());
+                                    pushNotificationClass=new PushNotificationClass(userClass.getFirst_name()+" "+userClass.getLast_name()+" liked your status ",new Date().getTime(),fromUser,post1,"like_post");
+                                }
+
+                                String key =ref.child("notification").child(fullPost.getUser_id()+"").child("all").push().getKey();
+                                ref.child("notification").child(fullPost.getUser_id()+"").child("all").child(key).setValue(pushNotificationClass);
+                                Map<String,String> unred=new HashMap<>();
+                                unred.put("unread",key);
+                                ref.child("notification").child(fullPost.getUser_id()+"").child("unread").child(key).setValue(unred);
                                 written_comment_body.setText("");
 
                             }
@@ -461,6 +517,12 @@ public class FullPostActivity extends AppCompatActivity {
                 requestQueue.add(stringRequest);
             }
         });
+
+
+        if(userClass.getUserId()==fullPost.getUser_id())
+        {
+            full_post_menu.setVisibility(View.VISIBLE);
+        }
         full_post_menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -474,23 +536,25 @@ public class FullPostActivity extends AppCompatActivity {
 
                         switch (item.getItemId()){
 
-
                             case R.id.editPost:
-                                if(fullPost.getType().equals("design"))
-                                {
-                                    startActivity(new Intent(FullPostActivity.this,DesignActivity.class));
-                                }
-                                else if(fullPost.getType().equals("article"))
-                                {
-                                    startActivity(new Intent(FullPostActivity.this,ArticleActivity.class));
-                                }
-                                else if(fullPost.getType().equals("status"))
-                                {
-
+                                if (fullPost.getType().equals("design")) {
+                                    Intent intent1 = new Intent(getApplicationContext(), DesignActivity.class);
+                                    intent1.putExtra("Post_Slug_ID", fullPost.getSlug());
+                                    intent1.putExtra("Post_ID", fullPost.getId());
+                                    startActivity(intent1);
+                                } else if (fullPost.getType().equals("article")) {
+                                    Intent intent1 = new Intent(getApplicationContext(), ArticleActivity.class);
+                                    intent1.putExtra("Post_Slug_ID", fullPost.getSlug());
+                                    intent1.putExtra("Post_ID", fullPost.getId());
+                                    startActivity(intent1);
+                                } else if (fullPost.getType().equals("status")) {
+                                    Intent intent1 = new Intent(getApplicationContext(), StatusPostActivity.class);
+                                    intent1.putExtra("Post_Slug_ID", fullPost.getSlug());
+                                    intent1.putExtra("Post_ID", fullPost.getId());
+                                    startActivity(intent1);
                                 }
                                 break;
-//                                Intent i = new Intent(context, FullPostActivity.class);
-//                                context.startActivity(i);
+
                             case R.id.deletePost:
                                 DeletePost(fullPost.getUser_post_id()+"",fullPost.getShared_id()+"",fullPost.getIs_shared());
                                 break;
@@ -543,95 +607,5 @@ public class FullPostActivity extends AppCompatActivity {
         requestQueue.add(stringRequest);
     }
 
-    public void FetchFullDeatailsFromServer(String slug) {
 
-        StringRequest myReq = new StringRequest(Request.Method.GET, "http://archsqr.in/api/post-detail/testing-article-7404",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.v("ReponseFeed", response);
-//                        Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            JSONObject jsonObjectFullPost = jsonObject.getJSONObject("posts");
-                            FullPost fullPost = new FullPost(jsonObjectFullPost);
-                            postTitle.setText(fullPost.getTitle());
-                            postDescription.setText(fullPost.getShort_description());
-                            postTag.setText(fullPost.getType());
-                            red_authName.setText(fullPost.getAuthName());
-                            red_postTime.setText(ConvertTime(fullPost.getUpdated_at()) + "");
-                            Glide.with(getApplicationContext()).load("https://archsqr.in/" + fullPost.getAuthImageUrl())
-                                    .into(red_authImage);
-                            editor.render(fullPost.getDescription());
-//                            red_postTime.setText(fullPost.getTitle());
-//                            postTitle.setText(fullPost.getTitle());
-//                            postTitle.setText(fullPost.getTitle());
-
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                },
-                new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-
-                    }
-                }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer " + TokenClass.Token);
-                return params;
-            }
-
-        };
-
-
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-
-        requestQueue.add(myReq);
-
-    }
-    public static String changedHeaderHtml(String htmlText) {
-
-        String head = "<head><meta name=\"viewport\" content=\"width=device-width, user-scalable=yes\" /></head>";
-
-        String closedTag = "</body></html>";
-        String changeFontHtml = head + htmlText + closedTag;
-        return changeFontHtml;
-    }
-
-    public long ConvertTime(String dtc) {
-        // String dtc = messageClassArrayList.get(position).getUpdatedAt();
-        Log.v("dtc", dtc);
-        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.ENGLISH);
-        SimpleDateFormat sdf2 = new SimpleDateFormat("dd MMMM", Locale.ENGLISH);
-        Log.v("sdf1", sdf1.toString());
-        Log.v("sdf2", sdf2.toLocalizedPattern());
-        Date date = null;
-        try {
-            date = sdf1.parse(dtc);
-            String newDate = sdf2.format(date);
-            Log.v("date", date + "");
-            System.out.println(newDate);
-            Log.e("Date", newDate);
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        Calendar thatDay = Calendar.getInstance();
-        thatDay.setTime(date);
-        long today = System.currentTimeMillis();
-
-        long diff = today - thatDay.getTimeInMillis();
-        long days = diff / (24 * 60 * 60 * 1000);
-        return days;
-
-    }
 }

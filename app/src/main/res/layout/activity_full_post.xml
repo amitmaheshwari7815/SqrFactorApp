@@ -82,7 +82,7 @@
                                 android:id="@+id/full_postViews"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="146"
+                                android:text="0"
                                 android:textSize="12sp"
                                 android:layout_marginStart="3sp"
                                 android:fontFamily="@font/roboto"
@@ -95,6 +95,7 @@
                         android:layout_width="20sp"
                         android:layout_height="match_parent"
                         android:layout_gravity="end"
+                        android:visibility="gone"
                         android:src="@drawable/ic_more"
                         android:layout_marginRight="5sp"
                         android:layout_marginLeft="5sp"/>
@@ -102,33 +103,30 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/full_postTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="20sp"
-                    android:text="Title"
                     android:fontFamily="@font/roboto_medium"
-                    android:id="@+id/full_postTitle"
+                    android:visibility="gone"
                     android:layout_margin="5dp"/>
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="16dp"
-                    android:text="Description"
                     android:fontFamily="@font/roboto"
                     android:id="@+id/full_postDescription"
                     android:layout_margin="5dp"/>
                 <TextView
+                    android:id="@+id/full_postTag"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/white"
                     android:padding="1sp"
+                    android:visibility="gone"
                     android:textSize="14dp"
-                    android:text="Description"
                     android:background="@color/colorPrimary"
-                    android:id="@+id/full_postTag"
                     android:layout_margin="5dp"/>
-
-
 
 
             </LinearLayout>

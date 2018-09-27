@@ -24,10 +24,12 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -54,6 +56,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.akshaykale.imagepicker.ImagePickerFragment;
+import com.akshaykale.imagepicker.ImagePickerListener;
+import com.akshaykale.imagepicker.PhotoObject;
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
 import com.android.volley.NoConnectionError;
@@ -70,7 +75,9 @@ import com.bumptech.glide.request.transition.Transition;
 import com.github.irshulx.Editor;
 import com.github.irshulx.EditorListener;
 import com.google.gson.Gson;
-
+import com.mlsdev.rximagepicker.RxImageConverters;
+import com.mlsdev.rximagepicker.RxImagePicker;
+import com.mlsdev.rximagepicker.Sources;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -92,12 +99,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Observable;
+
 
 //import io.github.angebagui.mediumtextview.MediumTextView;
 
 import static com.hackerkernel.user.sqrfactor.BuildConfig.DEBUG;
 
-public class ArticleActivity extends ToolbarActivity {
+public class ArticleActivity extends ToolbarActivity implements ImagePickerListener{
 
     private Toolbar toolbar;
     private Editor editor;
@@ -124,6 +133,8 @@ public class ArticleActivity extends ToolbarActivity {
     public  static final int RequestPermissionCode  = 1 ;
     private static final int PIC_CROP = 0;
     private static final int MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE = 2;
+    private ImagePickerFragment imagePickerFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +148,31 @@ public class ArticleActivity extends ToolbarActivity {
     public void ContinueAfterPermission() {
 
         //adding text editor
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setNavigationIcon(R.drawable.back_arrow);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
+        Intent intent=getIntent();
+        if(!intent.hasExtra("Fab"))
+        {
+            toolbar.setVisibility(View.GONE);
+        }else {
+            toolbar.setVisibility(View.VISIBLE);
+        }
+
+        if( intent.hasExtra("Post_Slug_ID"))
+        {
+            toolbar.setVisibility(View.VISIBLE);
+        }
+
 
         articleTitle = findViewById(R.id.articleTitle);
         articleTitle.setFocusable(true);
@@ -220,23 +256,6 @@ public class ArticleActivity extends ToolbarActivity {
 //        cropFinalImage.setVisibility(View.GONE);
 
 
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        toolbar.setNavigationIcon(R.drawable.back_arrow);
-
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                finish();
-            }
-        });
-
-        Intent intent=getIntent();
-        if(!intent.hasExtra("Fab"))
-        {
-            toolbar.setVisibility(View.GONE);
-        }
 
         GetTagFromServer();
 
@@ -246,30 +265,8 @@ public class ArticleActivity extends ToolbarActivity {
                 frameLayout.setVisibility(View.VISIBLE);
                 cropFinalImage.setVisibility(View.VISIBLE);
                 mRemoveButton.setVisibility(View.VISIBLE);
+                    CameraOpen();
 
-
-                if (ContextCompat.checkSelfPermission(ArticleActivity.this,
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-                    ActivityCompat.requestPermissions(ArticleActivity.this,
-                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                }
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(ArticleActivity.this,
-                        android.Manifest.permission.CAMERA))
-                {
-
-                    Toast.makeText(ArticleActivity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
-
-                } else {
-
-                    ActivityCompat.requestPermissions(ArticleActivity.this,new String[]{
-                            Manifest.permission.CAMERA}, RequestPermissionCode);
-
-                }
-                selectImage();
 
             }
 
@@ -282,28 +279,7 @@ public class ArticleActivity extends ToolbarActivity {
                 cropFinalImage.setVisibility(View.VISIBLE);
                 mRemoveButton.setVisibility(View.VISIBLE);
 
-                if (ContextCompat.checkSelfPermission(ArticleActivity.this,
-                        android.Manifest.permission.READ_EXTERNAL_STORAGE)
-                        != PackageManager.PERMISSION_GRANTED) {
-
-                    ActivityCompat.requestPermissions(ArticleActivity.this,
-                            new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                            MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE);
-                }
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(ArticleActivity.this,
-                        android.Manifest.permission.CAMERA))
-                {
-
-                    Toast.makeText(ArticleActivity.this,"CAMERA permission allows us to Access CAMERA app", Toast.LENGTH_LONG).show();
-
-                } else {
-
-                    ActivityCompat.requestPermissions(ArticleActivity.this,new String[]{
-                            Manifest.permission.CAMERA}, RequestPermissionCode);
-
-                }
-                selectImage();
+                CameraOpen();
 
             }
 
@@ -382,6 +358,41 @@ public class ArticleActivity extends ToolbarActivity {
         editor.render();
 
     }
+
+    private void CameraOpen(){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        imagePickerFragment = new ImagePickerFragment();//.newInstance(mStackLevel);
+        imagePickerFragment.addOnClickListener(this);
+        //imagePickerFragment.setImageLoadEngine(new ILoad());
+        imagePickerFragment.show(ft, "dialog");
+    }
+
+
+    @Override
+    public void onPhotoClicked(PhotoObject photoObject) {
+        Glide.with(getApplicationContext()).clear(cropFinalImage);
+        Glide.with(getApplicationContext())
+                .asBitmap()
+                .load(photoObject.getPath())
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap resource, Transition<? super Bitmap> transition) {
+                        Bitmap bitmapResized = Bitmap.createScaledBitmap(resource,
+                                (int) (resource.getWidth() * 0.5), (int) (resource.getHeight() * 0.5), false);
+
+                        cropFinalImage.setImageBitmap(bitmapResized);
+                    }
+                });
+
+        imagePickerFragment.dismiss();
+    }
+
+    @Override
+    public void onCameraClicked(Bitmap image) {
+        cropFinalImage.setImageBitmap(image);
+        imagePickerFragment.dismiss();
+    }
+
     private void GetTagFromServer() {
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
@@ -489,176 +500,12 @@ public class ArticleActivity extends ToolbarActivity {
 
 
 
-    private void selectImage() {
 
-        final CharSequence[] options = { "Take Photo", "Choose from Gallery","Cancel" };
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setTitle("Add Photo!");
-
-        builder.setItems(options, new DialogInterface.OnClickListener() {
-
-            @Override
-
-            public void onClick(DialogInterface dialog, int item) {
-
-                if (options[item].equals("Take Photo"))
-
-                {
-                    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
-
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
-
-                    startActivityForResult(intent, 1);
-
-                }
-
-                else if (options[item].equals("Choose from Gallery"))
-
-                {
-
-                    Intent intent = new   Intent(Intent.ACTION_PICK,android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, 2);
-                }
-
-                else if (options[item].equals("Cancel")) {
-
-                    dialog.dismiss();
-
-                }
-
-            }
-
-        });
-
-        builder.show();
-
-    }
 
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == Activity.RESULT_OK) {
-
-            if (requestCode == 1) {
-                uri = data.getData();
-                ImageCropFunction();
-
-//                File f = new File(Environment.getExternalStorageDirectory().toString());
-//
-//                for (File temp : f.listFiles()) {
-//
-//                    if (temp.getName().equals("temp.jpg")) {
-//
-//                        f = temp;
-//
-//                        break;
-//
-//                    }
-//
-//                }
-//
-//                try {
-//
-//                    Bitmap bitmap;
-//
-//                    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-//
-//
-//
-//                    bitmap = BitmapFactory.decodeFile(f.getAbsolutePath(),
-//
-//                            bitmapOptions);
-//
-//
-//
-//                    cropFinalImage.setImageBitmap(bitmap);
-//                    cropFinalImage.setVisibility(View.VISIBLE);
-//
-//
-//
-//                    String path = android.os.Environment
-//
-//                            .getExternalStorageDirectory()
-//
-//                            + File.separator
-//
-//                            + "Phoenix" + File.separator + "default";
-//                    articleSelectBannerImage.setText(String.valueOf(System.currentTimeMillis()) + ".jpg");
-//
-//
-//                    f.delete();
-//
-//                    OutputStream outFile = null;
-//
-//                    File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
-//
-//                    try {
-//
-//                        outFile = new FileOutputStream(file);
-//
-//                        bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
-//
-//                        outFile.flush();
-//
-//                        outFile.close();
-//
-//                    } catch (FileNotFoundException e) {
-//
-//                        e.printStackTrace();
-//
-//                    } catch (IOException e) {
-//
-//                        e.printStackTrace();
-//
-//                    } catch (Exception e) {
-//
-//                        e.printStackTrace();
-//
-//                    }
-//
-//                } catch (Exception e) {
-//
-//                    e.printStackTrace();
-//
-//                }
-
-            } else if (requestCode == 2) {
-
-
-                uri = data.getData();
-                ImageCropFunction();
-
-                String[] filePath = { MediaStore.Images.Media.DATA };
-                Cursor c = getContentResolver().query(uri,filePath, null, null, null);
-
-                c.moveToFirst();
-
-                int columnIndex = c.getColumnIndex(filePath[0]);
-
-                String picturePath = c.getString(columnIndex);
-                String[] fileName = picturePath.split("/");
-                c.close();
-
-                bitmap = (BitmapFactory.decodeFile(picturePath));
-
-                // Log.w("path of image from gallery......******************.........", fileName[fileName.length-1]+"");
-
-                articleSelectBannerImage.setText(fileName[fileName.length-1]+"");
-
-            }
-            else if(requestCode== PIC_CROP) {
-
-                Bundle extras = data.getExtras();
-                bitmap = extras.getParcelable("data");
-                cropFinalImage.setImageBitmap(bitmap);
-                cropFinalImage.setVisibility(View.VISIBLE);
-            }
-        }
 
 
         if (requestCode == editor.PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK&& data != null && data.getData() != null) {
@@ -1155,5 +1002,6 @@ public class ArticleActivity extends ToolbarActivity {
 
         }
     }
+
 
 }

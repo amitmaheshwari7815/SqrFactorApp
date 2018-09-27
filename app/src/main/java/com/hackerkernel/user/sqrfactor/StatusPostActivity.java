@@ -107,20 +107,6 @@ public class StatusPostActivity extends AppCompatActivity {
         toolbar.setTitle("Post Status");
         setSupportActionBar(toolbar);
 
-        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = mPrefs.getString("MyObject", "");
-        UserClass userClass = gson.fromJson(json, UserClass.class);
-
-        user_profile_photo = findViewById(R.id.statusProfileImage);
-        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
-                .into(user_profile_photo);
-
-        camera = findViewById(R.id.news_camera);
-        displayImage = findViewById(R.id.news_upload_image);
-        btnSubmit = findViewById(R.id.news_postButton);
-        writePost = findViewById(R.id.write_status);
-
         toolbar.setNavigationIcon(R.drawable.back_arrow);
 
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -135,12 +121,35 @@ public class StatusPostActivity extends AppCompatActivity {
         if(!intent.hasExtra("Fab"))
         {
             toolbar.setVisibility(View.GONE);
+        }else {
+            toolbar.setVisibility(View.VISIBLE);
         }
+
+        if( intent.hasExtra("Post_Slug_ID"))
+        {
+            toolbar.setVisibility(View.VISIBLE);
+        }
+
+
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        UserClass userClass = gson.fromJson(json, UserClass.class);
+
+        user_profile_photo = findViewById(R.id.statusProfileImage);
+        Glide.with(this).load("https://archsqr.in/"+userClass.getProfile())
+                .into(user_profile_photo);
+
+        camera = findViewById(R.id.news_camera);
+        displayImage = findViewById(R.id.news_upload_image);
+        btnSubmit = findViewById(R.id.news_postButton);
+        writePost = findViewById(R.id.write_status);
+
 
         dialog = new ProgressDialog(this);
         dialog.setMessage("Uploading Image...");
         dialog.setCancelable(false);
-        final FrameLayout frameLayout = findViewById(R.id.rl);
+        frameLayout = findViewById(R.id.rl);
         frameLayout.setVisibility(View.GONE);
         jsonObject = new JSONObject();
 

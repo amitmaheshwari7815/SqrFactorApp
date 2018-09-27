@@ -126,6 +126,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
             if (newsFeedStatus.getType().equals("status")) {
                 Log.v("status1", newsFeedStatus.getType());
                 //holder.postTitle.setText(newsFeedStatus.getPostTitle());
+                viewHolder.postTitle.setVisibility(View.GONE);
+                viewHolder.postTag.setVisibility(View.GONE);
                 viewHolder.authName.setText(newsFeedStatus.getUser_name_of_post());
                 userName = newsFeedStatus.getUser_name_of_post();
                 viewHolder.shortDescription.setText(newsFeedStatus.getFullDescription());
@@ -310,7 +312,6 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
             });
             viewHolder.like.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
@@ -318,7 +319,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         Toast.makeText(context, "checked", Toast.LENGTH_SHORT).show();
                         int likeCount = Integer.parseInt(newsFeedStatus.getLike());
 //                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
-                        viewHolder.likelist.setTextColor(context.getColor(R.color.sqr));
+                        viewHolder.likelist.setTextColor(context.getResources().getColor(R.color.sqr));
                         if (isAlreadyLikedFinal == 1)
                             viewHolder.likelist.setText(likeCount + " Like");
                         else {
@@ -373,7 +374,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
 
                         if (isAlreadyLikedFinal == 1) {
                             Log.v("isAlreadyLiked1", isAlreadyLikedFinal + " ");
-                            viewHolder.likelist.setTextColor(context.getColor(R.color.gray));
+                            viewHolder.likelist.setTextColor(context.getResources().getColor(R.color.gray));
                             int likeCount1 = Integer.parseInt(newsFeedStatus.getLike());
                             Toast.makeText(context, "Unchecked1", Toast.LENGTH_SHORT).show();
                             likeCount1 = likeCount1 - 1;
@@ -381,7 +382,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
                         } else {
                             Log.v("isAlreadyLiked2", isAlreadyLikedFinal + " ");
                             Toast.makeText(context, "Unchecked2", Toast.LENGTH_SHORT).show();
-                            viewHolder.likelist.setTextColor(context.getColor(R.color.gray));
+                            viewHolder.likelist.setTextColor(context.getResources().getColor(R.color.gray));
                             viewHolder.likelist.setText(newsFeedStatus.getLike() + " Like");
                         }
 

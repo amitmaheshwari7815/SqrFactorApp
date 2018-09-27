@@ -90,6 +90,8 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
             //holder.postTitle.setText(newsFeedStatus.getPostTitle());
             holder.userName.setText(newsFeedStatus.getUser_name_of_post());
             //userName=newsFeedStatus.getUser_name_of_post();
+            holder.user_post_title.setVisibility(View.GONE);
+            holder.postTag.setVisibility(View.GONE);
             holder.postShortDescription.setText(newsFeedStatus.getFullDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getUserImageUrl())
                     .into(holder.postBannerImage);
@@ -102,7 +104,8 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
             Log.v("status2",newsFeedStatus.getType());
             //holder.postTitle.setText(newsFeedStatus.getPostTitle());
             holder.userName.setText(newsFeedStatus.getUser_name_of_post());
-            //userName=newsFeedStatus.getUser_name_of_post();
+            holder.user_post_title.setVisibility(View.VISIBLE);
+            holder.postTag.setVisibility(View.VISIBLE);
             holder.user_post_title.setText(newsFeedStatus.getPostTitle());
             holder.postShortDescription.setText(newsFeedStatus.getShortDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
@@ -116,6 +119,8 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
             Log.v("status2",newsFeedStatus.getType());
             holder.userName.setText(newsFeedStatus.getUser_name_of_post());
             //userName=newsFeedStatus.getUser_name_of_post();
+            holder.user_post_title.setVisibility(View.VISIBLE);
+            holder.postTag.setVisibility(View.VISIBLE);
             holder.user_post_title.setText(newsFeedStatus.getPostTitle());
             holder.postShortDescription.setText(newsFeedStatus.getShortDescription());
             Glide.with(context).load("https://archsqr.in/"+newsFeedStatus.getPostImage())
@@ -488,7 +493,7 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
         return userProfileClassArrayList.size();
     }
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        TextView userName,postTime,postShortDescription,postDescription,user_post_title,buttonLikeList,commentpost;
+        TextView userName,postTime,postTag,postShortDescription,postDescription,user_post_title,buttonLikeList,commentpost;
         EditText userComment;
         TextView commentUserName,commentTime,commentDescription;
         ImageView usercommentProfile,userProfile,postBannerImage,user_post_menu,userComment_menu;
@@ -500,6 +505,7 @@ public class UserProfileAdapter extends RecyclerView.Adapter<UserProfileAdapter.
         public MyViewHolder(View itemView) {
             super(itemView);
             user_post_title=itemView.findViewById(R.id.user_post_title);
+            postTag = itemView.findViewById(R.id.user_post_tag);
             postBannerImage=(ImageView) itemView.findViewById(R.id.user_post_image);
             userName=(TextView)itemView.findViewById(R.id.userprofle_name);
             postTime=(TextView)itemView.findViewById(R.id.user_post_time);

@@ -345,10 +345,10 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
                 if (isChecked) {
-                    holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                    holder.buttonLikeList.setTextColor(ContextCompat.getColor(context,R.color.sqr));
                     int likeCount=Integer.parseInt(newsFeedStatus.getLike());
 //                        DrawableCompat.setTint(like.getDrawable(), ContextCompat.getColor(context,R.color.sqr));
-                    holder.buttonLikeList.setTextColor(context.getColor(R.color.sqr));
+                    holder.buttonLikeList.setTextColor(ContextCompat.getColor(context,R.color.sqr));
                     if(isAlreadyLikedFinal==1)
                         holder.buttonLikeList.setText(likeCount+" Like");
                     else
@@ -527,11 +527,11 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
                 @Override
                 public void onClick(View v) {
                     if (flag == 0) {
-                        buttonShare.setTextColor(context.getColor(R.color.sqr));
+                        buttonShare.setTextColor(ContextCompat.getColor(context,R.color.sqr));
                         flag = 1;
                     }
                     else {
-                        buttonShare.setTextColor(context.getColor(R.color.gray));
+                        buttonShare.setTextColor(ContextCompat.getColor(context,R.color.gray));
                         flag = 0;
                     }
                     shareIt();

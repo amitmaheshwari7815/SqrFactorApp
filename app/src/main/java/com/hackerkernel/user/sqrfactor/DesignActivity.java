@@ -147,6 +147,13 @@ public class DesignActivity extends ToolbarActivity implements PlaceSelectionLis
         if(!intent.hasExtra("Fab"))
         {
             toolbar.setVisibility(View.GONE);
+        }else {
+            toolbar.setVisibility(View.VISIBLE);
+        }
+
+        if( intent.hasExtra("Post_Slug_ID"))
+        {
+            toolbar.setVisibility(View.VISIBLE);
         }
 
         Intent intent1=getIntent();
