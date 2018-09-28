@@ -42,6 +42,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -85,14 +86,7 @@ public class SocialFormActivity extends AppCompatActivity {
         mobileNo = findViewById(R.id.user_mobile_number_text);
         country = findViewById(R.id.social_country_spinner);
         submit = findViewById(R.id.social_submit);
-        skip = findViewById(R.id.skip_button);
-        skip.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SocialFormActivity.this,HomeScreen.class);
-                startActivity(intent);
-            }
-        });
+
         uploadProfile = findViewById(R.id.upload_profile);
         uploadProfile.setOnClickListener(new View.OnClickListener() {
                                              @Override
@@ -288,9 +282,9 @@ public void submitDetails(){
 
                     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
-//                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
-////
-//                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
+                    File f = new File(android.os.Environment.getExternalStorageDirectory(), "temp.jpg");
+//
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(f));
 
                     startActivityForResult(intent, 1);
 

@@ -376,14 +376,19 @@ public class ProfileActivity extends ToolbarActivity {
     }
     public void LoadMoreDataFromServer(){
 
+        SharedPreferences mPrefs =getSharedPreferences("User",MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = mPrefs.getString("MyObject", "");
+        final UserClass userClass = gson.fromJson(json, UserClass.class);
+
         if(nextPageUrl!=null) {
-            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
             StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
                             Log.v("ReponseFeed", response);
-//                            Toast.makeText(context, response, Toast.LENGTH_LONG).show();
+//                            Toast.makeText(getApplicationContext(), response, Toast.LENGTH_LONG).show();
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
                                 nextPageUrl = jsonObject.getString("nextPage");

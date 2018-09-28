@@ -34,7 +34,7 @@ import java.util.Map;
 
 public class OTP_Verify extends AppCompatActivity {
     private Pinview pinview1;
-    private Button validate;
+    private Button validate,skip;
     private String otp;
     private TextView resendOTP;
     private UserClass userClass;
@@ -69,6 +69,14 @@ public class OTP_Verify extends AppCompatActivity {
             }
         });
         validate = (Button)findViewById(R.id.validate_button);
+        skip = findViewById(R.id.skip_button);
+        skip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(OTP_Verify.this,HomeScreen.class);
+                startActivity(intent);
+            }
+        });
         pinview1.setPinViewEventListener(new Pinview.PinViewEventListener() {
             @Override
             public void onDataEntered(Pinview pinview, boolean fromUser) {

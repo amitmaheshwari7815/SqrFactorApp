@@ -473,6 +473,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener,Goog
                     @Override
                     public void onResponse(String response) {
                         Log.v("Reponse", response);
+//                        MDToast.makeText(getApplicationContext(), "Check Your UserName/password field", MDToast.LENGTH_SHORT, MDToast.TYPE_ERROR).show();
                         try {
                             JSONObject jsonObject = new JSONObject(response);
 

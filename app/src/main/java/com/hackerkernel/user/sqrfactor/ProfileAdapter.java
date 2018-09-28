@@ -397,17 +397,21 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.MyViewHo
                                 context.startActivity(intent);
                                 break;
                             case R.id.editPost:
-                                if(profileClass.getType().equals("design"))
-                                {
-                                    context.startActivity(new Intent(context,DesignActivity.class));
-                                }
-                                else if(profileClass.getType().equals("article"))
-                                {
-                                    context.startActivity(new Intent(context,ArticleActivity.class));
-                                }
-                                else if(profileClass.getType().equals("status"))
-                                {
-                                    context.startActivity(new Intent(context,StatusPostActivity.class));
+                                if (profileClass.getType().equals("design")) {
+                                    Intent intent1 = new Intent(context, DesignActivity.class);
+                                    intent1.putExtra("Post_Slug_ID", profileClass.getSlug());
+                                    intent1.putExtra("Post_ID", profileClass.getPostId());
+                                    context.startActivity(intent1);
+                                } else if (profileClass.getType().equals("article")) {
+                                    Intent intent1 = new Intent(context, ArticleActivity.class);
+                                    intent1.putExtra("Post_Slug_ID", profileClass.getSlug());
+                                    intent1.putExtra("Post_ID", profileClass.getPostId());
+                                    context.startActivity(intent1);
+                                } else if (profileClass.getType().equals("status")) {
+                                    Intent intent1 = new Intent(context, StatusPostActivity.class);
+                                    intent1.putExtra("Post_Slug_ID", profileClass.getSlug());
+                                    intent1.putExtra("Post_ID", profileClass.getPostId());
+                                    context.startActivity(intent1);
                                 }
                                 break;
                             case R.id.deletePost:

@@ -575,7 +575,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener,Goo
                             Log.v("Reponse", response);
                             try {
                                 JSONObject jsonObject = new JSONObject(response);
-                                UserClass userClass = new UserClass(jsonObject);
+                                JSONObject user = jsonObject.getJSONObject("user");
+                                JSONObject activationToken = user.getJSONObject("activation_token");
+                                JSONObject userDeatil = activationToken.getJSONObject("user");
+                                UserClass userClass = new UserClass(userDeatil.getString("user_name"),userDeatil.getString("first_name"),userDeatil.getString("last_name"),userDeatil.getString("last_name"),
+                                        userDeatil.getInt("id"),userDeatil.getString("email"),userDeatil.getString("mobile_number"),userDeatil.getString("user_type"));
                                 // notification listner for like and comment
                                 FirebaseMessaging.getInstance().subscribeToTopic("pushNotifications" + userClass.getUserId());
                                 FirebaseMessaging.getInstance().subscribeToTopic("chats" + userClass.getUserId());

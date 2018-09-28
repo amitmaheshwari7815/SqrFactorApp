@@ -314,7 +314,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     public void LoadData() {
 
-        RequestQueue requestQueue2 = Volley.newRequestQueue(getApplicationContext());
+        RequestQueue requestQueue2 = Volley.newRequestQueue(this);
         if(userProfileClassArrayList!=null)
             userProfileClassArrayList.clear();
 
@@ -417,59 +417,66 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     public  void LoadMoreDataFromServer() {
-
-        RequestQueue requestQueue = Volley.newRequestQueue(context);
-        StringRequest myReq = new StringRequest(Request.Method.GET, nextPageUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.v("MorenewsFeedFromServer", response);
-                        //Toast.makeText(, response, Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response);
-                            UserProfileClass userProfileClass = new UserProfileClass(jsonObject);
-                            userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
-                            nextPageUrl=jsonObject.getString("nextPage");
-                            userProfileAdapter.notifyDataSetChanged();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                },
-                new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        NetworkResponse response = error.networkResponse;
-                        if (error instanceof ServerError && response != null) {
+        if (nextPageUrl != null) {
+            RequestQueue requestQueue = Volley.newRequestQueue(this);
+            StringRequest myReq = new StringRequest(Request.Method.POST, nextPageUrl,
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            Log.v("MorenewsFeedFromServer", response);
+                            //Toast.makeText(, response, Toast.LENGTH_LONG).show();
                             try {
-                                String res = new String(response.data,
-                                        HttpHeaderParser.parseCharset(response.headers, "utf-8"));
-                                // Now you can use any deserializer to make sense of data
-                                JSONObject obj = new JSONObject(res);
-                            } catch (UnsupportedEncodingException e1) {
-                                // Couldn't properly decode data to string
-                                e1.printStackTrace();
-                            } catch (JSONException e2) {
-                                // returned data is not JSONObject?
-                                e2.printStackTrace();
+                                JSONObject jsonObject = new JSONObject(response);
+                                UserProfileClass userProfileClass = new UserProfileClass(jsonObject);
+                                userProfileClassArrayList.addAll(userProfileClass.getPostDataClassArrayList());
+                                nextPageUrl = jsonObject.getString("nextPage");
+                                userProfileAdapter.notifyDataSetChanged();
+                            } catch (JSONException e) {
+                                e.printStackTrace();
                             }
                         }
 
-                    }
-                }) {
+                    },
+                    new Response.ErrorListener() {
 
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Accept", "application/json");
-                params.put("Authorization", "Bearer " + TokenClass.Token);
-                return params;
-            }
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            NetworkResponse response = error.networkResponse;
+                            if (error instanceof ServerError && response != null) {
+                                try {
+                                    String res = new String(response.data,
+                                            HttpHeaderParser.parseCharset(response.headers, "utf-8"));
+                                    // Now you can use any deserializer to make sense of data
+                                    JSONObject obj = new JSONObject(res);
+                                } catch (UnsupportedEncodingException e1) {
+                                    // Couldn't properly decode data to string
+                                    e1.printStackTrace();
+                                } catch (JSONException e2) {
+                                    // returned data is not JSONObject?
+                                    e2.printStackTrace();
+                                }
+                            }
 
-        };
+                        }
+                    }) {
 
-        requestQueue.add(myReq);
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("Accept", "application/json");
+                    params.put("Authorization", "Bearer " + TokenClass.Token);
+                    return params;
+                }
+                @Override
+                protected Map<String, String> getParams() throws AuthFailureError {
+                    Map<String, String> params = new HashMap<>();
+                    params.put("username", profileNameOfUser );
+                    return params;
+                }
+
+            };
+
+            requestQueue.add(myReq);
+        }
     }
 }

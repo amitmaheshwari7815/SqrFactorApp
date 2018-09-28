@@ -87,6 +87,8 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
         final UserClass userClass = gson.fromJson(json, UserClass.class);
         result = Integer.parseInt(newsFeedStatus.getComments());
 
+        Glide.with(context).load("https://archsqr.in/"+userClass.getProfile())
+                .into(holder.userProfile);
         if(userClass.getUserId()==newsFeedStatus.getUserId())
         {
             holder.red_menu.setVisibility(View.VISIBLE);
@@ -516,6 +518,7 @@ public class RedAdapter extends RecyclerView.Adapter<RedAdapter.MyViewHolder> {
             userComment = (EditText)itemView.findViewById(R.id.red_userComment);
             red_menu=(ImageView)itemView.findViewById(R.id.red_menu);
             commentProfile=(ImageView)itemView.findViewById(R.id.red_commenterProfile);
+            userProfile =(ImageView)itemView.findViewById(R.id.red_userProfile);
             commentMessage=itemView.findViewById(R.id.red_commentMsg);
             commentTime=itemView.findViewById(R.id.red_commentTime);
             commentUserName=itemView.findViewById(R.id.red_commentUserName);

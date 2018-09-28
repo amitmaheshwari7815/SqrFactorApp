@@ -75,7 +75,7 @@ public class Credits extends AppCompatActivity {
         portfolioCnt = (TextView) findViewById(R.id.profile_portfoliocnt);
         bluePrintCnt = (TextView) findViewById(R.id.profile_blueprintcnt);
 
-        profileName.setText(userClass.getName());
+        profileName.setText(userClass.getUser_name());
         followCnt.setText(userClass.getFollowerCount());
         followingCnt.setText(userClass.getFollowingCount());
         portfolioCnt.setText(userClass.getPortfolioCount());

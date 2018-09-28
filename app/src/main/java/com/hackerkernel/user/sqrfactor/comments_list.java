@@ -1,13 +1,25 @@
 package com.hackerkernel.user.sqrfactor;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class comments_list implements Serializable {
-    int id,from_user_id,commentLikeCount;
-    String body,from_user_user_name,from_user_name,from_user_first_name,from_user_last_name,from_user_profile,comment_date;
+    private int id,from_user_id,commentLikeCount;
+
+    private String body,from_user_user_name,from_user_name,from_user_first_name,from_user_last_name,from_user_profile,comment_date;
+    private ArrayList<commentLikeClass> commentLikeClassArrayList=new ArrayList<>();
+
+    public ArrayList<commentLikeClass> getCommentLikeClassArrayList() {
+        return commentLikeClassArrayList;
+    }
+
+    public void setCommentLikeClassArrayList(ArrayList<commentLikeClass> commentLikeClassArrayList) {
+        this.commentLikeClassArrayList = commentLikeClassArrayList;
+    }
 
     public int getId() {
         return id;
@@ -119,6 +131,14 @@ public class comments_list implements Serializable {
 
             JSONObject created_at=jsonObject.getJSONObject("created_at");
             this.comment_date=created_at.getString("date");
+
+
+            JSONArray likes=jsonObject.getJSONArray("likes");
+            for (int i=0;i<likes.length();i++)
+            {
+                commentLikeClass likeClass=new commentLikeClass(likes.getJSONObject(i));
+                commentLikeClassArrayList.add(likeClass);
+            }
 
 
         } catch (JSONException e) {
