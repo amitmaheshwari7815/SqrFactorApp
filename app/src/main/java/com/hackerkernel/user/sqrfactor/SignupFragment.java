@@ -394,7 +394,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener,Goo
                             }
 
 
-                            ArrayAdapter<String> spin_adapter1 = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, countryName);
+                            ArrayAdapter<String> spin_adapter1 = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_list_item_1, countryName);
                             userCountrySpinner.setAdapter(spin_adapter1);
 
                         } catch (JSONException e) {

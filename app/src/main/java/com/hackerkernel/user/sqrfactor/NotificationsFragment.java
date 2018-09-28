@@ -50,6 +50,7 @@ public class NotificationsFragment extends Fragment {
     private Button send;
     private boolean isLoading = false;
     private Context context;
+    PullRefreshLayout layout;
     public static DatabaseReference ref;
     public static FirebaseDatabase database;
     private String nextPageUrl;
@@ -109,7 +110,31 @@ public class NotificationsFragment extends Fragment {
             }
         });
 
+        layout = view.findViewById(R.id.notification_pullRefresh);
+        layout.setOnRefreshListener(new PullRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                //LoadNewsFeedDataFromServer();
+                //layout.setRefreshing(false);
+                layout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        layout.setRefreshing(false);
+                       NotificationLoad();
+                    }
+                },1000);
 
+            }
+        });
+
+
+        NotificationLoad();
+
+        return view;
+
+    }
+
+    public void NotificationLoad(){
         RequestQueue requestQueue = Volley.newRequestQueue(getActivity());
         StringRequest myReq = new StringRequest(Request.Method.POST, "https://archsqr.in/api/notifications",
                 new Response.Listener<String>() {
@@ -156,11 +181,7 @@ public class NotificationsFragment extends Fragment {
 
         requestQueue.add(myReq);
 
-
-        return view;
-
     }
-
     public void LoadMoreNotification() {
         if (nextPageUrl != null) {
             RequestQueue requestQueue = Volley.newRequestQueue(getActivity());

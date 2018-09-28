@@ -28,6 +28,7 @@ try {
     this.numberOf_post = jsonObject.getString("no_of_posts");
 
     JSONObject user = jsonObject.getJSONObject("user");
+    this.id = user.getString("id");
     this.name = user.getString("name");
     this.first_name = user.getString("first_name");
     this.last_name = user.getString("last_name");
